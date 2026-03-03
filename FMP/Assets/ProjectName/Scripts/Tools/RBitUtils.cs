@@ -5,6 +5,9 @@ namespace RBitUtils
     using UnityEngine;
     public static class Misc
     {
+        /// <summary>
+        /// Check if a variable has changed since the last callback (using a buffer var) and if it has, invoke a callback.
+        /// </summary>
         public static void CheckChange<T>(this T self, ref T other, Action callback)
         {
             if (!self.Equals(other))
@@ -14,11 +17,20 @@ namespace RBitUtils
             }
         }
 
+        /// <summary>
+        /// Check if a layermask contains a GameObject's layer
+        /// </summary>
         public static bool Contains(this LayerMask mask, GameObject gameObject)
         {
             return (mask & (1 << gameObject.layer)) != 0;
         }
 
+        /// <summary>
+        /// Checks if an array has no items or only nulls.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="self"></param>
+        /// <returns></returns>
         public static bool IsEmpty<T>(this T[] self)
         {
             if (self.Length == 0) return true;
@@ -209,6 +221,9 @@ namespace RBitUtils
 
         public static Vector3 xz(this Vector2 v, float y) => new(v.x, y, v.y);
 
+        /// <summary>
+        /// Multiplies two vectors componentwise. (Some fucking idiot decided Vector.Scale should be in-place)
+        /// </summary>
         public static Vector2 Scaled(
             this Vector2 v, Vector2 other)
         {
@@ -223,11 +238,23 @@ namespace RBitUtils
             return v;
         }
 
+        /// <summary>
+        /// Divides a vector by another componentwise.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public static Vector3 DivideBy(
             this Vector3 v, Vector3 other) => new(v.x / other.x, v.y / other.y, v.z / other.z);
         public static Vector2 DivideBy(
             this Vector2 v, Vector2 other) => new(v.x / other.x, v.y / other.y);
 
+        /// <summary>
+        /// Apply a float function to the components of a vector.
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <param name="func"></param>
+        /// <returns></returns>
         public static Vector2 Distribute(this Vector2 vec, Func<float, float> func) => new Vector2(func(vec.x), func(vec.y));
         public static Vector3 Distribute(this Vector3 vec, Func<float, float> func) => new Vector3(func(vec.x), func(vec.y), func(vec.z));
     }

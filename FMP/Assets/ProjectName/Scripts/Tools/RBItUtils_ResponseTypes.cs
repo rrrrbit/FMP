@@ -150,7 +150,6 @@ namespace RBitUtils
 			}
 		}
 		
-
 		public class AdaptiveStepV3
 		{
 			private float timer;

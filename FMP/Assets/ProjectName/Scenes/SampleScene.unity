@@ -590,7 +590,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 3
-  startingNumber: 50
+  startingNumber: 10
   desiredDistance: 2
 --- !u!4 &884068266
 Transform:

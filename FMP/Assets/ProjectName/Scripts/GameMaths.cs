@@ -48,7 +48,7 @@ public class GameMaths : MonoBehaviour
 			foreach (Node j in nodes)
             {
 				var x = Random.value * 2 - 1;
-				newRow.Add(j, Mathf.Pow(x, 5)*10);
+				newRow.Add(j, Mathf.Pow(x, 5));
 			}
 
             nn.Add(i, newRow);
@@ -98,7 +98,7 @@ public class GameMaths : MonoBehaviour
 	{
 		if(i == j) return;
 
-		var symmetricWeight = (Mathf.Abs(nn[i][j]) + Mathf.Abs(nn[j][i])) / maxAbs / 2;
+		var symmetricWeight = Mathf.Abs(nn[i][j]) / maxAbs / 2;
 
 		Vector3 d = j.visual.transform.position - i.visual.transform.position;
 
@@ -115,9 +115,9 @@ public class GameMaths : MonoBehaviour
 			drag
 		;
 
-		//Vector3 newV = i.visual.v + force * dt;
-		//i.visual.v = Mathf.Min(newV.magnitude, 100) * newV.normalized;
-		i.visual.v += force * dt;
+		Vector3 newV = i.visual.v + force * dt;
+		i.visual.v = Mathf.Min(newV.magnitude, 100) * newV.normalized;
+		//i.visual.v += force * dt;
 
 		
 	}

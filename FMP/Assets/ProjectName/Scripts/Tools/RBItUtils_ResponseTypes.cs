@@ -3,7 +3,6 @@ namespace RBitUtils
 	namespace ResponseTypes
 	{
 		using System;
-		using Unity.VisualScripting.FullSerializer;
 		using UnityEngine;
 		/// <summary>
 		/// Update an output value y based on an input value x with respect to timestep.

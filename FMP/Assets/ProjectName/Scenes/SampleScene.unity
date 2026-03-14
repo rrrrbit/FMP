@@ -382,8 +382,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 1090519039
+  m_fontColor: {r: 1, g: 1, b: 1, a: 0.2509804}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -549,8 +549,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9e9c01767332ab4c8204b5bd86332cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  centeringStrength: 0.25
-  dragStrength: 0.25
+  centeringStrength: 2
+  dragStrength: 5
   max: 0.25
   min: 0
   maxAbs: 0
@@ -590,7 +590,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 3
-  startingNumber: 10
+  startingNumber: 50
   desiredDistance: 2
 --- !u!4 &884068266
 Transform:

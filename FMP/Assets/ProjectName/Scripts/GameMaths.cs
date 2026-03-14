@@ -67,7 +67,7 @@ public class GameMaths : MonoBehaviour
 			Vector3 force = Vector3.zero;
 			foreach (Node j in nodes)
 			{
-				force += PairwiseForce(i, j, desiredDistance + i.visual.transform.localScale.x - 0.25f);
+				force += PairwiseForce(i, j, desiredDistance);
 
 				//debug edge visualisation
 				float gap = 0.01f;
@@ -98,16 +98,18 @@ public class GameMaths : MonoBehaviour
 		minIndegree = nodes.Min(i => nn[i].Values.Sum(x => Mathf.Abs(x)));
 	}
 
-	Vector3 PairwiseForce(Node i, Node j, float desiredDistance)
+	Vector3 PairwiseForce(Node i, Node j, float idealLength)
 	{
 		if (i == j) return Vector3.zero;
 
 		float symmetricWeight = Mathf.Abs(nn[i][j]) / maxAbs / 2;
+  float idealLengthWithRadii = i.visual.transform.localScale.x +
+j.visual.transform.localScale.x + idealLength
 
 		Vector3 d = j.visual.transform.position - i.visual.transform.position;
 
-		Vector3 repulsion = desiredDistance * desiredDistance / (d.magnitude + 0.01f) * -d.normalized;
-		Vector3 attraction = d.sqrMagnitude / desiredDistance * d.normalized * symmetricWeight;
+		Vector3 repulsion = idealLengthWithRadii * idealLengthWithRadii / (d.magnitude + 0.01f) * -d.normalized;
+		Vector3 attraction = d.sqrMagnitude / idealLengthWithRadii * d.normalized * symmetricWeight;
 
 		return attraction + repulsion;
 	}

@@ -257,7 +257,16 @@ namespace RBitUtils
         /// <returns></returns>
         public static Vector2 Distribute(this Vector2 vec, Func<float, float> func) => new Vector2(func(vec.x), func(vec.y));
         public static Vector3 Distribute(this Vector3 vec, Func<float, float> func) => new Vector3(func(vec.x), func(vec.y), func(vec.z));
-    }
+    
+		public static Vector3 ClampLength(this Vector3 v, float maxLength)
+		{
+			if (v.sqrMagnitude > maxLength * maxLength)
+			{
+				return v.normalized * maxLength;
+			}
+			return v;
+		}
+	}
 
     public static class DebugPlus
     {

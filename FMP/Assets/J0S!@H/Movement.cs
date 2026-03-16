@@ -1,38 +1,83 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
+using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
+using System.Linq;
 
-public class PlayerMovement : MonoBehaviour
+public class Idea : MonoBehaviour
 {
+    public Dictionary<Node, Dictionary<Node, float>> nn;
+    public float influence;
+    public float sumAbs;
+    public float maxIndegree;
+    public float min;
+    public float dragStrength;
+    public float max;
+    public float maxIndegree;
+    public float minIndegree;
+    public float CenteringStrength;
+    public float CenteringSpeed;
+    public float 
 
-    [SerializeField] Rigidbody idea;
-    public float moveSpeed;
-    float xInput, yInput;
-    Vector2 input;
-    public float speed = 5;
+    public Node[] nodes;
+    public TextMeshPro debugText;
 
-    void Start()
+    public VisualNode visualNodePrefab;
+    
+      public Gradient gradient;
+
+    public int StartingNumber;
+    public float desiredDistance = 10f;
+
+    private void Start()
     {
+        nodes = new Node[StartingNumber];
+        for ( int i = 0; 1 < nodes.Length i++)
+        {
+            var thisNode = new Node();
+            nodes[i] = thisNode;
+            thisNode.visual = Instantiate(visualNodePrefab, Random.insideUnitCircle, Quaternion.identity);
 
+        }
     }
 
-    void Update()
-    {
-        idea.AddForce(input * speed);
-    }
+
 
     private void FixedUpdate()
     {
-        xInput = Input.GetAxis("Horizontal");
-        xInput = Input.GetAxis("Vertical");
+        foreach (Node i in nodes)
+        {
+            i.Indegree = nn[1].Values.Sum(x => Mathf.Abs(x));
 
-        transform.Translate(xInput * moveSpeed, yInput * moveSpeed,0f);
+
+
+
+
+
+
+        }
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
-    public void Move(InputAction.CallbackContext context)
-    {
-        input = context.ReadValue<Vector2>();
-    }
-
-
+}
 
 
 

@@ -93,17 +93,17 @@ public class GameMaths : MonoBehaviour
 	}
 	private void FixedUpdate()
 	{
-		foreach (Node i in nodes)
+		foreach (Node i in nodes)// calculate forces
 		{
 			i.outdegree = nn.Values.Sum(x => Mathf.Abs(x[i]));
 			i.visual.transform.localScale = sizeByIndegree.Evaluate(i.outdegree) * Vector3.one;
 			i.visual.outdegree = i.outdegree;
 			i.visual.connections = nn[i].Values.ToList();
 
-			Vector3 force = Vector3.zero;
+			i.visual.a = Vector3.zero;
 			foreach (Node j in nodes)
 			{
-				force += PairwiseForce(i, j, padding);
+				i.visual.a += PairwiseForce(i, j, padding);
 
 				//debug edge visualisation
 				float gap = 0.01f;
@@ -111,15 +111,18 @@ public class GameMaths : MonoBehaviour
 				Vector3 offs = new(d.y, -d.x, 0);
 				Debug.DrawLine(i.visual.transform.position + offs * gap + d * i.visual.transform.localScale.x/2, j.visual.transform.position + offs * gap - d * j.visual.transform.localScale.x / 2, edgeColourGradient.Evaluate((nn[i][j] - min) / (max - min)));
 			}
-			force += NodewiseForce(i);
+			i.visual.a += NodewiseForce(i);
+		}
 
-			if (!float.IsFinite(force.sqrMagnitude))
+		foreach (Node i in nodes)// integrate
+		{
+			if (!float.IsFinite(i.visual.a.sqrMagnitude))
 			{
 				print("Caught infinite force");
-				force = force.WithMag(1000);
+				i.visual.a = i.visual.a.WithMag(1000);
 			}
 
-			i.visual.v += force.ClampLength(1000) * Time.fixedDeltaTime;
+			i.visual.v += i.visual.a.ClampLength(1000) * Time.fixedDeltaTime;
 			if (!float.IsFinite(i.visual.v.sqrMagnitude))
 			{
 				print("Caught infinite velocity");

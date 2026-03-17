@@ -266,6 +266,10 @@ namespace RBitUtils
 			}
 			return v;
 		}
+
+		public static Vector3 WithMag(this Vector3 v, float mag) {
+			return v.normalized * mag;
+		}
 	}
 
     public static class DebugPlus

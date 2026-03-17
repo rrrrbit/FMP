@@ -9,23 +9,45 @@ using UnityEngine.InputSystem.Utilities;
 
 public class GameMaths : MonoBehaviour
 {
+	[Header("Misc")]
 	public int startingNumber;
-	public float desiredDistance = 10f;
+	public AnimationCurve sizeByIndegree;
+	public Gradient edgeColourGradient;
+	[Header("Forces")]
+	public float padding = 10f;
+	public bool useScale = true;
+	public bool normaliseWeights = true;
+	public bool symmetriseWeights = true;
+	[Space]
 	public float centeringStrength;
 	public float dragStrength;
-	public AnimationCurve sizeOverIndegree;
-	public Gradient edgeColourGradient;
-	public float attractionForce = 2;
-	public float repulsionForce = 100;
 	public float clusterStrength = 1;
-
 	[Space]
+	public float attractionStrength = 2;
+	public AnimationCurve attractionByWeight;
+	public enum AttractionTypes 
+	{ 
+		Linear,
+		Log,
+		Quadratic, 
+	}
+	public AttractionTypes attractionType;
+	[Space]
+	public float repulsionStrength = 100;
+	public enum RepulsionTypes 
+	{
+		Reciprocal,
+		InverseSqr,
+	}
+	public RepulsionTypes repulsionType;
+
+	[Header("Statistics")]
 	public float max;
 	public float min;
 	public float maxAbs;
 	public float sumAbs;
 	public float maxOutdegree;
-	[Space]
+	[Header("Runtime & Refs")]
 
 	public Dictionary<Node, Dictionary<Node, float>> nn;
 	public Node[] nodes;
@@ -74,14 +96,14 @@ public class GameMaths : MonoBehaviour
 		foreach (Node i in nodes)
 		{
 			i.outdegree = nn.Values.Sum(x => Mathf.Abs(x[i]));
-			i.visual.transform.localScale = sizeOverIndegree.Evaluate(i.outdegree / maxOutdegree) * Vector3.one;
+			i.visual.transform.localScale = sizeByIndegree.Evaluate(i.outdegree) * Vector3.one;
 			i.visual.outdegree = i.outdegree;
 			i.visual.connections = nn[i].Values.ToList();
 
 			Vector3 force = Vector3.zero;
 			foreach (Node j in nodes)
 			{
-				force += PairwiseForce(i, j, desiredDistance);
+				force += PairwiseForce(i, j, padding);
 
 				//debug edge visualisation
 				float gap = 0.01f;
@@ -91,32 +113,85 @@ public class GameMaths : MonoBehaviour
 			}
 			force += NodewiseForce(i);
 
-			if(!float.IsFinite(force.sqrMagnitude)) force = Vector3.zero;
+			if (!float.IsFinite(force.sqrMagnitude))
+			{
+				print("Caught infinite force");
+				force = force.WithMag(1000);
+			}
 
 			i.visual.v += force.ClampLength(1000) * Time.fixedDeltaTime;
-			if (!float.IsFinite(i.visual.v.sqrMagnitude)) i.visual.v = Vector3.zero;
+			if (!float.IsFinite(i.visual.v.sqrMagnitude))
+			{
+				print("Caught infinite velocity");
+				i.visual.v = i.visual.v.WithMag(1000);
+			}
 
 			i.visual.transform.position += i.visual.v.ClampLength(1000) * Time.fixedDeltaTime;
-			if (!float.IsFinite(i.visual.transform.position.sqrMagnitude)) i.visual.transform.position = Vector3.zero;
+			if (!float.IsFinite(i.visual.transform.position.sqrMagnitude))
+			{
+				print("Caught infinite position");
+				i.visual.transform.position = Vector3.zero;
+			}
 		}
 	}
 
 
-	Vector3 PairwiseForce(Node i, Node j, float idealLength)
+	Vector3 PairwiseForce(Node i, Node j, float padding)
 	{
 		if (i == j) return Vector3.zero;
 
-		float w = Mathf.Pow((Mathf.Abs(nn[i][j])) / 2 / maxAbs, 2);
+		float w;
+		if (symmetriseWeights)
+		{
+			w = (Mathf.Abs(nn[i][j]) + Mathf.Abs(nn[j][i])) / 2;
+		}
+		else
+		{
+			w = Mathf.Abs(nn[i][j]);
+		}
 
+		if(normaliseWeights)
+		{
+			w /= maxAbs;
+		}
 
 		Vector3 dv = (j.visual.transform.position - i.visual.transform.position).normalized;
-		float d = (j.visual.transform.position - i.visual.transform.position).magnitude;
-		float contactDistance = (i.visual.transform.localScale.x + j.visual.transform.localScale.x) / 2;
+		float distance = (j.visual.transform.position - i.visual.transform.position).magnitude;
+		float radii = (i.visual.transform.localScale.x + j.visual.transform.localScale.x) / 2;
+		float d = Mathf.Max(distance - padding - radii * (useScale ? 1 : 0), 0.01f);
 
-		Vector3 attraction = (attractionForce * w * (d - contactDistance - idealLength)) * dv;
-		Vector3 repulsion = repulsionForce / Mathf.Max(d - contactDistance, 0.01f) * -dv;
+		return (
+			RawAttraction(d) * attractionStrength * attractionByWeight.Evaluate(w) - 
+			RawRepulsion(d) * repulsionStrength
+			) * dv;
+	}
 
-		return attraction + repulsion;
+	float RawAttraction(float d)
+	{
+		switch (attractionType)
+		{
+			case AttractionTypes.Linear:
+				return d;
+			case AttractionTypes.Log:
+				return Mathf.Log(d + 1);
+			case AttractionTypes.Quadratic:
+				return d * d;
+			default:
+				return 0;
+		}
+	}
+
+	float RawRepulsion(float d)
+	{
+		switch (repulsionType)
+		{
+			case RepulsionTypes.Reciprocal:
+				return 1 / d;
+			case RepulsionTypes.InverseSqr:
+				return 1 / (d * d);
+			default:
+				return 0;
+		}
 	}
 
 	Vector3 NodewiseForce(Node i)

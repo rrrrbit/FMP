@@ -550,26 +550,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingNumber: 50
-  desiredDistance: 0
-  centeringStrength: 100
-  dragStrength: 5
-  sizeOverIndegree:
+  sizeByIndegree:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0.25
-      inSlope: 1.75
-      outSlope: 1.75
+      inSlope: 0.0975
+      outSlope: 0.0975
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 1
-      value: 2
-      inSlope: 1.75
-      outSlope: 1.75
+      time: 100
+      value: 10
+      inSlope: 0.0975
+      outSlope: 0.0975
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -607,15 +604,147 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 5
-  attractionForce: 100
-  repulsionForce: 20
-  max: 0
-  min: 0
-  maxAbs: 0
-  sumAbs: 0
-  maxIndegree: 0
-  minIndegree: 0
-  nodes: []
+  padding: 5
+  useScale: 1
+  normaliseWeights: 0
+  symmetriseWeights: 1
+  centeringStrength: 100
+  dragStrength: 1
+  clusterStrength: 0
+  attractionStrength: 1
+  attractionByWeight:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 5
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  attractionType: 0
+  repulsionStrength: 100
+  repulsionType: 0
+  max: 9.803921
+  min: -9.90365
+  maxAbs: 9.90365
+  sumAbs: 1899.9526
+  maxOutdegree: 74.739235
+  nodes:
+  - visual: {fileID: 0}
+    outdegree: 23.61235
+  - visual: {fileID: 0}
+    outdegree: 23.505823
+  - visual: {fileID: 0}
+    outdegree: 22.447031
+  - visual: {fileID: 0}
+    outdegree: 29.376497
+  - visual: {fileID: 0}
+    outdegree: 42.476334
+  - visual: {fileID: 0}
+    outdegree: 32.826687
+  - visual: {fileID: 0}
+    outdegree: 42.419014
+  - visual: {fileID: 0}
+    outdegree: 32.50435
+  - visual: {fileID: 0}
+    outdegree: 50.285873
+  - visual: {fileID: 0}
+    outdegree: 41.995533
+  - visual: {fileID: 0}
+    outdegree: 49.001865
+  - visual: {fileID: 0}
+    outdegree: 53.677937
+  - visual: {fileID: 0}
+    outdegree: 19.272009
+  - visual: {fileID: 0}
+    outdegree: 35.60318
+  - visual: {fileID: 0}
+    outdegree: 51.81109
+  - visual: {fileID: 0}
+    outdegree: 21.044294
+  - visual: {fileID: 0}
+    outdegree: 45.339283
+  - visual: {fileID: 0}
+    outdegree: 56.800545
+  - visual: {fileID: 0}
+    outdegree: 17.482044
+  - visual: {fileID: 0}
+    outdegree: 59.707092
+  - visual: {fileID: 0}
+    outdegree: 20.485355
+  - visual: {fileID: 0}
+    outdegree: 54.513912
+  - visual: {fileID: 0}
+    outdegree: 39.28272
+  - visual: {fileID: 0}
+    outdegree: 20.710659
+  - visual: {fileID: 0}
+    outdegree: 27.484913
+  - visual: {fileID: 0}
+    outdegree: 32.90939
+  - visual: {fileID: 0}
+    outdegree: 74.739235
+  - visual: {fileID: 0}
+    outdegree: 47.69303
+  - visual: {fileID: 0}
+    outdegree: 39.566013
+  - visual: {fileID: 0}
+    outdegree: 49.920635
+  - visual: {fileID: 0}
+    outdegree: 65.72831
+  - visual: {fileID: 0}
+    outdegree: 38.392902
+  - visual: {fileID: 0}
+    outdegree: 38.691822
+  - visual: {fileID: 0}
+    outdegree: 26.089098
+  - visual: {fileID: 0}
+    outdegree: 29.135406
+  - visual: {fileID: 0}
+    outdegree: 41.139824
+  - visual: {fileID: 0}
+    outdegree: 24.926605
+  - visual: {fileID: 0}
+    outdegree: 28.016323
+  - visual: {fileID: 0}
+    outdegree: 46.420956
+  - visual: {fileID: 0}
+    outdegree: 41.42016
+  - visual: {fileID: 0}
+    outdegree: 32.602673
+  - visual: {fileID: 0}
+    outdegree: 39.84747
+  - visual: {fileID: 0}
+    outdegree: 33.520496
+  - visual: {fileID: 0}
+    outdegree: 44.233356
+  - visual: {fileID: 0}
+    outdegree: 26.966246
+  - visual: {fileID: 0}
+    outdegree: 32.632362
+  - visual: {fileID: 0}
+    outdegree: 39.305622
+  - visual: {fileID: 0}
+    outdegree: 33.640747
+  - visual: {fileID: 0}
+    outdegree: 48.762352
+  - visual: {fileID: 0}
+    outdegree: 29.985228
   debugText: {fileID: 767006260}
   visualNodePrefab: {fileID: 1297033350721654513, guid: e4227e8697f29a146bcde6987d96a048, type: 3}
 --- !u!4 &884068266

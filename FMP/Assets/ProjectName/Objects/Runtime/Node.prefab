@@ -78,7 +78,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -100,6 +100,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fe4c0886a59a7a44a18a91820025c46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  a: {x: 0, y: 0, z: 0}
   v: {x: 0, y: 0, z: 0}
-  indegree: 0
+  node:
+    visual: {fileID: 0}
+    outdegree: 0
+  gameMaths: {fileID: 0}
+  outdegree: 0
   connections: []

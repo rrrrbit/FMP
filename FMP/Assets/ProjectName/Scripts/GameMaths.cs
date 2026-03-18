@@ -11,6 +11,7 @@ public class GameMaths : MonoBehaviour
 {
 	[Header("Misc")]
 	public int startingNumber;
+	public float lineGap = 0;
 	public AnimationCurve sizeByIndegree;
 	public Gradient edgeColourGradient;
 	[Header("Forces")]
@@ -56,19 +57,21 @@ public class GameMaths : MonoBehaviour
 
 	private void Start()
 	{
-		//initialise list of all nodes
+		// initialise list of all nodes
 		nodes = new Node[startingNumber];
+
 		for (int i = 0; i < nodes.Length; i++)
 		{
 			Node thisNode = new Node();
 			nodes[i] = thisNode;
-			thisNode.visual = Instantiate(visualNodePrefab, Random.insideUnitCircle, Quaternion.identity);
+			thisNode.visual = Instantiate(visualNodePrefab, Random.insideUnitCircle, Quaternion.identity); // create gameobject for this node
 			thisNode.visual.node = thisNode;
 			thisNode.visual.gameMaths = this;
 		}
 
-		//initialise nn matrix with random weights
+		// initialise 2d dictionary with random weights
 		nn = new Dictionary<Node, Dictionary<Node, float>>();
+
 		foreach (Node i in nodes)
 		{
 			Dictionary<Node, float> newRow = new Dictionary<Node, float>();
@@ -93,24 +96,26 @@ public class GameMaths : MonoBehaviour
 	}
 	private void FixedUpdate()
 	{
-		foreach (Node i in nodes)// calculate forces
+		foreach (Node i in nodes) // calculate forces
 		{
 			i.outdegree = nn.Values.Sum(x => Mathf.Abs(x[i]));
+
 			i.visual.transform.localScale = sizeByIndegree.Evaluate(i.outdegree) * Vector3.one;
 			i.visual.outdegree = i.outdegree;
 			i.visual.connections = nn[i].Values.ToList();
 
 			i.visual.a = Vector3.zero;
+
 			foreach (Node j in nodes)
 			{
 				i.visual.a += PairwiseForce(i, j, padding);
 
 				//debug edge visualisation
-				float gap = 0.01f;
 				Vector3 d = (j.visual.transform.position - i.visual.transform.position).normalized;
 				Vector3 offs = new(d.y, -d.x, 0);
-				Debug.DrawLine(i.visual.transform.position + offs * gap + d * i.visual.transform.localScale.x/2, j.visual.transform.position + offs * gap - d * j.visual.transform.localScale.x / 2, edgeColourGradient.Evaluate((nn[i][j] - min) / (max - min)));
+				Debug.DrawLine(i.visual.transform.position + offs * lineGap + d * i.visual.transform.localScale.x/2, j.visual.transform.position + offs * lineGap - d * j.visual.transform.localScale.x / 2, edgeColourGradient.Evaluate((nn[i][j] - min) / (max - min)));
 			}
+
 			i.visual.a += NodewiseForce(i);
 		}
 
@@ -122,7 +127,7 @@ public class GameMaths : MonoBehaviour
 				i.visual.a = i.visual.a.WithMag(1000);
 			}
 
-			i.visual.v += i.visual.a.ClampLength(1000) * Time.fixedDeltaTime;
+			i.visual.v += i.visual.a.ClampLength(1000)/i.visual.transform.localScale.x/ i.visual.transform.localScale.x * Time.fixedDeltaTime;
 			if (!float.IsFinite(i.visual.v.sqrMagnitude))
 			{
 				print("Caught infinite velocity");
@@ -159,6 +164,7 @@ public class GameMaths : MonoBehaviour
 		}
 
 		Vector3 dv = (j.visual.transform.position - i.visual.transform.position).normalized;
+
 		float distance = (j.visual.transform.position - i.visual.transform.position).magnitude;
 		float radii = (i.visual.transform.localScale.x + j.visual.transform.localScale.x) / 2;
 		float d = Mathf.Max(distance - padding - radii * (useScale ? 1 : 0), 0.01f);
@@ -194,7 +200,7 @@ public class GameMaths : MonoBehaviour
 				return 1 / (d * d);
 			default:
 				return 0;
-		}
+		}  
 	}
 
 	Vector3 NodewiseForce(Node i)

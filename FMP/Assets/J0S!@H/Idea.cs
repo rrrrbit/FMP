@@ -19,6 +19,7 @@ public class Idea : MonoBehaviour
     public float CenteringStrength;
     public float CenteringSpeed;
     public float maxOutDegree;
+    public float Indegree;
     [Header("Go and Influence")]
 
     public Dictionary<Node, Dictionary<Node, float[]>> influences;
@@ -72,7 +73,7 @@ public class Idea : MonoBehaviour
         foreach (Node i in nodes)
         {
             i.outdegree = nn[i].Values.Sum(x => Mathf.Abs(x));
-
+            i.visual.transform.localScale = ( 1 + 4 * (i.indigree - minIndegree) / (maxIndegree - minIndegree) );
 
 
 
@@ -150,4 +151,3 @@ public class Idea : MonoBehaviour
 
 
 
-}

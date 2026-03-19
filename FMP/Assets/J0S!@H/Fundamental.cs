@@ -6,56 +6,54 @@ using NUnit.Framework;
 using UnityEngine.Rendering;
 
 
-public class VisualNode : MonoBehaviour
-{    
-    
+public class Fundamental : MonoBehaviour
+{
+
+    private void Start()
+    {
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    private void Update()
+    {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
     [Header("Clarification")]
-    public VisualNode[]
+    public VisualNode[] nameThisArray;
     public Vector3 Nodes;
     public Node Node;
     public float Outdegree;
-    public float Instantiate;
+    public new float Instantiate;
     public List<float>
-   
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -69,3 +67,43 @@ public class VisualNode : MonoBehaviour
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

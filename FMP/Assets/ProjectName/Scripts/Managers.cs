@@ -10,7 +10,6 @@ public class Managers : MonoBehaviour
 	{
 		DontDestroyOnLoad(gameObject);
 		Instance = this;
-		print(Instance);
 
 		Register<MGR_gameMaths>(GetComponent<MGR_gameMaths>());
 		Register<IGraphView>(GetComponent<MGR_graphView>());

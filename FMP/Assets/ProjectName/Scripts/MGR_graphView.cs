@@ -40,17 +40,18 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	}
 	public RepulsionTypes repulsionType;
 	[Header("Runtime & Refs")]
-	public AdjacencyDictionary graph;
-	HashSet<VisualNode> visualNodes;
 	public VisualNode visualNodePrefab;
+	public int nodeCount;
 	MGR_gameMaths gameMaths;
-	public Dictionary<Node, float> outdegrees;
-	public Dictionary<Node, Vector3> pos;
+	AdjacencyMtx graph;
+	VisualNode[] obj;
+	Vector2[] p, v, a;
+	float[] r;
 
 	private void Awake()
 	{
 		gameMaths = Managers.Get<MGR_gameMaths>();
-		gameMaths.OnReadyForVisualisation += InstantiateVisualNodes;
+		gameMaths.OnReadyForVisualisation += Init;
 	}
 
 	private void Update()
@@ -63,79 +64,83 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 		
 	}
 
-	void InstantiateVisualNodes()
+	void Init()
 	{
-		visualNodes = new HashSet<VisualNode>();
 		graph = gameMaths.nn;
-		foreach (Node i in graph.nodes)
-		{
-			i.visual = Instantiate(visualNodePrefab);
-			i.visual.node = i;
-			i.visual.transform.position = Random.insideUnitCircle * 1;
-			print("created new visualNode");
-		}
-		outdegrees = new();
-		visualNodes = graph.nodes.Select(x => x.visual).ToHashSet();
+		nodeCount = graph.nodes.Count;
+		obj = new VisualNode[nodeCount];
+		p = new Vector2[nodeCount];
+		v = new Vector2[nodeCount];
+		a = new Vector2[nodeCount];
+		r = new float[nodeCount];
+
+        for (int i = 0; i < obj.Length; i++)
+        {
+			obj[i] = Instantiate(visualNodePrefab);
+			p[i] = Random.insideUnitCircle * 1;
+			v[i] = Vector2.zero;
+			a[i] = Vector2.zero;
+			r[i] = sizeByOutdegree.Evaluate(graph.GetOutdegree(i));
+        }
 	}
 
 	void UpdateView(float dt)
 	{
-		float minWeight = graph.minWeight;
-		float maxWeight = graph.maxWeight;
-		float maxAbsWeight = graph.maxAbsWeight;
-		float sumAbsWeight = graph.sumAbsWeight;
+        for (int i = 0; i < nodeCount; i++) // nodewise forces and some calcs
+        {
+            r[i] = sizeByOutdegree.Evaluate(graph.GetOutdegree(i));
+            a[i] = Vector3.zero;
+            a[i] += NodewiseForce(i, graph.sumAbsWeight);
+        }
 
-		outdegrees = graph.nodes.ToDictionary(x => x, x => graph.GetOutdegree(x));
-		pos = graph.nodes.ToDictionary(x => x, x => x.visual.transform.position);
-		foreach (VisualNode i in visualNodes) // calculate forces
-		{
-			i.radius = sizeByOutdegree.Evaluate(outdegrees[i]);
+        for (int i = 0; i < graph.mtx.Rows(); i++) // pairwise forces
+        {
+			
+            for (int j = 0; j < graph.mtx.Cols(); j++)
+            {
+                float ij = graph.mtx[i, j];
+                float ji = graph.mtx[j, i];
+                Vector2 d = p[j] - p[i];
+                Vector2 dn = d.normalized;
 
-			i.a = Vector3.zero;
+                if (i == j) continue;
+                a[i] += PairwiseForce(i, j, d, ij, ji, padding, graph.maxAbsWeight);
 
-			foreach (VisualNode j in visualNodes)
-			{
-				float ij = graph.dict[i][j];
-				float ji = graph.dict[j][i];
-				Vector3 d = (pos[j] - pos[i]);
-				Vector3 dn = d.normalized;
+                //debug edge visualisation
+                Vector2 offs = new(dn.y, -dn.x);
+				Debug.DrawLine(p[i] + offs * lineGap + dn * r[i], p[j] + offs * lineGap - dn * r[j], edgeColourGradient.Evaluate((ij - graph.minWeight) / (graph.maxWeight - graph.minWeight)));
+            }
+			
+        }
+        for (int i = 0; i < nodeCount; i++) // integrate
+        {
+            if (!float.IsFinite(a[i].sqrMagnitude))
+            {
+                print("Caught infinite force");
+                a[i] = a[i].WithMag(1000);
+            }
 
-				if (i == j) continue;
-				i.a += PairwiseForce(i, j, d, ij, ji, padding, maxAbsWeight);
+            v[i] += a[i].ClampLength(1000) * dt;
+            if (!float.IsFinite(v[i].sqrMagnitude))
+            {
+                print("Caught infinite velocity");
+                v[i] = v[i].WithMag(1000);
+            }
 
-				//debug edge visualisation
-				Vector3 offs = new(dn.y, -dn.x, 0);
-				Debug.DrawLine(i.transform.position + offs * lineGap + dn * i.radius, pos[j] + offs * lineGap - dn * j.radius, edgeColourGradient.Evaluate((ij - minWeight) / (maxWeight - minWeight)));
-			}
+			p[i] += v[i].ClampLength(1000) * dt;
+            if (!float.IsFinite(p[i].sqrMagnitude))
+            {
+                print("Caught infinite position");
+                p[i] = Vector3.zero;
+            }
 
-			i.a += NodewiseForce(i, sumAbsWeight);
-		}
-
-		foreach (VisualNode i in visualNodes)// integrate
-		{
-			if (!float.IsFinite(i.a.sqrMagnitude))
-			{
-				print("Caught infinite force");
-				i.a = i.a.WithMag(1000);
-			}
-
-			i.v += i.a.ClampLength(1000) * dt;
-			if (!float.IsFinite(i.v.sqrMagnitude))
-			{
-				print("Caught infinite velocity");
-				i.v = i.v.WithMag(1000);
-			}
-
-			i.transform.position += i.v.ClampLength(1000) * dt;
-			if (!float.IsFinite(i.transform.position.sqrMagnitude))
-			{
-				print("Caught infinite position");
-				i.transform.position = Vector3.zero;
-			}
-		}
+			obj[i].transform.position = p[i];
+			print(r[i]);
+			obj[i].transform.localScale = r[i] * 2 * Vector3.one;
+        }
 	}
 
-	Vector3 PairwiseForce(VisualNode i, VisualNode j, Vector3 dv, float ij, float ji, float padding, float maxAbsWeight)
+	Vector2 PairwiseForce(int i, int j, Vector3 dv, float ij, float ji, float padding, float maxAbsWeight)
 	{
 		float w;
 		
@@ -153,7 +158,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 			w /= maxAbsWeight;
 		}
 
-		float radii = i.radius + j.radius;
+		float radii = r[i] + r[j];
 		float d = Mathf.Max(dv.magnitude - padding - radii * (useScale ? 1 : 0), 0.01f);
 
 		return (
@@ -190,21 +195,22 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 		}
 	}
 
-	Vector3 NodewiseForce(VisualNode i, float sumAbsWeight)
+	Vector2 NodewiseForce(int i, float sumAbsWeight)
 	{
-		Vector3 globalCentroid = Vector3.zero;
-		Vector3 weightedCentroid = Vector3.zero;
-		foreach (VisualNode j in visualNodes)
-		{
-			if(i == j) continue;
-			globalCentroid += j.transform.position / (graph.nodes.Count - 1);
-			weightedCentroid += j.transform.position * outdegrees[j] / sumAbsWeight;
-		}
-		Vector3 centeringForce = centeringStrength * globalCentroid.sqrMagnitude * -globalCentroid.normalized;
-		Vector3 weightedCentroidD = (weightedCentroid - i.transform.position);
-		Vector3 clusterForce = clusterStrength * weightedCentroidD;
+		Vector2 globalCentroid = Vector3.zero;
+		Vector2 weightedCentroid = Vector3.zero;
 
-		Vector3 drag = dragStrength * i.v.sqrMagnitude * -i.v.normalized;
+        for (int j = 0; j < nodeCount; j++)
+        {
+			if(i == j) continue;
+			globalCentroid += p[j] / (graph.nodes.Count - 1);
+			weightedCentroid += p[j] * graph.GetOutdegree(j) / sumAbsWeight;
+        }
+		Vector2 centeringForce = centeringStrength * globalCentroid.sqrMagnitude * -globalCentroid.normalized;
+		Vector2 weightedCentroidD = (weightedCentroid - p[i]);
+		Vector2 clusterForce = clusterStrength * weightedCentroidD;
+
+		Vector2 drag = dragStrength * v[i].sqrMagnitude * -v[i].normalized;
 		return centeringForce + drag + clusterForce;
 	}
 }

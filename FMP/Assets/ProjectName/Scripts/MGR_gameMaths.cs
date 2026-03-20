@@ -1,10 +1,11 @@
-using JetBrains.Annotations;
+using RBitUtils;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem.Utilities;
+using UnityEngine.Rendering;
 
 public class MGR_gameMaths : MonoBehaviour, IGameMaths
 {
@@ -18,7 +19,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	public float maxOutdegree;
 	public float sumOutdegree;
 	[Header("Runtime & Refs")]
-	public AdjacencyDictionary nn;
+	public AdjacencyMtx nn;
 	public List<Node> nodes;
 	public TextMeshProUGUI debugText;
 	public event System.Action OnReadyForVisualisation;
@@ -34,17 +35,17 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 		}
 
 		// initialise 2d dictionary with random weights
-		nn = new AdjacencyDictionary(nodes);
-		foreach (Node i in nodes)
-		{
-			foreach (Node j in nodes)
-			{
-				if(i == j) continue; // skip self-connections
-				float x = Random.value * 2 - 1;
-				nn.dict[i][j]=Mathf.Pow(x, 11)*10;
-			}
-		}
-		OnReadyForVisualisation?.Invoke();
+		nn = new AdjacencyMtx(nodes, nodes);
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            for (int j = 0; j < nodes.Count; j++)
+            {
+                if (i == j) continue; // skip self-connections
+                float x = Random.value * 2 - 1;
+                nn.mtx[i, j] = Mathf.Pow(x, 11) * 10;
+            }
+        }
+        OnReadyForVisualisation?.Invoke();
 	}
 
 	private void Update()
@@ -54,7 +55,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
 	void UpdateStatistics()
 	{
-		debugText.text = string.Join("\n", nn.dict.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString()))));
 		max = nn.maxWeight;
 		min = nn.minWeight;
 		maxAbs = nn.maxAbsWeight;
@@ -70,68 +70,76 @@ public class Node
 	public static implicit operator VisualNode(Node node) => node.visual;
 }
 
-public class AdjacencyDictionary
+public class AdjacencyMtx
 {
 	public List<Node> nodes;
-	public Dictionary<Node, Dictionary<Node, float>> dict;
-	public AdjacencyDictionary()
+	public float[,] mtx;
+	
+	public AdjacencyMtx(IEnumerable<Node> nodesTo, IEnumerable<Node> nodesFrom)
 	{
 		nodes = new List<Node>();
-		dict = new Dictionary<Node, Dictionary<Node, float>>();
+		nodes.AddRange(nodesTo);
+		nodes.AddRange(nodesFrom);
+        nodes = nodes.ToHashSet().ToList();
+		mtx = new float[nodesTo.Count(), nodesFrom.Count()];
 	}
-	
-	public AdjacencyDictionary(IEnumerable<Node> nodes)
-	{
-		this.nodes = nodes.ToList();
-		dict = new Dictionary<Node, Dictionary<Node, float>>();
-		foreach (Node to in nodes)
-		{
-			dict[to] = new Dictionary<Node, float>();
-			foreach (Node from in nodes)
-			{
-				dict[to][from] = 0;
-			}
-		}
-	}
-	public Dictionary<Node, float> GetConnectionsFrom(Node from)
-	{
-		Dictionary<Node, float> connectionsTo = new Dictionary<Node, float>();
-		foreach (Node to in nodes)
-		{
-			connectionsTo[to] = dict[to][from];
-		}
-		return connectionsTo;
-	}
-	public float GetOutdegree(Node from)
-	{
-		float sum = 0;
-		foreach (Node to in nodes)
-		{
-			sum += Mathf.Abs(dict[to][from]);
-		}
-		return sum;
-	}
+    public float[] GetEdgesFrom(int from)
+    {
+        float[] edges = new float[mtx.Rows()];
+        for (int to = 0; to < edges.Length; to++)
+        {
+            edges[to] = mtx[to, from];
+        }
+        return edges;
+    }
+	public float[] GetEdgesFrom(Node fromNode) => GetEdgesFrom(nodes.FindIndex(x => x == fromNode));
 
-	public IEnumerable<(Node to, Node from, float weight)> GetAllConnections()
-	{
-		foreach (var to in dict.Keys)
-		{
-			foreach (var from in dict[to].Keys)
-			{
-				yield return (to, from, dict[from][to]);
-			}
-		}
-	}
-	public IEnumerable<(Node other, float weight)> GetAllConnections(Node node)
-	{
-		foreach (var connection in dict[node].Concat(GetConnectionsFrom(node)))
-		{
-			yield return (connection.Key, connection.Value);
-		}
-	}
-	public float maxWeight => dict.Values.Max(x => x.Values.Max());
-	public float minWeight => dict.Values.Min(x => x.Values.Min());
-	public float maxAbsWeight => dict.Values.Max(x => x.Values.Max(y => Mathf.Abs(y)));
-	public float sumAbsWeight => dict.Values.Sum(x => x.Values.Sum(y => Mathf.Abs(y)));
-	public float maxOutdegree => nodes.Max(x => GetOutdegree(x));
+    public float[] GetEdgesTo(int to)
+    {
+        float[] edges = new float[mtx.Cols()];
+        for (int from = 0; from < edges.Length; from++)
+        {
+            edges[from] = mtx[to, from];
+        }
+        return edges;
+    }
+    public float[] GetEdgesTo(Node fromNode) => GetEdgesTo(nodes.FindIndex(x => x == fromNode));
+
+    public float GetOutdegree(int from)
+    {
+        float sum = 0;
+        for (int to = 0; to < mtx.Rows(); to++)
+        {
+            try
+            {
+                sum += Mathf.Abs(mtx[to, from]);
+            }
+            catch
+            {
+                Debug.Log("fucking broke at "+to.ToString()+", "+ from.ToString());
+            }
+        }
+        return sum;
+    }
+    public float GetOutdegree(Node fromNode) => GetOutdegree(nodes.FindIndex(x => x == fromNode));
+
+    public float[] FlatMtx()
+    {
+        float[] flat = new float[mtx.Length];
+        Vector2Int size = mtx.Dimensions();
+        for (int i = 0; i < size.x; i++)
+        {
+            for (int j = 0; j < size.y; j++)
+            {
+                flat[i * size.y + j] = mtx[i, j];
+            }
+        }
+        return flat;
+    }
+
+    public float maxWeight => Mathf.Max(FlatMtx());
+	public float minWeight => Mathf.Min(FlatMtx());
+    public float maxAbsWeight => Mathf.Max(FlatMtx().Select(x => Mathf.Abs(x)).ToArray());
+    public float sumAbsWeight => FlatMtx().Sum(x => Mathf.Abs(x));
+    public float maxOutdegree => nodes.Max(x => GetOutdegree(x));
 }

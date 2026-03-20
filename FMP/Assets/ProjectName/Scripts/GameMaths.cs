@@ -49,7 +49,7 @@ public class GameMaths : MonoBehaviour
 	public float maxOutdegree;
 	[Header("Runtime & Refs")]
 
-	public Dictionary<Node, Dictionary<Node, float>> nn;
+	public Dictionary<Node, Dictionary<Node, float> > nn;
 	public Node[] nodes;
 	public TextMeshProUGUI debugText;
 	public VisualNode visualNodePrefab;
@@ -223,5 +223,5 @@ public class GameMaths : MonoBehaviour
 public class Node
 {
 	public VisualNode visual;
-	public float outdegree;
+	public float outdegree;0
 }

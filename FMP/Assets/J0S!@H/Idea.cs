@@ -11,6 +11,7 @@ public class Idea : MonoBehaviour
     public Dictionary<Node, Dictionary<Node, float>> nn;
     public float influence;
     public float sumAbs;
+    public float maxAbs;
     public float min;
     public float dragStrength;
     public float max;
@@ -19,8 +20,12 @@ public class Idea : MonoBehaviour
     public float CenteringStrength;
     public float CenteringSpeed;
     public float maxOutDegree;
+    public float minOutDegree;
     public float Indegree;
-    [Header("Go and Influence")]
+    public float OutDegree;
+    public float coordination
+    [Header("Go and Influence")]`
+    [Header("Context")]
 
     public Dictionary<Node, Dictionary<Node, float[]>> influences;
     public Node[] nodes;
@@ -50,8 +55,8 @@ public class Idea : MonoBehaviour
             foreach (Node j in nodes)
             {
                 var x = Random.value * 2 - 1;
-                newRow.Add(j, Mathf.Pow(x, 5));
-
+                newRow.Add(j, Mathf.Pow(x, 7) * 5);
+                nn[i][i] = 0;
             }
 
             
@@ -67,14 +72,25 @@ public class Idea : MonoBehaviour
     }
 
 
+    private void Update()
+    {
+        debugText.text = string.Join("\n", nn.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString())));
+        max = nn.Values.Max(x => x.Values.Max());
+        min = nn.Values.Max(x => x.Values.Min());
+        maxAbs = nn.Values.Max(x => x.Values.Max(y => Mathf.Abs(y)));
+        sumAbs = nn.Values.Max(x => x.Values.Sum(y => Mathf.Abs(y)));
+        maxOutDegree = nodes.Max(i => nn.Values.Sum(x => Mathf.Abs(x[i])));
+
+    }
+
 
     private void FixedUpdate()
     {  
         foreach (Node i in nodes)
         {
             i.outdegree = nn[i].Values.Sum(x => Mathf.Abs(x));
-            i.visual.transform.localScale = ( 1 + 4 * (i.indigree - minIndegree) / (maxIndegree - minIndegree) );
-
+            i.visual.transform.localScale = ( 1 + 4 * (i.o - minIndegree) / (maxIndegree - minIndegree);
+            
 
 
 

@@ -7,29 +7,12 @@ public class VisualNode : MonoBehaviour
 	public Vector3 a;
 	public Vector3 v;
 	public Node node;
-	public GameMaths gameMaths;
-	public float outdegree;
-	public List<float> connections;
+	public bool onScreen = true;
+	public float radius;
 
-	// Start is called once before the first execution of Update after the MonoBehaviour is created
-	void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-	private void OnDrawGizmosSelected()
+	public static implicit operator Node(VisualNode v) => v.node;
+	private void Update()
 	{
-		Vector3 weightedCentroid = Vector3.zero;
-		foreach (Node j in gameMaths.nodes)
-		{
-			weightedCentroid += j.visual.transform.position * j.outdegree * gameMaths.nn[node][j] / gameMaths.nodes.Sum(x => x.outdegree * gameMaths.nn[node][j]);
-		}
-		Gizmos.DrawSphere(weightedCentroid, 0.1f);
+		transform.localScale = Vector3.one * 2 * radius;
 	}
 }

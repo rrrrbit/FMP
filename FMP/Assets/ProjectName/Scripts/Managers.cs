@@ -1,0 +1,37 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Managers : MonoBehaviour
+{
+    public static Managers Instance { get; private set; }
+	Dictionary<Type, object> managers = new();
+	private void Awake()
+	{
+		DontDestroyOnLoad(gameObject);
+		Instance = this;
+		print(Instance);
+
+		Register<MGR_gameMaths>(GetComponent<MGR_gameMaths>());
+		Register<IGraphView>(GetComponent<MGR_graphView>());
+	}
+	
+	void Register<T>(T impl)
+	{
+		managers[typeof(T)] = impl;
+	}
+
+	public static T Get<T>() 
+	{
+		if (Instance.managers.TryGetValue(typeof(T), out var impl))
+		{
+			return (T)impl;
+		}
+		else
+		{
+			throw new Exception($"Manager of type {typeof(T)} not found");
+
+		}
+
+	}
+}

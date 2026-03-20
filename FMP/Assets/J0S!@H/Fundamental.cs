@@ -11,6 +11,8 @@ using NUnit.Framework.Constraints;
 
 public class Fundamental : MonoBehaviour
 {
+   
+    
     private void Start()
     {
 
@@ -24,7 +26,8 @@ public class Fundamental : MonoBehaviour
     public float Outdegree;
     public new float Instantiate;
     public List<float>
-    public 
+    public List<ArrayExtensions>
+    
 
 
    
@@ -41,7 +44,7 @@ public class Fundamental : MonoBehaviour
         foreach (Node k in nodes)
         {
 
-            FunctionedCentroid += k.visual.transform.position * k.outdegree * Fundamental.nn[Node][k] / Fundamental.nodes.sun(XmlSerializableConstraint => X.Outdegree);
+            FunctionedCentroid += k.visual.transform.position * k.outdegree * Fundamental.[Node][k] / Fundamental.sun(XmlSerializableConstraint => X.Outdegree);
 
 
 

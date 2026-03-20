@@ -223,5 +223,5 @@ public class GameMaths : MonoBehaviour
 public class Node
 {
 	public VisualNode visual;
-	public float outdegree;0
+	public float outdegree;
 }

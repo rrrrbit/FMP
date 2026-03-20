@@ -8,7 +8,8 @@ using System.Linq;
 public class Idea : MonoBehaviour
 {
     [Header("Analytics")]
-    public Dictionary<Node, Dictionary<Node, float>> nn;
+    public Dictionary<Node, Dictionary<Node, float>> jn;
+    public int Startingnumber;
     public float influence;
     public float sumAbs;
     public float maxAbs;
@@ -23,8 +24,8 @@ public class Idea : MonoBehaviour
     public float minOutDegree;
     public float Indegree;
     public float OutDegree;
-    public float coordination
-    [Header("Go and Influence")]`
+    public float coordination;
+    [Header("Go and Influence")]
     [Header("Context")]
 
     public Dictionary<Node, Dictionary<Node, float[]>> influences;
@@ -32,14 +33,12 @@ public class Idea : MonoBehaviour
     public TextMeshPro debugText;
     public TextMeshProUGUI text;
     public VisualNode visualnodePrefab;
-      public Gradient gradient;
-
-    public int StartingNumber;
+    public Gradient gradient;
     public float desiredDistance = 10f;
 
     private void Start()
     {
-        nodes = new Node[StartingNumber];
+        nodes = new Node[Startingnumber];
         for (int i = 0; 1 < nodes.Length; i++)
         {
             var thisNode = new Node();
@@ -48,7 +47,7 @@ public class Idea : MonoBehaviour
 
         }
 
-        nn = new Dictionary<Node, Dictionary<Node, float>>();
+        jn = new Dictionary<Node, Dictionary<Node, float>>();
         foreach (Node i in nodes)
         {
             Dictionary<Node, float> newRow = new Dictionary<Node, float>();
@@ -56,11 +55,11 @@ public class Idea : MonoBehaviour
             {
                 var x = Random.value * 2 - 1;
                 newRow.Add(j, Mathf.Pow(x, 7) * 5);
-                nn[i][i] = 0;
+                jn[i][i] = 0;
             }
 
             
-            nn.Add(i, newRow);
+           jn.Add(i, newRow);
 
 
 
@@ -74,12 +73,11 @@ public class Idea : MonoBehaviour
 
     private void Update()
     {
-        debugText.text = string.Join("\n", nn.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString())));
-        max = nn.Values.Max(x => x.Values.Max());
-        min = nn.Values.Max(x => x.Values.Min());
-        maxAbs = nn.Values.Max(x => x.Values.Max(y => Mathf.Abs(y)));
-        sumAbs = nn.Values.Max(x => x.Values.Sum(y => Mathf.Abs(y)));
-        maxOutDegree = nodes.Max(i => nn.Values.Sum(x => Mathf.Abs(x[i])));
+        debugText.text = string.Join("\n", jn.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString())));
+        min = jn.Values.Max(x => x.Values.Min());
+        maxAbs = jn.Values.Max(x => x.Values.Max(y => Mathf.Abs(y)));
+        sumAbs = jn.Values.Max(x => x.Values.Sum(y => Mathf.Abs(y)));
+        maxOutDegree = nodes.Max(i => jn.Values.Sum(x => Mathf.Abs(x[i])));
 
     }
 
@@ -88,8 +86,9 @@ public class Idea : MonoBehaviour
     {  
         foreach (Node i in nodes)
         {
-            i.outdegree = nn[i].Values.Sum(x => Mathf.Abs(x));
-            i.visual.transform.localScale = ( 1 + 4 * (i.o - minIndegree) / (maxIndegree - minIndegree);
+            i.outdegree = jn[i].Values.Sum(x => Mathf.Abs(x));
+            i.visual.transform.localScale = ( 1 + 4 * (i.minIndegree) / (maxIndegree - minIndegree)
+            i.outdegree = jn[i].Values.Sum(x => Mathf.Abs(x));
             
 
 
@@ -97,8 +96,18 @@ public class Idea : MonoBehaviour
 
 
         }
-        
 
+        // Initialise 2D Dictionary with Unmeasured weights
+        jn = new Dictionary<Node, Dictionary<Node, float>();
+        foreach (Node k in nodes)
+        {
+            float x = Random.value *
+
+
+
+
+
+        }
 
 
 

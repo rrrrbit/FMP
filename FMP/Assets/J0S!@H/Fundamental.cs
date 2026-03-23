@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 
 public class Fundamental : MonoBehaviour
 {
+    [SerializeField] Rigidbody jp;
     [Header("Clarification")]
     public VisualNode[] nameThisArray;
     public Vector3 Nodes;

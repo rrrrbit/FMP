@@ -91,7 +91,7 @@ public class Idea : MonoBehaviour
             i.outdegree = nn[i].Values.Sum(x => Mathf.Abs(x));
             i.visual.transform.localScale = sizebyIndegree.Evaluate(i.outdegree) * Vector3.one;
             i.visual.outdegree = i.outdegree;
-            i.visual,connections = nn[i].Values.ToList();
+            i.visual.connections = nn[i].Values.ToList();
             i.influence.connections = nn[i].Values.ToList();
 
 

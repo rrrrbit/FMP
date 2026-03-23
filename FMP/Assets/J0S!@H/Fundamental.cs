@@ -5,9 +5,22 @@ using NUnit.Framework;
  using System.Linq;
 using UnityEngine.Rendering;
 
-
 public class Fundamental : MonoBehaviour
 {
+    [Header("Clarification")]
+    public VisualNode[] nameThisArray;
+    public Vector3 Nodes;
+    public Node Node;
+    public float Outdegree;
+    public new float Instantiate;
+    public List<float>
+
+    private float generalise;
+    public float fundamental;
+    public float authenticate;
+
+
+
 
     private void Start()
     {
@@ -47,13 +60,7 @@ public class Fundamental : MonoBehaviour
 
 
 
-    [Header("Clarification")]
-    public VisualNode[] nameThisArray;
-    public Vector3 Nodes;
-    public Node Node;
-    public float Outdegree;
-    public new float Instantiate;
-    public List<float>
+    
 
 
 
@@ -67,7 +74,6 @@ public class Fundamental : MonoBehaviour
 
 
 }
-
 
 
 

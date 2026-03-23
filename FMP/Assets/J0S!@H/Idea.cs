@@ -19,7 +19,7 @@ public class Idea : MonoBehaviour
     public float CenteringStrength;
     public float CenteringSpeed;
     public float maxOutDegree;
-    public float Indegree;
+    public float indegree;
     [Header("Go and Influence")]
 
     public Dictionary<Node, Dictionary<Node, float[]>> influences;
@@ -27,10 +27,13 @@ public class Idea : MonoBehaviour
     public TextMeshPro debugText;
     public TextMeshProUGUI text;
     public VisualNode visualnodePrefab;
-      public Gradient gradient;
+    public Gradient gradient;
+    public float Indigree;
 
     public int StartingNumber;
     public float desiredDistance = 10f;
+
+    public object DebugText { get; private set; }
 
     private void Start()
     {
@@ -39,7 +42,7 @@ public class Idea : MonoBehaviour
         {
             var thisNode = new Node();
             nodes[i] = thisNode;
-           // thisNode.visual = Instantiate(VisualNode, Random.insideUnitCircle, Quaternion.identity);
+            // thisNode.visual = Instantiate(VisualNode, Random.insideUnitCircle, Quaternion.identity);
 
         }
 
@@ -54,7 +57,7 @@ public class Idea : MonoBehaviour
 
             }
 
-            
+
             nn.Add(i, newRow);
 
 
@@ -66,29 +69,37 @@ public class Idea : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+        DebugText.text = string.Join("\n", nn.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString())));
 
+
+
+
+
+
+
+
+
+
+    }
 
     private void FixedUpdate()
-    {  
+    {
         foreach (Node i in nodes)
         {
             i.outdegree = nn[i].Values.Sum(x => Mathf.Abs(x));
-            i.visual.transform.localScale = ( 1 + 4 * (i.indigree - minIndegree) / (maxIndegree - minIndegree) );
-
-
+            i.visual.transform.localScale = sizebyIndegree.Evaluate(i.outdegree) * Vector3.one;
+            i.visual.outdegree = i.outdegree;
+            i.visual,connections = nn[i].Values.ToList();
+            i.influence.connections = nn[i].Values.ToList();
 
 
 
 
         }
-        
 
-
-
-
-
-
-
+            
 
 
 
@@ -102,6 +113,18 @@ public class Idea : MonoBehaviour
 
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -225,6 +225,7 @@ namespace RBitUtils
         public static Vector2 xz(this Vector3 v) => new(v.x, v.z);
 
         public static Vector3 xz(this Vector2 v, float y) => new(v.x, y, v.y);
+        public static Vector3 xy(this Vector2 v, float z = 0) => new(v.x, v.y, z);
 
         /// <summary>
         /// Multiplies two vectors componentwise. (Some fucking idiot decided Vector.Scale should be in-place)

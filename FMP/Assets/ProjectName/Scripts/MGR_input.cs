@@ -2,13 +2,17 @@ using UnityEngine;
 
 public class MGR_input : MonoBehaviour, IInput
 {
-    Input input;
-    Input.GameActions gameActions;
+    public Input input;
+    public Input.GameActions gameActions;
     public event System.Action OnInputReady;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        input = new Input();
+        input.Enable();
+        gameActions = input.Game;
+        gameActions.Enable();
+        OnInputReady?.Invoke();
     }
 
     // Update is called once per frame

@@ -269,6 +269,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a17cefd9102c91544b743f5e37319d6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  panSpeed: {x: 0, y: 0}
+  zoomMin: 1
+  zoomMax: 10
+  zoomSens: 1
+  currentZoom: 0
 --- !u!1 &562323770
 GameObject:
   m_ObjectHideFlags: 0
@@ -545,6 +550,7 @@ GameObject:
   - component: {fileID: 884068269}
   - component: {fileID: 884068268}
   - component: {fileID: 884068267}
+  - component: {fileID: 884068270}
   m_Layer: 0
   m_Name: MANAGERS
   m_TagString: Untagged
@@ -702,6 +708,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 33a3f9ca685f4034b98ce02eeca5b605, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &884068270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884068264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c9a9119507ee794b8818f6628890721, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1064434389

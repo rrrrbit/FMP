@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -256,6 +257,18 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a17cefd9102c91544b743f5e37319d6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &562323770
 GameObject:
   m_ObjectHideFlags: 0
@@ -572,18 +585,18 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.125
-      inSlope: 0.11875
-      outSlope: 0.11875
+      value: 0.05
+      inSlope: 0.0475
+      outSlope: 0.0475
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 20
-      value: 2.5
-      inSlope: 0.11875
-      outSlope: 0.11875
+      value: 1
+      inSlope: 0.0475
+      outSlope: 0.0475
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -621,14 +634,14 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 4
-  padding: 1
+  padding: 0
   useScale: 1
   normaliseWeights: 1
   symmetriseWeights: 1
   centeringStrength: 1
   dragStrength: 5
   clusterStrength: 0
-  attractionStrength: 100
+  attractionStrength: 25
   attractionByWeight:
     serializedVersion: 2
     m_Curve:
@@ -653,10 +666,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  attractionType: 2
-  repulsionStrength: 10
+  attractionType: 0
+  repulsionStrength: 50
   repulsionType: 1
   visualNodePrefab: {fileID: 1297033350721654513, guid: e4227e8697f29a146bcde6987d96a048, type: 3}
+  nodeCount: 25
 --- !u!114 &884068268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -675,6 +689,8 @@ MonoBehaviour:
   maxAbs: 0
   sumAbs: 0
   maxOutdegree: 0
+  sumOutdegree: 0
+  nodes: []
   debugText: {fileID: 767006260}
 --- !u!114 &884068269
 MonoBehaviour:

@@ -135,7 +135,6 @@ public class MGR_graphView : MonoBehaviour, IGraphView
             }
 
 			obj[i].transform.position = p[i];
-			print(r[i]);
 			obj[i].transform.localScale = r[i] * 2 * Vector3.one;
         }
 	}

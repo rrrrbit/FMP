@@ -13,6 +13,7 @@ public class Managers : MonoBehaviour
 
 		Register<MGR_gameMaths>(GetComponent<MGR_gameMaths>());
 		Register<IGraphView>(GetComponent<MGR_graphView>());
+		Register<MGR_input>(GetComponent<MGR_input>());
 	}
 	
 	void Register<T>(T impl)

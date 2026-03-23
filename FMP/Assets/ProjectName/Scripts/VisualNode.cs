@@ -8,11 +8,6 @@ public class VisualNode : MonoBehaviour
 	public Vector3 v;
 	public Node node;
 	public bool onScreen = true;
-	public float radius;
 
 	public static implicit operator Node(VisualNode v) => v.node;
-	private void Update()
-	{
-		transform.localScale = Vector3.one * 2 * radius;
-	}
 }

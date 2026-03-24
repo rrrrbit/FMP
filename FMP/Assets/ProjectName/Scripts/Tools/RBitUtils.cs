@@ -13,8 +13,8 @@ namespace RBitUtils
         {
             if (!self.Equals(other))
             {
-                other = self;
                 callback();
+                other = self;
             }
         }
 

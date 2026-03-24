@@ -1,7 +1,9 @@
 using RBitUtils;
+using RBitUtils.ResponseTypes;
 using Unity.Hierarchy;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XR;
 
 public class GameCamera : MonoBehaviour
 {
@@ -13,11 +15,17 @@ public class GameCamera : MonoBehaviour
     Camera cam;
 
     [SerializeField]float currentZoom = 1;
+    Vector3 targetPos;
+    [SerializeField] float targetZoom = 1;
+    float prevZoom;
+
+    Spring zoomEasing;
     void Awake()
     {
         input = Managers.Get<MGR_input>();
         cam = GetComponent<Camera>();
         input.OnInputReady += AddCallbacks;
+        zoomEasing = new(currentZoom, 4, 1, 0);
     }
 
     void AddCallbacks()
@@ -28,15 +36,21 @@ public class GameCamera : MonoBehaviour
 
     void ZoomOnPoint(float delta, Vector2 point)
     {
-        currentZoom *= delta;
         transform.position = (delta * (transform.position.xy() - point) + point).xy(transform.position.z);
     }
 
     private void Zoom(InputAction.CallbackContext obj)
     {
         float amt = -obj.ReadValue<float>();
+        targetZoom *= Mathf.Pow(zoomInterval, amt);
+
+
+    }
+
+    void UpdateZoom()
+    {
         ZoomOnPoint(
-            Mathf.Pow(zoomInterval, amt), 
+            currentZoom/prevZoom,
             cam.ScreenToWorldPoint(
                 Mouse.current.position.ReadValue().xy(-transform.position.z)
                 )
@@ -46,6 +60,10 @@ public class GameCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        currentZoom = zoomEasing.Update(Time.deltaTime, targetZoom);
+        currentZoom.CheckChange(ref prevZoom, UpdateZoom);
+
+
         transform.position += input.gameActions.Pan.ReadValue<Vector2>().xy().Scaled(panSpeed) * currentZoom * Time.deltaTime;
         cam.orthographicSize = currentZoom;
 

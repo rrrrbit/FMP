@@ -108,6 +108,15 @@ public partial class @Input: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""PanBtn"",
+                    ""type"": ""Button"",
+                    ""id"": ""dcb40c7d-92f5-4514-804f-2d1be415d59f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -198,6 +207,17 @@ public partial class @Input: IInputActionCollection2, IDisposable
                     ""action"": ""Pan"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4423c0de-b6e0-4f95-9dc7-bb3a836430f6"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PanBtn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -269,6 +289,7 @@ public partial class @Input: IInputActionCollection2, IDisposable
         m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
         m_Game_Scroll = m_Game.FindAction("Scroll", throwIfNotFound: true);
         m_Game_Pan = m_Game.FindAction("Pan", throwIfNotFound: true);
+        m_Game_PanBtn = m_Game.FindAction("PanBtn", throwIfNotFound: true);
     }
 
     ~@Input()
@@ -351,6 +372,7 @@ public partial class @Input: IInputActionCollection2, IDisposable
     private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
     private readonly InputAction m_Game_Scroll;
     private readonly InputAction m_Game_Pan;
+    private readonly InputAction m_Game_PanBtn;
     /// <summary>
     /// Provides access to input actions defined in input action map "Game".
     /// </summary>
@@ -370,6 +392,10 @@ public partial class @Input: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Game/Pan".
         /// </summary>
         public InputAction @Pan => m_Wrapper.m_Game_Pan;
+        /// <summary>
+        /// Provides access to the underlying input action "Game/PanBtn".
+        /// </summary>
+        public InputAction @PanBtn => m_Wrapper.m_Game_PanBtn;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -402,6 +428,9 @@ public partial class @Input: IInputActionCollection2, IDisposable
             @Pan.started += instance.OnPan;
             @Pan.performed += instance.OnPan;
             @Pan.canceled += instance.OnPan;
+            @PanBtn.started += instance.OnPanBtn;
+            @PanBtn.performed += instance.OnPanBtn;
+            @PanBtn.canceled += instance.OnPanBtn;
         }
 
         /// <summary>
@@ -419,6 +448,9 @@ public partial class @Input: IInputActionCollection2, IDisposable
             @Pan.started -= instance.OnPan;
             @Pan.performed -= instance.OnPan;
             @Pan.canceled -= instance.OnPan;
+            @PanBtn.started -= instance.OnPanBtn;
+            @PanBtn.performed -= instance.OnPanBtn;
+            @PanBtn.canceled -= instance.OnPanBtn;
         }
 
         /// <summary>
@@ -538,5 +570,12 @@ public partial class @Input: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPan(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PanBtn" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPanBtn(InputAction.CallbackContext context);
     }
 }

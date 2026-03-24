@@ -223,6 +223,7 @@ namespace RBitUtils
             new(Mathf.RoundToInt(v.x), Mathf.RoundToInt(v.y));
 
         public static Vector2 xz(this Vector3 v) => new(v.x, v.z);
+        public static Vector2 xy(this Vector3 v) => new(v.x, v.y);
 
         public static Vector3 xz(this Vector2 v, float y) => new(v.x, y, v.y);
         public static Vector3 xy(this Vector2 v, float z = 0) => new(v.x, v.y, z);

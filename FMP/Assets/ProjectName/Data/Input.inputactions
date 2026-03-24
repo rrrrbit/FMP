@@ -22,6 +22,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "PanBtn",
+                    "type": "Button",
+                    "id": "dcb40c7d-92f5-4514-804f-2d1be415d59f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -112,6 +121,17 @@
                     "action": "Pan",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "4423c0de-b6e0-4f95-9dc7-bb3a836430f6",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PanBtn",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

@@ -20,7 +20,6 @@ public class GameCamera : MonoBehaviour
     float prevZoom;
 
     Spring zoomEasing;
-    Vec2Response<Spring> posEasing;
     void Awake()
     {
         input = Managers.Get<MGR_input>();
@@ -37,7 +36,7 @@ public class GameCamera : MonoBehaviour
 
     void ZoomOnPoint(float delta, Vector2 point)
     {
-        targetPos = (delta * (targetPos.xy() - point) + point).xy(targetPos.z);
+        transform.position = (delta * (transform.position.xy() - point) + point).xy(transform.position.z);
     }
 
     private void Zoom(InputAction.CallbackContext obj)
@@ -63,10 +62,7 @@ public class GameCamera : MonoBehaviour
     {
         currentZoom = zoomEasing.Update(Time.deltaTime, targetZoom);
         currentZoom.CheckChange(ref prevZoom, UpdateZoom);
-        transform.position = posEasing.Update(Time.deltaTime, targetPos);
-
-
-        //transform.position += input.gameActions.Pan.ReadValue<Vector2>().xy().Scaled(panSpeed) * currentZoom * Time.deltaTime;
+        transform.position += input.gameActions.Pan.ReadValue<Vector2>().xy().Scaled(panSpeed) * currentZoom * Time.deltaTime;
         cam.orthographicSize = currentZoom;
 
         if (input.gameActions.PanBtn.IsPressed())

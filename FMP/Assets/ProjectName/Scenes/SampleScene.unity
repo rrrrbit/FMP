@@ -594,23 +594,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lineGap: 0.1
+  pairwiseForceThreshold: 0
   sizeByOutdegree:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0.05
-      inSlope: 0.0475
-      outSlope: 0.0475
+      inSlope: 0.0495
+      outSlope: 0.0495
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 20
-      value: 1
-      inSlope: 0.0475
-      outSlope: 0.0475
+      time: 100
+      value: 5
+      inSlope: 0.0495
+      outSlope: 0.0495
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -655,7 +656,7 @@ MonoBehaviour:
   centeringStrength: 1
   dragStrength: 5
   clusterStrength: 0
-  attractionStrength: 25
+  attractionStrength: 4
   attractionByWeight:
     serializedVersion: 2
     m_Curve:
@@ -681,8 +682,10 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   attractionType: 0
-  repulsionStrength: 50
-  repulsionType: 1
+  repulsionStrength: 100
+  repulsionType: 0
+  calculatedPairs: 0
+  totalPairs: 0
   visualNodePrefab: {fileID: 1297033350721654513, guid: e4227e8697f29a146bcde6987d96a048, type: 3}
   nodeCount: 25
 --- !u!114 &884068268
@@ -697,7 +700,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a918ca942621ad4ba090885df76de57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingNumber: 25
+  startingNumber: 100
   max: 0
   min: 0
   maxAbs: 0
@@ -705,6 +708,7 @@ MonoBehaviour:
   maxOutdegree: 0
   sumOutdegree: 0
   nodes: []
+  ideas: []
   debugText: {fileID: 767006260}
 --- !u!114 &884068269
 MonoBehaviour:

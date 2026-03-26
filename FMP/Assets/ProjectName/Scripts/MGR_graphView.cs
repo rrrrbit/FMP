@@ -10,6 +10,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 {
 	[Header("Misc")]
 	public float lineGap = 0;
+	public float pairwiseForceThreshold = 0.01f;
 	public AnimationCurve sizeByOutdegree;
 	public Gradient edgeColourGradient;
 	[Header("Forces")]
@@ -40,6 +41,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	}
 	public RepulsionTypes repulsionType;
 	[Header("Runtime & Refs")]
+	[SerializeField] int calculatedPairs, totalPairs;
 	public VisualNode visualNodePrefab;
 	public int nodeCount;
 	MGR_gameMaths gameMaths;
@@ -56,13 +58,14 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 
 	private void Update()
 	{
-	}
+        
+    }
 
 	private void FixedUpdate()
 	{
-		UpdateView(Time.fixedDeltaTime);
-		
-	}
+
+        UpdateView(Time.fixedDeltaTime);
+    }
 
 	void Init()
 	{
@@ -82,15 +85,18 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 			a[i] = Vector2.zero;
 			r[i] = sizeByOutdegree.Evaluate(graph.GetOutdegree(i));
         }
+
+		totalPairs = nodeCount * nodeCount;
 	}
 
 	void UpdateView(float dt)
 	{
-        for (int i = 0; i < nodeCount; i++) // nodewise forces and some calcs
+		calculatedPairs = 0;
+		for (int i = 0; i < nodeCount; i++) // nodewise forces and some calcs
         {
             r[i] = sizeByOutdegree.Evaluate(graph.GetOutdegree(i));
             a[i] = Vector3.zero;
-            a[i] += NodewiseForce(i, graph.sumAbsWeight);
+            a[i] += NodewiseForce(i);
         }
 
         for (int i = 0; i < graph.mtx.Rows(); i++) // pairwise forces
@@ -98,13 +104,22 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 			
             for (int j = 0; j < graph.mtx.Cols(); j++)
             {
+                if (i == j) continue;
                 float ij = graph.mtx[i, j];
                 float ji = graph.mtx[j, i];
+
+                float w;
+                if (symmetriseWeights) w = (Mathf.Abs(ij) + Mathf.Abs(ji)) / 2;
+                else w = Mathf.Abs(ij);
+                if (normaliseWeights) w /= graph.maxAbsWeight;
+
+				if (w < pairwiseForceThreshold) continue;
+
                 Vector2 d = p[j] - p[i];
                 Vector2 dn = d.normalized;
 
-                if (i == j) continue;
-                a[i] += PairwiseForce(i, j, d, ij, ji, padding, graph.maxAbsWeight);
+                a[i] += PairwiseForce(i, j, d, w, padding);
+				calculatedPairs += 1;
 
                 //debug edge visualisation
                 Vector2 offs = new(dn.y, -dn.x);
@@ -139,29 +154,13 @@ public class MGR_graphView : MonoBehaviour, IGraphView
         }
 	}
 
-	Vector2 PairwiseForce(int i, int j, Vector3 dv, float ij, float ji, float padding, float maxAbsWeight)
+	Vector2 PairwiseForce(int i, int j, Vector3 dv, float weight, float padding)
 	{
-		float w;
-		
-		if (symmetriseWeights)
-		{
-			w = (Mathf.Abs(ij) + Mathf.Abs(ji)) / 2;
-		}
-		else
-		{
-			w = Mathf.Abs(ij);
-		}
-
-		if (normaliseWeights)
-		{
-			w /= maxAbsWeight;
-		}
-
 		float radii = r[i] + r[j];
 		float d = Mathf.Max(dv.magnitude - padding - radii * (useScale ? 1 : 0), 0.01f);
 
 		return (
-			RawAttraction(d) * attractionStrength * attractionByWeight.Evaluate(w) -
+			RawAttraction(d) * attractionStrength * attractionByWeight.Evaluate(weight) -
 			RawRepulsion(d) * repulsionStrength
 			) * dv.normalized;
 	}
@@ -194,7 +193,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 		}
 	}
 
-	Vector2 NodewiseForce(int i, float sumAbsWeight)
+	Vector2 NodewiseForce(int i)
 	{
 		Vector2 globalCentroid = Vector3.zero;
 		Vector2 weightedCentroid = Vector3.zero;
@@ -203,7 +202,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
         {
 			if(i == j) continue;
 			globalCentroid += p[j] / (graph.nodes.Count - 1);
-			weightedCentroid += p[j] * graph.GetOutdegree(j) / sumAbsWeight;
+			weightedCentroid += p[j] * graph.GetOutdegree(j) / graph.sumAbsWeight;
         }
 		Vector2 centeringForce = centeringStrength * globalCentroid.sqrMagnitude * -globalCentroid.normalized;
 		Vector2 weightedCentroidD = (weightedCentroid - p[i]);

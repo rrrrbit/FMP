@@ -42,6 +42,7 @@ public class GameCamera : MonoBehaviour
         cam = GetComponent<Camera>();
         input.OnInputReady += AddCallbacks;
         zoomEasingSettings.token.Reload += InitialiseZoomEasing;
+        InitialiseZoomEasing();
     }
 
     public void InitialiseZoomEasing()

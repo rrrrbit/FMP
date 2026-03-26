@@ -20,7 +20,9 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	public float sumOutdegree;
 	[Header("Runtime & Refs")]
 	public AdjacencyMtx nn;
+    public AdjacencyMtx ni;
 	public List<Node> nodes;
+    public List<Idea> ideas;
 	public TextMeshProUGUI debugText;
 	public event System.Action OnReadyForVisualisation;
 
@@ -50,7 +52,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
 	private void Update()
 	{
-		UpdateStatistics();
+        nn.RecalculateStats();
+        UpdateStatistics();
 	}
 
 	void UpdateStatistics()
@@ -69,13 +72,24 @@ public class Node
 	public VisualNode visual;
 	public static implicit operator VisualNode(Node node) => node.visual;
 }
+[System.Serializable]
+public class Idea
+{
+    //public VisualNode visual;
+    //public static implicit operator VisualNode(Node node) => node.visual;
+}
+
 
 public class AdjacencyMtx
 {
 	public List<Node> nodes;
 	public float[,] mtx;
-	
-	public AdjacencyMtx(IEnumerable<Node> nodesTo, IEnumerable<Node> nodesFrom)
+    public float maxWeight;
+    public float minWeight;
+    public float maxAbsWeight;
+    public float sumAbsWeight;
+    public float maxOutdegree;
+    public AdjacencyMtx(IEnumerable<Node> nodesTo, IEnumerable<Node> nodesFrom)
 	{
 		nodes = new List<Node>();
 		nodes.AddRange(nodesTo);
@@ -83,6 +97,16 @@ public class AdjacencyMtx
         nodes = nodes.ToHashSet().ToList();
 		mtx = new float[nodesTo.Count(), nodesFrom.Count()];
 	}
+
+    public void RecalculateStats()
+    {
+        maxWeight = Mathf.Max(FlatMtx());
+        minWeight = Mathf.Min(FlatMtx());
+        maxAbsWeight = Mathf.Max(FlatMtx().Select(x => Mathf.Abs(x)).ToArray());
+        sumAbsWeight = FlatMtx().Sum(x => Mathf.Abs(x));
+        maxOutdegree = nodes.Max(x => GetOutdegree(x));
+    }
+
     public float[] GetEdgesFrom(int from)
     {
         float[] edges = new float[mtx.Rows()];
@@ -137,9 +161,9 @@ public class AdjacencyMtx
         return flat;
     }
 
-    public float maxWeight => Mathf.Max(FlatMtx());
-	public float minWeight => Mathf.Min(FlatMtx());
-    public float maxAbsWeight => Mathf.Max(FlatMtx().Select(x => Mathf.Abs(x)).ToArray());
-    public float sumAbsWeight => FlatMtx().Sum(x => Mathf.Abs(x));
-    public float maxOutdegree => nodes.Max(x => GetOutdegree(x));
+    //public float maxWeight => Mathf.Max(FlatMtx());
+    //public float minWeight => Mathf.Min(FlatMtx());
+    //public float maxAbsWeight => Mathf.Max(FlatMtx().Select(x => Mathf.Abs(x)).ToArray());
+    //public float sumAbsWeight => FlatMtx().Sum(x => Mathf.Abs(x));
+    //public float maxOutdegree => nodes.Max(x => GetOutdegree(x));
 }

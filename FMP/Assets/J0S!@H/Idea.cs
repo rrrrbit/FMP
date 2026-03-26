@@ -10,7 +10,7 @@ using System;
 public class Idea : MonoBehaviour
 {
     [Header("Analytics")]
-    public Dictionary<Node, Dictionary<Node, float>> nn;
+    public Dictionary<Node, Dictionary<Node, float>> jn;
     public float influence;
     public float sumAbs;
     public float min;
@@ -47,8 +47,8 @@ public class Idea : MonoBehaviour
             // thisNode.visual = Instantiate(VisualNode, Random.insideUnitCircle, Quaternion.identity);
 
         }
-        
-        nn = new Dictionary<Node, Dictionary<Node, float>>();
+
+        jn = new Dictionary<Node, Dictionary<Node, float>>();
 
         foreach (Node i in nodes)
         {
@@ -61,28 +61,46 @@ public class Idea : MonoBehaviour
             }
 
 
-            nn.Add(i, newRow);
+            jn.Add(i, newRow);
             //Using Add Method
             Dictionary<int, string> dict = new Dictionary<int, string>();
             dict.Add(1, "One");
 
 
-            
+
+
+
+
         }
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 
     }
-
-
-
-
-
-
-
-
 
 
 

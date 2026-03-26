@@ -20,8 +20,8 @@ public class Fundamental : MonoBehaviour
     public float effect;
     public float fundamental;
     public float authenticate;
-
-
+    Vector3 alternate;
+    Vector3 enuxtricate;
 
 
     private void Start()

@@ -10,7 +10,8 @@ using UnityEngine.Rendering;
 public class MGR_gameMaths : MonoBehaviour, IGameMaths
 {
 	[Header("Misc")]
-	public int startingNumber;
+	public int startingNumberPeople;
+	public int startingNumberIdeas;
 	[Header("Statistics")]
 	public float max;
 	public float min;
@@ -21,23 +22,28 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	[Header("Runtime & Refs")]
 	public AdjacencyMtx nn;
     public AdjacencyMtx ni;
-	public List<Node> nodes;
-    public List<Idea> ideas;
+	public List<PersonNode> nodes;
+    public List<IdeaNode> ideas;
 	public TextMeshProUGUI debugText;
 	public event System.Action OnReadyForVisualisation;
 
 	private void Start()
 	{
 		// initialise list of all nodes
-		nodes = new List<Node>();
-
-		for (int i = 0; i < startingNumber; i++)
+		nodes = new List<PersonNode>(startingNumberPeople);
+		for (int i = 0; i < startingNumberPeople; i++)
 		{
-			nodes.Add(new Node());
+			nodes.Add(new PersonNode());
 		}
 
-		// initialise 2d dictionary with random weights
-		nn = new AdjacencyMtx(nodes, nodes);
+        ideas = new List<IdeaNode>(startingNumberIdeas);
+        for (int i = 0; i < startingNumberIdeas; i++)
+        {
+            ideas.Add(new IdeaNode());
+        }
+
+        // initialise nn with random weights
+        nn = new AdjacencyMtx(nodes, nodes);
         for (int i = 0; i < nodes.Count; i++)
         {
             for (int j = 0; j < nodes.Count; j++)
@@ -47,6 +53,18 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
                 nn.mtx[i, j] = Mathf.Pow(x, 11) * 10;
             }
         }
+
+        // initialise ni with random weights
+        ni = new AdjacencyMtx(ideas, nodes);
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            for (int j = 0; j < ideas.Count; j++)
+            {
+                float x = Random.value * 2 - 1;
+                nn.mtx[i, j] = x;
+            }
+        }
+
         OnReadyForVisualisation?.Invoke();
 	}
 
@@ -72,8 +90,13 @@ public class Node
 	public VisualNode visual;
 	public static implicit operator VisualNode(Node node) => node.visual;
 }
-[System.Serializable]
-public class Idea
+
+public class PersonNode : Node
+{
+
+}
+
+public class IdeaNode : Node
 {
     //public VisualNode visual;
     //public static implicit operator VisualNode(Node node) => node.visual;
@@ -89,13 +112,19 @@ public class AdjacencyMtx
     public float maxAbsWeight;
     public float sumAbsWeight;
     public float maxOutdegree;
+
+    /// <summary>
+    /// Construct a matrix with To as columns (x axis) and From as row (y axis).
+    /// </summary>
+    /// <param name="nodesTo"></param>
+    /// <param name="nodesFrom"></param>
     public AdjacencyMtx(IEnumerable<Node> nodesTo, IEnumerable<Node> nodesFrom)
 	{
 		nodes = new List<Node>();
 		nodes.AddRange(nodesTo);
 		nodes.AddRange(nodesFrom);
         nodes = nodes.ToHashSet().ToList();
-		mtx = new float[nodesTo.Count(), nodesFrom.Count()];
+		mtx = new float[nodesFrom.Count(), nodesTo.Count()];
 	}
 
     public void RecalculateStats()
@@ -107,6 +136,11 @@ public class AdjacencyMtx
         maxOutdegree = nodes.Max(x => GetOutdegree(x));
     }
 
+    /// <summary>
+    /// Get a column (y slice) as an array.
+    /// </summary>
+    /// <param name="from"></param>
+    /// <returns></returns>
     public float[] GetEdgesFrom(int from)
     {
         float[] edges = new float[mtx.Rows()];
@@ -118,6 +152,11 @@ public class AdjacencyMtx
     }
 	public float[] GetEdgesFrom(Node fromNode) => GetEdgesFrom(nodes.FindIndex(x => x == fromNode));
 
+    /// <summary>
+    /// Get a row (x slice) as an array.
+    /// </summary>
+    /// <param name="to"></param>
+    /// <returns></returns>
     public float[] GetEdgesTo(int to)
     {
         float[] edges = new float[mtx.Cols()];
@@ -146,7 +185,6 @@ public class AdjacencyMtx
         return sum;
     }
     public float GetOutdegree(Node fromNode) => GetOutdegree(nodes.FindIndex(x => x == fromNode));
-
     public float[] FlatMtx()
     {
         float[] flat = new float[mtx.Length];

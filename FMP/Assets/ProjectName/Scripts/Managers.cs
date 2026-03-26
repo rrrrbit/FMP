@@ -12,7 +12,7 @@ public class Managers : MonoBehaviour
 		Instance = this;
 
 		Register<MGR_gameMaths>(GetComponent<MGR_gameMaths>());
-		Register<IGraphView>(GetComponent<MGR_graphView>());
+		Register<MGR_graphView>(GetComponent<MGR_graphView>());
 		Register<MGR_input>(GetComponent<MGR_input>());
 	}
 	

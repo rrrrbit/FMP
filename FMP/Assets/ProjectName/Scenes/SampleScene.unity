@@ -700,15 +700,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a918ca942621ad4ba090885df76de57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingNumber: 100
+  startingNumberPeople: 25
+  startingNumberIdeas: 5
   max: 0
   min: 0
   maxAbs: 0
   sumAbs: 0
   maxOutdegree: 0
   sumOutdegree: 0
-  nodes: []
-  ideas: []
   debugText: {fileID: 767006260}
 --- !u!114 &884068269
 MonoBehaviour:

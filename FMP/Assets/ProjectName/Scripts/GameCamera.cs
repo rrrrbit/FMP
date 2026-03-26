@@ -1,9 +1,24 @@
 using RBitUtils;
 using RBitUtils.ResponseTypes;
 using Unity.Hierarchy;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
+
+[CustomEditor(typeof(GameCamera), true)]
+public class EDITOR_GameCamera : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+        GameCamera gameCamera = (GameCamera)target;
+        if (GUILayout.Button("Reload Zoom Easing Settings"))
+        {
+            gameCamera.InitialiseZoomEasing();
+        }
+    }
+}
 
 public class GameCamera : MonoBehaviour
 {
@@ -14,18 +29,25 @@ public class GameCamera : MonoBehaviour
     public float zoomInterval;
     Camera cam;
 
-    [SerializeField]float currentZoom = 1;
+    public float currentZoom = 1;
     Vector3 targetPos;
-    [SerializeField] float targetZoom = 1;
+    public float targetZoom = 1;
     float prevZoom;
 
-    Spring zoomEasing;
+    public Spring zoomEasing;
+    public TokenResolvableValue<SpringSettings> zoomEasingSettings;
     void Awake()
     {
         input = Managers.Get<MGR_input>();
         cam = GetComponent<Camera>();
         input.OnInputReady += AddCallbacks;
-        zoomEasing = new(currentZoom, 4, 1, 0);
+        zoomEasingSettings.token.Reload += InitialiseZoomEasing;
+    }
+
+    public void InitialiseZoomEasing()
+    {
+        SpringSettings settings = zoomEasingSettings;
+        zoomEasing = new(currentZoom, settings.frequency, settings.damping, settings.response);
     }
 
     void AddCallbacks()

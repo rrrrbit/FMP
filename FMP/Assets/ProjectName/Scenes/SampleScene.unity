@@ -272,8 +272,16 @@ MonoBehaviour:
   panSpeed: {x: 2, y: 2}
   zoomMin: 1
   zoomMax: 10
-  zoomInterval: 1.1
+  zoomInterval: 1.2
   currentZoom: 1
+  targetZoom: 1
+  zoomEasingSettings:
+    useToken: 1
+    value:
+      frequency: 4
+      damping: 1
+      response: 1
+    token: {fileID: 11400000, guid: 29aff3315e44a8344b7429a4952c353c, type: 2}
 --- !u!1 &562323770
 GameObject:
   m_ObjectHideFlags: 0

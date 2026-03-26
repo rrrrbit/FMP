@@ -4,6 +4,8 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using System.Linq;
+using System;
+
 
 public class Idea : MonoBehaviour
 {
@@ -45,74 +47,242 @@ public class Idea : MonoBehaviour
             // thisNode.visual = Instantiate(VisualNode, Random.insideUnitCircle, Quaternion.identity);
 
         }
-
+        
         nn = new Dictionary<Node, Dictionary<Node, float>>();
+
         foreach (Node i in nodes)
         {
             Dictionary<Node, float> newRow = new Dictionary<Node, float>();
             foreach (Node j in nodes)
             {
-                var x = Random.value * 2 - 1;
+                float x = UnityEngine.Random.value * 2 - 1;
                 newRow.Add(j, Mathf.Pow(x, 5));
 
             }
 
 
             nn.Add(i, newRow);
+            //Using Add Method
+            Dictionary<int, string> dict = new Dictionary<int, string>();
+            dict.Add(1, "One");
 
-
-
-
-
-        }
-
-
-    }
-
-    private void Update()
-    {
-        DebugText.text = string.Join("\n", nn.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString())));
-
-
-
-
-
-
-
-
-
-
-    }
-
-    private void FixedUpdate()
-    {
-        foreach (Node i in nodes)
-        {
-            i.outdegree = nn[i].Values.Sum(x => Mathf.Abs(x));
-            i.visual.transform.localScale = sizebyIndegree.Evaluate(i.outdegree) * Vector3.one;
-            i.visual.outdegree = i.outdegree;
-            i.visual.connections = nn[i].Values.ToList();
-            i.influence.connections = nn[i].Values.ToList();
-
-
-
-
-        }
 
             
-
-
-
-
-
-
+        }
 
 
 
 
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

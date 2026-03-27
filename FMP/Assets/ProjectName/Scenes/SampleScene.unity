@@ -686,7 +686,7 @@ MonoBehaviour:
   repulsionType: 0
   calculatedPairs: 0
   totalPairs: 0
-  visualNodePrefab: {fileID: 1297033350721654513, guid: e4227e8697f29a146bcde6987d96a048, type: 3}
+  visualNodePrefab: {fileID: 8003208030640895489, guid: e4227e8697f29a146bcde6987d96a048, type: 3}
   nodeCount: 25
 --- !u!114 &884068268
 MonoBehaviour:

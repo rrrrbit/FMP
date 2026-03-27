@@ -61,7 +61,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             for (int j = 0; j < ideas.Count; j++)
             {
                 float x = Random.value * 2 - 1;
-                nn.mtx[i, j] = x;
+                ni.mtx[i, j] = x;
             }
         }
 

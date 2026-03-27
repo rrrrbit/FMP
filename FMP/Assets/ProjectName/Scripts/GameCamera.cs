@@ -30,6 +30,7 @@ public class GameCamera : MonoBehaviour
     Camera cam;
 
     public float currentZoom = 1;
+    public Camera midCam, frontCam;
     Vector3 targetPos;
     public float targetZoom = 1;
     float prevZoom;
@@ -86,7 +87,9 @@ public class GameCamera : MonoBehaviour
         currentZoom = zoomEasing.Update(Time.deltaTime, targetZoom);
         currentZoom.CheckChange(ref prevZoom, UpdateZoom);
         transform.position += input.gameActions.Pan.ReadValue<Vector2>().xy().Scaled(panSpeed) * currentZoom * Time.deltaTime;
-        cam.orthographicSize = currentZoom;
+        //cam.orthographicSize = currentZoom;
+        midCam.orthographicSize = currentZoom;
+        //frontCam.orthographicSize = currentZoom;
 
         if (input.gameActions.PanBtn.IsPressed())
         {

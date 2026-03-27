@@ -50,7 +50,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             {
                 if (i == j) continue; // skip self-connections
                 float x = Random.value * 2 - 1;
-                nn.mtx[i, j] = Mathf.Pow(x, 11) * 10;
+                nn.mtx[i, j] = Mathf.Pow(x, 3);
             }
         }
 
@@ -68,10 +68,28 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         OnReadyForVisualisation?.Invoke();
 	}
 
+    void Step(float dt)
+    {
+        for (int n = 0; n < nodes.Count; n++)
+        {
+            for (int i = 0; i < ideas.Count; i++)
+            {
+                float niDelta = 0;
+                for (int k = 0; k < nodes.Count; k++)
+                {
+                    if(n == k || nn.mtx[n, k] == 0) continue;
+                    niDelta += nn.mtx[n, k] * ni.mtx[k, i];
+                }
+                ni.mtx[n, i] += niDelta * dt;
+            }
+        }
+    }
+
 	private void Update()
 	{
         nn.RecalculateStats();
         UpdateStatistics();
+        Step(Time.deltaTime);
 	}
 
 	void UpdateStatistics()
@@ -133,7 +151,7 @@ public class AdjacencyMtx
         minWeight = Mathf.Min(FlatMtx());
         maxAbsWeight = Mathf.Max(FlatMtx().Select(x => Mathf.Abs(x)).ToArray());
         sumAbsWeight = FlatMtx().Sum(x => Mathf.Abs(x));
-        maxOutdegree = nodes.Max(x => GetOutdegree(x));
+        maxOutdegree = nodes.Max(x => GetIndegree(x));
     }
 
     /// <summary>
@@ -168,16 +186,16 @@ public class AdjacencyMtx
     }
     public float[] GetEdgesTo(Node fromNode) => GetEdgesTo(nodes.FindIndex(x => x == fromNode));
 
-    public float GetOutdegree(int from)
+    public float GetIndegree(int to)
     {
         float sum = 0;
-        for (int to = 0; to < mtx.Cols(); to++)
+        for (int from = 0; from < mtx.Cols(); from++)
         {
 			sum += Mathf.Abs(mtx[from, to]);
 		}
         return sum;
     }
-    public float GetOutdegree(Node fromNode) => GetOutdegree(nodes.FindIndex(x => x == fromNode));
+    public float GetIndegree(Node fromNode) => GetIndegree(nodes.FindIndex(x => x == fromNode));
     public float[] FlatMtx()
     {
         float[] flat = new float[mtx.Length];

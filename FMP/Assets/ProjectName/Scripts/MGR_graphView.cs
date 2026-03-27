@@ -11,7 +11,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	[Header("Misc")]
 	public float lineGap = 0;
 	public float pairwiseForceThreshold = 0.01f;
-	public AnimationCurve sizeByOutdegree;
+	public AnimationCurve sizeByIndegree;
 	public Gradient edgeColourGradient;
 	[Header("Forces")]
 	public float padding = 10f;
@@ -41,7 +41,8 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	}
 	public RepulsionTypes repulsionType;
 	[Header("Runtime & Refs")]
-	[SerializeField] int calculatedPairs, totalPairs;
+	[SerializeField] int calculatedPairs;
+	[SerializeField] int totalPairs;
 	public VisualNode visualNodePrefab;
 	public int nodeCount;
 	MGR_gameMaths gameMaths;
@@ -84,7 +85,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 			p[i] = Random.insideUnitCircle * 1;
 			v[i] = Vector2.zero;
 			a[i] = Vector2.zero;
-			r[i] = sizeByOutdegree.Evaluate(graph.GetOutdegree(i));
+			r[i] = sizeByIndegree.Evaluate(graph.GetIndegree(i));
         }
 
 		totalPairs = nodeCount * nodeCount;
@@ -95,7 +96,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 		calculatedPairs = 0;
 		for (int i = 0; i < nodeCount; i++) // nodewise forces and some calcs
         {
-            r[i] = sizeByOutdegree.Evaluate(graph.GetOutdegree(i));
+            r[i] = sizeByIndegree.Evaluate(graph.GetIndegree(i));
             a[i] = Vector3.zero;
             a[i] += NodewiseForce(i);
         }
@@ -111,7 +112,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 
                 float w;
                 if (symmetriseWeights) w = (Mathf.Abs(ij) + Mathf.Abs(ji)) / 2;
-                else w = Mathf.Abs(ji);
+                else w = Mathf.Abs(ij);
                 if (normaliseWeights) w /= graph.maxAbsWeight;
 
 				if (w < pairwiseForceThreshold) continue;
@@ -203,7 +204,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
         {
 			if(i == j) continue;
 			globalCentroid += p[j] / (graph.nodes.Count - 1);
-			weightedCentroid += p[j] * graph.GetOutdegree(j) / graph.sumAbsWeight;
+			weightedCentroid += p[j] * graph.GetIndegree(j) / graph.sumAbsWeight;
         }
 		Vector2 centeringForce = centeringStrength * globalCentroid.sqrMagnitude * -globalCentroid.normalized;
 		Vector2 weightedCentroidD = (weightedCentroid - p[i]);

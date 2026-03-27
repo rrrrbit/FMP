@@ -595,23 +595,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineGap: 0.1
   pairwiseForceThreshold: 0
-  sizeByOutdegree:
+  sizeByIndegree:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.05
-      inSlope: 0.0495
-      outSlope: 0.0495
+      value: 1
+      inSlope: 0.2
+      outSlope: 0.2
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 100
-      value: 5
-      inSlope: 0.0495
-      outSlope: 0.0495
+      value: 21
+      inSlope: 0.2
+      outSlope: 0.2
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -683,7 +683,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   attractionType: 0
   repulsionStrength: 100
-  repulsionType: 0
+  repulsionType: 1
   calculatedPairs: 0
   totalPairs: 0
   visualNodePrefab: {fileID: 8003208030640895489, guid: e4227e8697f29a146bcde6987d96a048, type: 3}

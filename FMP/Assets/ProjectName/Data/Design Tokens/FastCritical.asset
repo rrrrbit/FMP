@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: FastCritical
   m_EditorClassIdentifier: 
   value:
-    frequency: 5
+    frequency: 3
     damping: 1
     response: 1

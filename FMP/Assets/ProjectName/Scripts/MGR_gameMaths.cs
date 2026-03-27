@@ -52,7 +52,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             {
                 if (i == j) continue; // skip self-connections
                 float x = Random.value * 2 - 1;
-                nnMtx.mtx[i, j] = Mathf.Pow(x, 3);
+                nnMtx.mtx[i, j] = 0;//Mathf.Pow(x, 3);
             }
         }
 
@@ -99,7 +99,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             for (int i = 0; i < ideas.Count; i++)
             {
                 niMtx.mtx[n, i] += niDelta(n, i) * dt;
-                inMtx.mtx[n, i] = inOf(i, n);
+                inMtx.mtx[i, n] = inOf(i, n);
             }
 
             for (int m = 0; m < nodes.Count; m++)

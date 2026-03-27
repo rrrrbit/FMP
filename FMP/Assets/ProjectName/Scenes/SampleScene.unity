@@ -594,7 +594,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lineGap: 0.1
-  pairwiseForceThreshold: 0
+  pairwiseForceThreshold: -1
   sizeByIndegree:
     serializedVersion: 2
     m_Curve:

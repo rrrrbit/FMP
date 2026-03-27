@@ -113,7 +113,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
                 float w;
                 if (symmetriseWeights) w = (Mathf.Abs(ij) + Mathf.Abs(ji)) / 2;
                 else w = Mathf.Abs(ij);
-                if (normaliseWeights) w /= graph.maxAbsWeight;
+				if (normaliseWeights) w /= graph.maxAbsWeight + 0.0001f;
 
 				if (w < pairwiseForceThreshold) continue;
 

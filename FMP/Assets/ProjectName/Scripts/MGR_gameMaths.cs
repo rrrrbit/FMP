@@ -114,7 +114,7 @@ public class AdjacencyMtx
     public float maxOutdegree;
 
     /// <summary>
-    /// Construct a matrix with To as columns (x axis) and From as row (y axis).
+    /// Construct a matrix [y,x] with From as rows and To as columns.
     /// </summary>
     /// <param name="nodesTo"></param>
     /// <param name="nodesFrom"></param>
@@ -137,32 +137,32 @@ public class AdjacencyMtx
     }
 
     /// <summary>
-    /// Get a column (y slice) as an array.
+    /// Get a row as an array.
     /// </summary>
     /// <param name="from"></param>
     /// <returns></returns>
     public float[] GetEdgesFrom(int from)
     {
-        float[] edges = new float[mtx.Rows()];
+        float[] edges = new float[mtx.Cols()];
         for (int to = 0; to < edges.Length; to++)
         {
-            edges[to] = mtx[to, from];
+            edges[to] = mtx[from, to];
         }
         return edges;
     }
 	public float[] GetEdgesFrom(Node fromNode) => GetEdgesFrom(nodes.FindIndex(x => x == fromNode));
 
     /// <summary>
-    /// Get a row (x slice) as an array.
+    /// Get a column as an array.
     /// </summary>
     /// <param name="to"></param>
     /// <returns></returns>
     public float[] GetEdgesTo(int to)
     {
-        float[] edges = new float[mtx.Cols()];
+        float[] edges = new float[mtx.Rows()];
         for (int from = 0; from < edges.Length; from++)
         {
-            edges[from] = mtx[to, from];
+            edges[from] = mtx[from, to];
         }
         return edges;
     }
@@ -171,17 +171,10 @@ public class AdjacencyMtx
     public float GetOutdegree(int from)
     {
         float sum = 0;
-        for (int to = 0; to < mtx.Rows(); to++)
+        for (int to = 0; to < mtx.Cols(); to++)
         {
-            try
-            {
-                sum += Mathf.Abs(mtx[to, from]);
-            }
-            catch
-            {
-                Debug.Log("fucking broke at "+to.ToString()+", "+ from.ToString());
-            }
-        }
+			sum += Mathf.Abs(mtx[from, to]);
+		}
         return sum;
     }
     public float GetOutdegree(Node fromNode) => GetOutdegree(nodes.FindIndex(x => x == fromNode));

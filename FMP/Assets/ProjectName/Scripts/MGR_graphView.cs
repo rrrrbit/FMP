@@ -80,6 +80,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
         for (int i = 0; i < obj.Length; i++)
         {
 			obj[i] = Instantiate(visualNodePrefab);
+			obj[i].id = i;
 			p[i] = Random.insideUnitCircle * 1;
 			v[i] = Vector2.zero;
 			a[i] = Vector2.zero;
@@ -110,7 +111,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 
                 float w;
                 if (symmetriseWeights) w = (Mathf.Abs(ij) + Mathf.Abs(ji)) / 2;
-                else w = Mathf.Abs(ij);
+                else w = Mathf.Abs(ji);
                 if (normaliseWeights) w /= graph.maxAbsWeight;
 
 				if (w < pairwiseForceThreshold) continue;

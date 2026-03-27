@@ -13,7 +13,11 @@ public class VisualNodePerson : VisualNode
 
     void Update()
     {
-        int max;
+        int strongestId = 0;
         float[] edges = game.ni.GetEdgesFrom(id);
+		for(int i = 0; i < edges.Length; i++)
+		{
+			
+		}
     }
 }

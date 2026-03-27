@@ -700,8 +700,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a918ca942621ad4ba090885df76de57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingNumberPeople: 25
-  startingNumberIdeas: 5
+  startingNumberPeople: 10
+  startingNumberIdeas: 3
   max: 0
   min: 0
   maxAbs: 0

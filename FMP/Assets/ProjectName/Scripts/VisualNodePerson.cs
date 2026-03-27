@@ -5,7 +5,7 @@ public class VisualNodePerson : VisualNode
 {
     MGR_gameMaths game;
     [SerializeField]TextMeshPro text;
-    [SerializeField]float[] edges;
+    [SerializeField] float[] niEdges;
 
     private void Start()
     {
@@ -16,13 +16,13 @@ public class VisualNodePerson : VisualNode
     {
         int strongestId = 0;
         float strongestWeight = 0;
-        edges = game.ni.GetEdgesFrom(id);
-		for(int i = 0; i < edges.Length; i++)
+        niEdges = game.niMtx.GetEdgesFrom(id);
+		for(int i = 0; i < niEdges.Length; i++)
 		{
-            if (edges[i] > strongestWeight)
+            if (niEdges[i] > strongestWeight)
             {
                 strongestId = i;
-                strongestWeight = edges[i];
+                strongestWeight = niEdges[i];
             }
 		}
         text.text = strongestId.ToString();

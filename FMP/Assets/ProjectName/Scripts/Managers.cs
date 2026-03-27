@@ -8,7 +8,7 @@ public class Managers : MonoBehaviour
 	Dictionary<Type, object> managers = new();
 	private void Awake()
 	{
-		DontDestroyOnLoad(gameObject);
+		//DontDestroyOnLoad(gameObject);
 		Instance = this;
 
 		Register<MGR_gameMaths>(GetComponent<MGR_gameMaths>());

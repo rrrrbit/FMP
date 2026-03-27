@@ -20,9 +20,11 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	public float maxOutdegree;
 	public float sumOutdegree;
 	[Header("Runtime & Refs")]
-	public AdjacencyMtx nn;
-    public AdjacencyMtx ni;
-	public List<PersonNode> nodes;
+	public AdjacencyMtx nnMtx;
+    public AdjacencyMtx niMtx;
+    public AdjacencyMtx inMtx;
+    public AdjacencyMtx iiMtx;
+    public List<PersonNode> nodes;
     public List<IdeaNode> ideas;
 	public TextMeshProUGUI debugText;
 	public event System.Action OnReadyForVisualisation;
@@ -43,25 +45,47 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         }
 
         // initialise nn with random weights
-        nn = new AdjacencyMtx(nodes, nodes);
+        nnMtx = new AdjacencyMtx(nodes, nodes);
         for (int i = 0; i < nodes.Count; i++)
         {
             for (int j = 0; j < nodes.Count; j++)
             {
                 if (i == j) continue; // skip self-connections
                 float x = Random.value * 2 - 1;
-                nn.mtx[i, j] = Mathf.Pow(x, 3);
+                nnMtx.mtx[i, j] = Mathf.Pow(x, 3);
             }
         }
 
         // initialise ni with random weights
-        ni = new AdjacencyMtx(ideas, nodes);
+        niMtx = new AdjacencyMtx(nodes, ideas);
         for (int i = 0; i < nodes.Count; i++)
         {
             for (int j = 0; j < ideas.Count; j++)
             {
                 float x = Random.value * 2 - 1;
-                ni.mtx[i, j] = x;
+                niMtx.mtx[i, j] = x;
+            }
+        }
+
+        // in
+        inMtx = new AdjacencyMtx(ideas, nodes);
+        for (int i = 0; i < ideas.Count; i++)
+        {
+            for (int j = 0; j < nodes.Count; j++)
+            {
+                float x = Random.value * 2 - 1;
+                inMtx.mtx[i, j] = x;
+            }
+        }
+
+        // ii
+        iiMtx = new AdjacencyMtx(ideas, ideas);
+        for (int i = 0; i < ideas.Count; i++)
+        {
+            for (int j = 0; j < ideas.Count; j++)
+            {
+                float x = Random.value * 2 - 1;
+                iiMtx.mtx[i, j] = x;
             }
         }
 
@@ -74,31 +98,61 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         {
             for (int i = 0; i < ideas.Count; i++)
             {
-                float niDelta = 0;
-                for (int k = 0; k < nodes.Count; k++)
-                {
-                    if(n == k || nn.mtx[n, k] == 0) continue;
-                    niDelta += nn.mtx[n, k] * ni.mtx[k, i];
-                }
-                ni.mtx[n, i] += niDelta * dt;
+                niMtx.mtx[n, i] += niDelta(n, i) * dt;
+                inMtx.mtx[n, i] = inOf(i, n);
+            }
+
+            for (int m = 0; m < nodes.Count; m++)
+            {
+                nnMtx.mtx[n, m] += nnDelta(n,m) * dt;
             }
         }
+    }
+    float nnDelta(int n, int m)
+    {
+        float nnDelta = 0;
+        for (int k = 0; k < ideas.Count; k++)
+        {
+            if (n == m || nnMtx.mtx[n, k] == 0) continue;
+            nnDelta += inMtx.mtx[k, m] * niMtx.mtx[n, k];
+        }
+        return nnDelta;
+    }
+    float inOf(int i, int n)
+    {
+        float newIN = 0;
+        for (int k = 0; k < ideas.Count; k++)
+        {
+            if (i == k || nnMtx.mtx[n, k] == 0) continue;
+            newIN += iiMtx.mtx[i, k] * niMtx.mtx[n, k];
+        }
+        return newIN;
+    }
+    float niDelta(int n, int i)
+    {
+        float niDelta = 0;
+        for (int k = 0; k < nodes.Count; k++)
+        {
+            if (n == k || nnMtx.mtx[n, k] == 0) continue;
+            niDelta += nnMtx.mtx[n, k] * niMtx.mtx[k, i];
+        }
+        return niDelta;
     }
 
 	private void Update()
 	{
-        nn.RecalculateStats();
+        nnMtx.RecalculateStats();
         UpdateStatistics();
-        Step(Time.deltaTime);
+        Step(Time.deltaTime * 0.1f);
 	}
 
 	void UpdateStatistics()
 	{
-		max = nn.maxWeight;
-		min = nn.minWeight;
-		maxAbs = nn.maxAbsWeight;
-		sumAbs = nn.sumAbsWeight;
-		maxOutdegree = nn.maxOutdegree;
+		max = nnMtx.maxWeight;
+		min = nnMtx.minWeight;
+		maxAbs = nnMtx.maxAbsWeight;
+		sumAbs = nnMtx.sumAbsWeight;
+		maxOutdegree = nnMtx.maxOutdegree;
 	}
 }
 
@@ -136,7 +190,7 @@ public class AdjacencyMtx
     /// </summary>
     /// <param name="nodesTo"></param>
     /// <param name="nodesFrom"></param>
-    public AdjacencyMtx(IEnumerable<Node> nodesTo, IEnumerable<Node> nodesFrom)
+    public AdjacencyMtx(IEnumerable<Node> nodesFrom, IEnumerable<Node> nodesTo)
 	{
 		nodes = new List<Node>();
 		nodes.AddRange(nodesTo);

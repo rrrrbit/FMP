@@ -14,7 +14,7 @@ namespace RBitUtils
             if (!self.Equals(other))
             {
                 callback();
-                other = self;
+                other = self; 
             }
         }
 

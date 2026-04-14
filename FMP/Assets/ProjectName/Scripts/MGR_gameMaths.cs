@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using TMPro;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngine.Rendering;
@@ -78,12 +79,20 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
                 for (int k = 0; k < nodes.Count; k++)
                 {
                     if(n == k || nn.mtx[n, k] == 0) continue;
-                    niDelta += nn.mtx[n, k] * ni.mtx[k, i];
+                    // rate of change of alignment of node n to idea i scales by sum of alignments of n to each node * alignments of each node to i. (log)
+                    float nanCatch = Mathf.Log(nn.mtx[n, k] * ni.mtx[k, i]);
+                    if (!float.IsFinite(nanCatch))
+                    {
+                        continue;
+                    }
+                    niDelta += nanCatch;
                 }
                 ni.mtx[n, i] += niDelta * dt;
             }
         }
     }
+
+    float LogScaling(float x) => Mathf.Log(Mathf.Abs(x) + 1) * Mathf.Sign(x); // replace with something better
 
 	private void Update()
 	{

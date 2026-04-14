@@ -129,7 +129,6 @@ GameObject:
   m_Component:
   - component: {fileID: 25208403}
   - component: {fileID: 25208400}
-  - component: {fileID: 25208402}
   - component: {fileID: 25208401}
   m_Layer: 0
   m_Name: frontCamera
@@ -233,14 +232,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &25208402
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 25208399}
-  m_Enabled: 1
 --- !u!4 &25208403
 Transform:
   m_ObjectHideFlags: 0
@@ -1323,7 +1314,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2138412819}
   - component: {fileID: 2138412822}
-  - component: {fileID: 2138412821}
   - component: {fileID: 2138412820}
   m_Layer: 0
   m_Name: gameCamera
@@ -1391,14 +1381,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &2138412821
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2138412818}
-  m_Enabled: 1
 --- !u!20 &2138412822
 Camera:
   m_ObjectHideFlags: 0

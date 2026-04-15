@@ -4,11 +4,12 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using System.Linq;
+using System.Reflection.Emit;
 
 public class Idea : MonoBehaviour
 {
     [Header("Analytics")]
-    public Dictionary<Node, Dictionary<Node, float>> nn;
+    public Dictionary<Node, Dictionary<Node, float>> jj;
     public float influence;
     public float sumAbs;
     public float min;
@@ -20,6 +21,8 @@ public class Idea : MonoBehaviour
     public float CenteringSpeed;
     public float maxOutDegree;
     public float indegree;
+    public float Implement;
+    public float zenify;
     [Header("Go and Influence")]
     [Header("Implement node effects")]
 
@@ -48,7 +51,7 @@ public class Idea : MonoBehaviour
 
         }
 
-        nn = new Dictionary<Node, Dictionary<Node, float>>();
+        jj = new Dictionary<Node, Dictionary<Node, float>>();
         foreach (Node i in nodes)
         {
             Dictionary<Node, float> newRow = new Dictionary<Node, float>();
@@ -60,7 +63,7 @@ public class Idea : MonoBehaviour
             }
 
 
-            nn.Add(i, newRow);
+            jj.Add(i, newRow);
 
 
 
@@ -73,8 +76,8 @@ public class Idea : MonoBehaviour
 
     private void Update()
     {
-        DebugText.text = string.Join("\n", nn.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString())));
-        
+        //Unidentified// DebugText.text = string.Join("\n", jj.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString())));
+
 
 
 
@@ -89,18 +92,18 @@ public class Idea : MonoBehaviour
     {
         foreach (Node i in nodes)
         {
-            i.outdegree = nn[i].Values.Sum(x => Mathf.Abs(x));
-            i.visual.transform.localScale = sizebyIndegree.(i.outdegree) * Vector3.one;
+            i.outdegree = jj[i].Values.Sum(x => Mathf.Abs(x));
+            //Unidentified//.visual.transform.localScale = sizebyIndegree.(i.outdegree) * Vector3.one;
             i.visual.outdegree = i.outdegree;
-            i.visual.connections = nn[i].Values.ToList();
-            i.influence.connections = nn[i].Values.ToList();
+            i.visual.connections = jj[i].Values.ToList();
+            //Ignore this// i.influence.connections = jj [i].Values.ToList();
 
 
 
 
         }
 
-            
+
 
 
 
@@ -113,56 +116,72 @@ public class Idea : MonoBehaviour
 
 
     }
+
+
+    public void latharlatharising()
+    {
+
+
+
+
+    }
+
+    public void sentinel()
+    {
+        
+
+
+
+    }
+
+    public void Node_positioning()
+    {
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

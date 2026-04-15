@@ -1,7 +1,9 @@
 using UnityEngine;
 
-public class MGR_gameUI : MonoBehaviour
+public class MGR_levelUI : MonoBehaviour
 {
+    VisualNode selectedNode;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

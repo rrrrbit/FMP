@@ -14,6 +14,7 @@ public class Managers : MonoBehaviour
 		Register<MGR_gameMaths>(GetComponent<MGR_gameMaths>());
 		Register<MGR_graphView>(GetComponent<MGR_graphView>());
 		Register<MGR_input>(GetComponent<MGR_input>());
+		Register<MGR_levelUI>(GetComponent<MGR_levelUI>());
 	}
 	
 	void Register<T>(T impl)

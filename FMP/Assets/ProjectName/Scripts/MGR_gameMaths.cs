@@ -29,6 +29,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     public List<IdeaNode> ideas;
 	public TextMeshProUGUI debugText;
 	public event System.Action OnReadyForVisualisation;
+    [Header("debug")]
+    public List<float> debugFlatMtx;
 
 	private void Start()
 	{
@@ -53,7 +55,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             {
                 if (i == j) continue; // skip self-connections
                 float x = Random.value * 2 - 1;
-                n_n.mtx[i, j] = x/10f;
+                n_n.mtx[i, j] = Mathf.Pow(x, 10) /10f;
             }
         }
 
@@ -124,7 +126,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         {
             for (int b = 0; b < nodes.Count; b++)
             {
-                if (a == b || n_n.mtx[a, b] == 0) continue;
+                if (a == b) continue;
                 n_n.mtx[a, b] += CalcDeltaNN(a, b) * dt;
             }
         }
@@ -135,11 +137,11 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         float inAccm = 0;
         for (int k = 0; k < ideas.Count; k++)
         {
-            if (i == k || i_n.mtx[i, k] == 0) continue; // skip if nodes are equal
+            if (i == k || i_i.mtx[i, k] == 0) continue; // skip if nodes are equal
 
             // alignment of idea i to node n scales by 
             // sum of alignments of i to each idea * alignments of each idea to i
-            float nanCatch = i_i.mtx[i, k] * n_i.mtx[n, k];
+            float nanCatch = LogScaling(i_i.mtx[i, k] * n_i.mtx[n, k]);
 
             if (!float.IsFinite(nanCatch)) continue; // skip if calculation broke
 
@@ -191,13 +193,14 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         Step(Time.deltaTime);
 	}
 
-	void UpdateStatistics()// not changing???
+	void UpdateStatistics()
 	{
 		max = n_n.maxWeight;
 		min = n_n.minWeight;
 		maxAbs = n_n.maxAbsWeight;
 		sumAbs = n_n.sumAbsWeight;
 		maxOutdegree = n_n.maxOutdegree;
+        debugFlatMtx = i_i.FlatMtx().ToList();
 	}
 }
 
@@ -251,7 +254,6 @@ public class AdjacencyMtx
         maxAbsWeight = Mathf.Max(FlatMtx().Select(x => Mathf.Abs(x)).ToArray());
         sumAbsWeight = FlatMtx().Sum(x => Mathf.Abs(x));
         maxOutdegree = nodes.Max(x => GetIndegree(x));
-        Debug.Log(maxOutdegree.ToString());
     }
 
     /// <summary>

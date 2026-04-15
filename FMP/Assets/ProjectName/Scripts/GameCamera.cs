@@ -27,7 +27,7 @@ public class GameCamera : MonoBehaviour
     public float zoomMin;
     public float zoomMax;
     public float zoomInterval;
-    Camera cam;
+    Camera backCam;
 
     public float currentZoom = 1;
     public Camera midCam, frontCam;
@@ -40,7 +40,7 @@ public class GameCamera : MonoBehaviour
     void Awake()
     {
         input = Managers.Get<MGR_input>();
-        cam = GetComponent<Camera>();
+        backCam = GetComponent<Camera>();
         input.OnInputReady += AddCallbacks;
         zoomEasingSettings.token.Reload += InitialiseZoomEasing;
         InitialiseZoomEasing();
@@ -75,7 +75,7 @@ public class GameCamera : MonoBehaviour
     {
         ZoomOnPoint(
             currentZoom/prevZoom,
-            cam.ScreenToWorldPoint(
+            midCam.ScreenToWorldPoint(
                 Mouse.current.position.ReadValue().xy(-transform.position.z)
                 )
             );
@@ -95,9 +95,9 @@ public class GameCamera : MonoBehaviour
         {
             
             transform.position -= ScreenToWorldDelta(
-                cam, 
+                midCam, 
                 Mouse.current.delta.ReadValue(), 
-                -transform.position.z
+                transform.position.z
                 );
             //Mouse.current.delta.ReadValue().xy() / currentZoom / cam.aspect / 2
         }

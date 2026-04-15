@@ -21,6 +21,7 @@ public class Idea : MonoBehaviour
     public float maxOutDegree;
     public float indegree;
     [Header("Go and Influence")]
+    [Header("Implement node effects")]
 
     public Dictionary<Node, Dictionary<Node, float[]>> influences;
     public Node[] nodes;
@@ -32,6 +33,7 @@ public class Idea : MonoBehaviour
 
     public int StartingNumber;
     public float desiredDistance = 10f;
+    private object sizebyIndegree;
 
     public object DebugText { get; private set; }
 
@@ -72,8 +74,7 @@ public class Idea : MonoBehaviour
     private void Update()
     {
         DebugText.text = string.Join("\n", nn.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString())));
-
-
+        
 
 
 
@@ -89,7 +90,7 @@ public class Idea : MonoBehaviour
         foreach (Node i in nodes)
         {
             i.outdegree = nn[i].Values.Sum(x => Mathf.Abs(x));
-            i.visual.transform.localScale = sizebyIndegree.Evaluate(i.outdegree) * Vector3.one;
+            i.visual.transform.localScale = sizebyIndegree.(i.outdegree) * Vector3.one;
             i.visual.outdegree = i.outdegree;
             i.visual.connections = nn[i].Values.ToList();
             i.influence.connections = nn[i].Values.ToList();

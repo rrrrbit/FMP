@@ -14,12 +14,10 @@ public class Fundamental : MonoBehaviour
     public Node Node;
     public float Outdegree;
     public new float Instantiate;
-    public List<float>
-
-    private float generalise;
+    public float generalise;
     public float fundamental;
     public float authenticate;
-
+    
 
 
 

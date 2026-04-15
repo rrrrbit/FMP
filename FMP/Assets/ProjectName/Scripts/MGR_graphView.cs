@@ -70,7 +70,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 
 	void Init()
 	{
-		graph = gameMaths.nn;
+		graph = gameMaths.n_n;
 		nodeCount = graph.nodes.Count;
 		obj = new VisualNode[nodeCount];
 		p = new Vector2[nodeCount];

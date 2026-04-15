@@ -16,7 +16,7 @@ public class VisualNodePerson : VisualNode
     {
         int strongestId = 0;
         float strongestWeight = 0;
-        edges = game.ni.GetEdgesFrom(id);
+        edges = game.n_i.GetEdgesFrom(id);
 		for(int i = 0; i < edges.Length; i++)
 		{
             if (edges[i] > strongestWeight)

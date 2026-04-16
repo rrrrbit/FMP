@@ -14,8 +14,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	[Header("Misc")]
 	public int startingNumberPeople;
 	public int startingNumberIdeas;
-    [Header("Curves")]
-    public AnimationCurve mutualScoreCurve;
 	[Header("Statistics")]
 	public float max;
 	public float min;
@@ -24,15 +22,20 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	public float maxOutdegree;
 	public float sumOutdegree;
 	[Header("Runtime & Refs")]
+    [Header("- Lists")]
+	public List<PersonNode> nodes;
+    public List<IdeaNode> ideas;
+    [Header("- Matrices")]
 	public AdjacencyMtx n_n;
     public AdjacencyMtx n_i;
     public AdjacencyMtx i_n;
     public AdjacencyMtx i_i;
-	public List<PersonNode> nodes;
-    public List<IdeaNode> ideas;
-	public TextMeshProUGUI debugText;
+    [Header("- Idea Stats")]
+    public float[] deleteThisVar;
+
 	public event System.Action OnReadyForVisualisation;
     [Header("debug")]
+	public TextMeshProUGUI debugText;
     public List<float> debugFlatMtx;
 
 	private void Start()
@@ -58,7 +61,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             {
                 if (i == j) continue; // skip self-connections
                 float x = UnityEngine.Random.value * 2 - 1;
-                n_n.mtx[i, j] = Mathf.Pow(x, 10) /10f;
+                n_n.mtx[i, j] = Mathf.Pow(x, 11) /10f;
             }
         }
 
@@ -202,7 +205,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     /// <param name="x"></param>
     /// <returns></returns>
     float Symmetricise(Func<float, float> f, float x) => f(Mathf.Abs(x)) * Mathf.Sign(x);
-    float LogScaling(float x) => Symmetricise(x => Mathf.Log(x+1), x); // replace with something cheaper
+
+    float LogScaling(float x) => Symmetricise(x => Mathf.Log10(x+1), x);
     float RecScaling(float x, float k) => Symmetricise(x => 1 - (k / (x+k)), x);
 
     private void Update()

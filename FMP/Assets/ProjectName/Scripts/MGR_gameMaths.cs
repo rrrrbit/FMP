@@ -1,4 +1,5 @@
 using RBitUtils;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -13,6 +14,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	[Header("Misc")]
 	public int startingNumberPeople;
 	public int startingNumberIdeas;
+    [Header("Curves")]
+    public AnimationCurve mutualScoreCurve;
 	[Header("Statistics")]
 	public float max;
 	public float min;
@@ -54,7 +57,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             for (int j = 0; j < nodes.Count; j++)
             {
                 if (i == j) continue; // skip self-connections
-                float x = Random.value * 2 - 1;
+                float x = UnityEngine.Random.value * 2 - 1;
                 n_n.mtx[i, j] = Mathf.Pow(x, 10) /10f;
             }
         }
@@ -65,7 +68,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         {
             for (int j = 0; j < ideas.Count; j++)
             {
-                float x = Random.value * 2 - 1;
+                float x = UnityEngine.Random.value * 2 - 1;
                 n_i.mtx[i, j] = x;
             }
         }
@@ -87,7 +90,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             for (int j = 0; j < ideas.Count; j++)
             {
                 if (i == j) continue; // skip self-connections
-                float x = Random.value * 2 - 1;
+                float x = UnityEngine.Random.value * 2 - 1;
                 i_i.mtx[i, j] = x;
             }
         }
@@ -181,12 +184,28 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
             nnDeltaAccm += nanCatch;
         }
-        return nnDeltaAccm;
+
+        float mutualScore = 0;
+        for (int k = 0; k < nodes.Count; k++)
+        {
+            mutualScore += Mathf.Abs(n_n.mtx[a, k] * n_n.mtx[k, b]);  
+        }
+
+
+        return nnDeltaAccm * RecScaling(mutualScore, 3);
     }
 
-    float LogScaling(float x) => Mathf.Log(Mathf.Abs(x) + 1) * Mathf.Sign(x); // replace with something cheaper
+    /// <summary>
+    /// Mirror f(x) for positive x, to negative x. Good for making sigmoids
+    /// </summary>
+    /// <param name="f"></param>
+    /// <param name="x"></param>
+    /// <returns></returns>
+    float Symmetricise(Func<float, float> f, float x) => f(Mathf.Abs(x)) * Mathf.Sign(x);
+    float LogScaling(float x) => Symmetricise(x => Mathf.Log(x+1), x); // replace with something cheaper
+    float RecScaling(float x, float k) => Symmetricise(x => 1 - (k / (x+k)), x);
 
-	private void Update()
+    private void Update()
 	{
         n_n.RecalculateStats();
         UpdateStatistics();
@@ -311,10 +330,4 @@ public class AdjacencyMtx
         }
         return flat;
     }
-
-    //public float maxWeight => Mathf.Max(FlatMtx());
-    //public float minWeight => Mathf.Min(FlatMtx());
-    //public float maxAbsWeight => Mathf.Max(FlatMtx().Select(x => Mathf.Abs(x)).ToArray());
-    //public float sumAbsWeight => FlatMtx().Sum(x => Mathf.Abs(x));
-    //public float maxOutdegree => nodes.Max(x => GetOutdegree(x));
 }

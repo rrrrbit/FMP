@@ -25,6 +25,7 @@ public class Idea : MonoBehaviour
     public float zenify;
     [Header("Go and Influence")]
     [Header("Implement node effects")]
+    public float[,] formulate;
 
     public Dictionary<Node, Dictionary<Node, float[]>> influences;
     public Node[] nodes;
@@ -128,7 +129,7 @@ public class Idea : MonoBehaviour
 
     public void sentinel()
     {
-        
+       
 
 
 

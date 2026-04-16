@@ -9,7 +9,7 @@ public class Fundamental : MonoBehaviour
 {
     [SerializeField] Rigidbody jp;
     [Header("Clarification")]
-    public VisualNode[] nameThisArray;
+    public VisualNode[] FormingNode;
     public Vector3 Nodes;
     public Node Node;
     public float Outdegree;
@@ -17,7 +17,7 @@ public class Fundamental : MonoBehaviour
     public float generalise;
     public float fundamental;
     public float authenticate;
-    
+    public float requiem; 
 
 
 
@@ -59,7 +59,35 @@ public class Fundamental : MonoBehaviour
 
 
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

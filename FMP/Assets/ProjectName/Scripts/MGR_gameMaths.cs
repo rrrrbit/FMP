@@ -30,8 +30,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     public AdjacencyMtx n_i;
     public AdjacencyMtx i_n;
     public AdjacencyMtx i_i;
-    [Header("- Idea Stats")]
-    public float[] deleteThisVar;
+    //[Header("- Idea Stats")]
+    //public float[] deleteThisVar;
 
 	public event System.Action OnReadyForVisualisation;
     [Header("debug")]
@@ -158,7 +158,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
     float CalcDeltaNI(int n, int i)
     {
-        float niDeltaAccm = 0;
+        float suggestabilityAccm = 0;
         for (int k = 0; k < nodes.Count; k++)
         {
             if (n == k || n_n.mtx[n, k] == 0) continue;
@@ -169,9 +169,18 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
             if (!float.IsFinite(nanCatch)) continue;
 
-            niDeltaAccm += nanCatch;
+            suggestabilityAccm += nanCatch;
         }
-        return niDeltaAccm;
+
+        float internalInfluenceAccm = 0;
+        for (int k = 0; k < ideas.Count; k++)
+        {
+            if (i == k || i_i.mtx[i, k] == 0) continue;
+
+
+        }
+
+        return suggestabilityAccm + internalInfluenceAccm;
     }
 
     float CalcDeltaNN(int a, int b)

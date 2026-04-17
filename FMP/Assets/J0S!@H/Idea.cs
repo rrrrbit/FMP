@@ -73,7 +73,7 @@ public class Idea : MonoBehaviour
 
     private void Update()
     {
-        debugText.text = string.Join("\n", jn.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString())));
+        debugText.text = string.Join("\n", jn.Values.Select(x => string.Join(" ", x.Values.Select(y => Mathf.Round(y).ToString()))));
         min = jn.Values.Max(x => x.Values.Min());
         maxAbs = jn.Values.Max(x => x.Values.Max(y => Mathf.Abs(y)));
         sumAbs = jn.Values.Max(x => x.Values.Sum(y => Mathf.Abs(y)));
@@ -87,7 +87,7 @@ public class Idea : MonoBehaviour
         foreach (Node i in nodes)
         {
             i.outdegree = jn[i].Values.Sum(x => Mathf.Abs(x));
-            i.visual.transform.localScale = ( 1 + 4 * (i.minIndegree) / (maxIndegree - minIndegree)
+            //i.visual.transform.localScale = ( 1 + 4 * (i.minIndegree) / (maxIndegree - minIndegree)
             i.outdegree = jn[i].Values.Sum(x => Mathf.Abs(x));
             
 
@@ -97,17 +97,7 @@ public class Idea : MonoBehaviour
 
         }
 
-        // Initialise 2D Dictionary with Unmeasured weights
-        jn = new Dictionary<Node, Dictionary<Node, float>();
-        foreach (Node k in nodes)
-        {
-            float x = Random.value *
-
-
-
-
-
-        }
+        
 
 
 

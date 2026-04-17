@@ -20,14 +20,12 @@ public class Fundamental : MonoBehaviour
     }
 
     [Header("Clarification")]
-    public VisualNode[] nameThisArray;
+    public VisualNode[] FormulatedNode;
     public Vector3 Nodes;
     public Node Node;
     public float Outdegree;
-    public new float Instantiate;
-    public List<float>
-    public List<ArrayExtensions>
     
+   
 
 
    
@@ -38,23 +36,6 @@ public class Fundamental : MonoBehaviour
 
    
 
-    private void OnDrawGizmosSelected()
-    {
-        Vector3 FunctionedCentroid = Vector3.zero;
-        foreach (Node k in nodes)
-        {
-
-            FunctionedCentroid += k.visual.transform.position * k.outdegree * Fundamental.[Node][k] / Fundamental.sun(XmlSerializableConstraint => X.Outdegree);
-
-
-
-        }
-
-
-
-
-
-    }
 
 
 

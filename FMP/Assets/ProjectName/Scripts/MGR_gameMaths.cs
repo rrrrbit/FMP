@@ -14,7 +14,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	[Header("Misc")]
 	public int startingNumberPeople;
 	public int startingNumberIdeas;
-	[Header("Statistics")]
+	[Header("graph stats")]
 	public float max;
 	public float min;
 	public float maxAbs;
@@ -30,8 +30,17 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     public AdjacencyMtx n_i;
     public AdjacencyMtx i_n;
     public AdjacencyMtx i_i;
-    //[Header("- Idea Stats")]
-    //public float[] deleteThisVar;
+    [Header("-- Node Stats")]
+    float[] nodeSuggestability;
+    float[] nodeBias;
+    float[] nodeComplexity;
+    [Header("-- Idea Stats")]
+    float[] complexity;
+
+    float[,] nnNext;
+    float[,] niNext;
+    float[,] inNext;
+    float[,] iiNext;
 
 	public event System.Action OnReadyForVisualisation;
     [Header("debug")]
@@ -55,6 +64,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         // initialise nn with random weights
         n_n = new AdjacencyMtx(nodes, nodes);
+        nnNext = new float[nodes.Count(), nodes.Count()];
         for (int i = 0; i < nodes.Count; i++)
         {
             for (int j = 0; j < nodes.Count; j++)
@@ -67,6 +77,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         // initialise ni with random weights
         n_i = new AdjacencyMtx(ideas, nodes);
+        niNext = new float[nodes.Count(), ideas.Count()];
         for (int i = 0; i < nodes.Count; i++)
         {
             for (int j = 0; j < ideas.Count; j++)
@@ -78,6 +89,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         // initialise in to 0s
         i_n = new AdjacencyMtx(nodes, ideas);
+        inNext = new float[ideas.Count(), nodes.Count()];
         for (int i = 0; i < ideas.Count; i++)
         {
             for (int j = 0; j < nodes.Count; j++)
@@ -136,6 +148,10 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
                 n_n.mtx[a, b] += CalcDeltaNN(a, b) * dt;
             }
         }
+
+        //i_n.mtx = inNext;
+        //n_i.mtx = niNext;
+        //n_n.mtx = nnNext; as expected does tank.
     }
 
     float CalcIN(int i, int n)

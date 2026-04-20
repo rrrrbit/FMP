@@ -97,8 +97,8 @@ public class Idea : MonoBehaviour
 
         }
 
-        
 
+        
 
 
 

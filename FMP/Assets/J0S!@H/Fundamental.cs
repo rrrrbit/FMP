@@ -13,10 +13,17 @@ using System;
 
 public class Fundamental : MonoBehaviour
 {
-   
+    public bool isNode;
+    GameObject FundamentalNode;
     
     private void Start()
     {
+        if (FundamentalNode == null)
+        {
+            Debug.Log("Node is activated");
+            isNode = true;
+        }
+      
 
 
     }
@@ -28,7 +35,7 @@ public class Fundamental : MonoBehaviour
     public Node Node;
     public float Outdegree;
     public float Indegree;
-
+    public float Node_physics;
 
     
     

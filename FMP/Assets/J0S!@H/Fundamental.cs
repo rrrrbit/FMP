@@ -30,6 +30,7 @@ public class Fundamental : MonoBehaviour
 
     [Header("Clarification")]
     [Header("Consolidation")]
+    [Header("Amplifier")]
     public VisualNode[] FormulatedNode;
     public Vector3 Nodes;
     public Node Node;

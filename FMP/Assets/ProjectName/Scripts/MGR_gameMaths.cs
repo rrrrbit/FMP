@@ -21,7 +21,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	public float sumAbs;
 	public float maxOutdegree;
 	public float sumOutdegree;
-	[Header("Runtime & Refs")]
+	//[Header("Runtime & Refs")]
+	public event System.Action OnReadyForVisualisation;
     [Header("- Lists")]
 	public List<PersonNode> nodes;
     public List<IdeaNode> ideas;
@@ -41,13 +42,44 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     float[,] niNext;
     float[,] inNext;
     float[,] iiNext;
-
-	public event System.Action OnReadyForVisualisation;
+    [Header("Misc Parameters")]
+    public float rcThresholdMaxGradient;
+    public float rcThresholdOffset;
+    float rcConst = Mathf.Log(1 / 99);
     [Header("debug")]
 	public TextMeshProUGUI debugText;
     public List<float> debugFlatMtx;
 
-	private void Start()
+
+    #region utilities
+    /// <summary>
+    /// Mirror f(x) for positive x, to negative x. Good for making sigmoids
+    /// </summary>
+    /// <param name="f"></param>
+    /// <param name="x"></param>
+    /// <returns></returns>
+    float Symmetricise(Func<float, float> f, float x) => f(Mathf.Abs(x)) * Mathf.Sign(x);
+    float LogScaling(float x) => Symmetricise(x => Mathf.Log10(x + 1), x);
+    float RecScaling(float x, float k) => Symmetricise(x => 1 - (k / (x + k)), x);
+    /// <summary>
+    /// <a href="https://www.desmos.com/calculator/ygh3492ofo">See Demo.</a>
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="thresholdOffset"></param>
+    /// <param name="thresholdMaxGradient"></param>
+    /// <param name="positive"></param>
+    /// <param name="negative"></param>
+    /// <returns></returns>
+    float ResponseCurve(float x, float thresholdOffset, float thresholdMaxGradient, Func<float, float> positive, Func<float, float> negative)
+    {
+        float f = 0;
+        if (x >= 0) f = positive(x);
+        else f = -negative(Mathf.Abs(x));
+        return 1/(1+Mathf.Exp(rcConst-4*thresholdMaxGradient*(x-thresholdOffset))) * f;
+    }
+    #endregion
+
+    private void Start()
 	{
 		// initialise lists of all nodes & ideas
 		nodes = new List<PersonNode>(startingNumberPeople);
@@ -222,17 +254,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         return nnDeltaAccm * RecScaling(mutualScore, 3);
     }
-
-    /// <summary>
-    /// Mirror f(x) for positive x, to negative x. Good for making sigmoids
-    /// </summary>
-    /// <param name="f"></param>
-    /// <param name="x"></param>
-    /// <returns></returns>
-    float Symmetricise(Func<float, float> f, float x) => f(Mathf.Abs(x)) * Mathf.Sign(x);
-
-    float LogScaling(float x) => Symmetricise(x => Mathf.Log10(x+1), x);
-    float RecScaling(float x, float k) => Symmetricise(x => 1 - (k / (x+k)), x);
 
     private void Update()
 	{

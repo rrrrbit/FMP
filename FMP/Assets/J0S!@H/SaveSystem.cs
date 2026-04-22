@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using UnityEngine.VFX;
 public class SaveSystem : MonoBehaviour
 {
     public void SavePrefs()

@@ -1,11 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 public class Nodestats : MonoBehaviour
-{
+{    
     [SerializeField] Node Amplifier;
     [SerializeField] Node stats;
     [SerializeField] Node Node;
-    [SerializeField] Node Consilidation;
+    [SerializeField] Node Consolidation;
+    [SerializeField] Node statistics;
+    [SerializeField] Node experimentation;
+    
     public class Stats
     {
         public int stat1;
@@ -13,13 +19,18 @@ public class Nodestats : MonoBehaviour
         public int stat3;
         public int stat4;
         public int stat5;
-
-
-
-
+        Vector2 Influence;
+        Vector2 Consolidate;
+        Vector2 Correlation;
+        Vector2 Node_size;
+        Vector2 Chamar;
 
 
     }
+
+    public bool isNodeAnomalyDetected;
+
+    
 
     public enum Stat
     {
@@ -32,27 +43,34 @@ public class Nodestats : MonoBehaviour
         minIndegree,
         Outdegree,
 
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public void cancellation()
+    {
 
 
 
     }
 
     
+    public void Node_Sound_Amplitude()
+    {
+
+
+    }
+
+    public void LIGHT_YAGAMI()
+    {
+
+
+
+    }
+
+    public void Chamar()
+    {
+
+
+    }
 
 
 
@@ -76,7 +94,35 @@ public class Nodestats : MonoBehaviour
 
 
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

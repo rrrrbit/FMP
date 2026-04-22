@@ -15,7 +15,8 @@ public class Fundamental : MonoBehaviour
 {
     public bool isNode;
     GameObject FundamentalNode;
-    
+
+
     private void Start()
     {
         if (FundamentalNode == null)
@@ -23,7 +24,7 @@ public class Fundamental : MonoBehaviour
             Debug.Log("Node is activated");
             isNode = true;
         }
-      
+
 
 
     }
@@ -38,13 +39,40 @@ public class Fundamental : MonoBehaviour
     public float Indegree;
     public float Node_physics;
 
-    
-    
+
+
+    public enum node_influence
+    {
+
+
+    }
+
+    void Node_Amplifier()
+    {
+
+
+    }
 
 
 
 
-   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -67,6 +95,35 @@ public class Fundamental : MonoBehaviour
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

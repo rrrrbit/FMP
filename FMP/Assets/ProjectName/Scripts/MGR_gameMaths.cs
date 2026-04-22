@@ -45,7 +45,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     [Header("Misc Parameters")]
     public float rcThresholdMaxGradient;
     public float rcThresholdOffset;
-    float rcConst = Mathf.Log(1 / 99);
+    float rcConst = -Mathf.Log(99);
     [Header("debug")]
 	public TextMeshProUGUI debugText;
     public List<float> debugFlatMtx;
@@ -62,20 +62,20 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     float LogScaling(float x) => Symmetricise(x => Mathf.Log10(x + 1), x);
     float RecScaling(float x, float k) => Symmetricise(x => 1 - (k / (x + k)), x);
     /// <summary>
-    /// <a href="https://www.desmos.com/calculator/ygh3492ofo">See Demo.</a>
+    /// Parametric f(x) with an optional threshold and asymmetric shape. <a href="https://www.desmos.com/calculator/ygh3492ofo">See demo.</a>
     /// </summary>
     /// <param name="x"></param>
-    /// <param name="thresholdOffset"></param>
-    /// <param name="thresholdMaxGradient"></param>
-    /// <param name="positive"></param>
-    /// <param name="negative"></param>
+    /// <param name="activation">value of x where threshold is roughly fully open (0.99 hard coded).</param>
+    /// <param name="steepness">Maximum gradient of threshold</param>
+    /// <param name="positive">Function describing behaviour when x >= 0.</param>
+    /// <param name="negative">Funcion describing behaviour when x &lt;j 0.</param>
     /// <returns></returns>
-    float ResponseCurve(float x, float thresholdOffset, float thresholdMaxGradient, Func<float, float> positive, Func<float, float> negative)
+    float ResponseCurve(float x, float activation, float steepness, Func<float, float> positive, Func<float, float> negative)
     {
         float f = 0;
         if (x >= 0) f = positive(x);
         else f = -negative(Mathf.Abs(x));
-        return 1/(1+Mathf.Exp(rcConst-4*thresholdMaxGradient*(x-thresholdOffset))) * f;
+        return 1/(1+Mathf.Exp(rcConst-4*steepness*(x-activation))) * f;
     }
     #endregion
 

@@ -7,21 +7,24 @@ using UnityEngine.Rendering;
 using NUnit.Framework.Constraints;
 using UnityEngine.SceneManagement;
 using System;
-using System.Collections.Generic;
 
 
 
 
 public class Fundamental : MonoBehaviour
 {
-   
+    public bool isNode;
     GameObject FundamentalNode;
-    public int amplifier = 15;
-    
+
 
     private void Start()
     {
-       
+        if (FundamentalNode == null)
+        {
+            Debug.Log("Node is activated");
+            isNode = true;
+        }
+
 
 
     }
@@ -35,22 +38,18 @@ public class Fundamental : MonoBehaviour
     public float Outdegree;
     public float Indegree;
     public float Node_physics;
-    public bool isNode_influence;
 
-    public enum Fundamentals
+
+
+    public enum node_influence
     {
 
-
-    }
-
-    void node_influence()
-    {
-        
 
     }
 
     void Node_Amplifier()
     {
+
 
     }
 

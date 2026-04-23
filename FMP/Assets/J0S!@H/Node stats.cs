@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using UnityEngine.Analytics;
 public class Nodestats : MonoBehaviour
-{    
+{
+    float Influence_time = 55f;
+    float Consolidation = 33f;
     [SerializeField] Node Amplifier;
     [SerializeField] Node stats;
     [SerializeField] Node Node;
-    [SerializeField] Node Consolidation;
     [SerializeField] Node statistics;
     [SerializeField] Node experimentation;
     
@@ -30,8 +32,17 @@ public class Nodestats : MonoBehaviour
 
     public bool isNodeAnomalyDetected;
 
-    
+    private void Start()
+    {
+        while (Consolidation > 0)
+        {
+            Debug.Log("Need more consolidation");
+            Consolidation--;
 
+        }
+    }
+
+   
     public enum Stat
     {
         Physics2D,
@@ -66,14 +77,46 @@ public class Nodestats : MonoBehaviour
 
     }
 
-    public void Chamar()
+    public void Node_Amplifier()
     {
 
 
     }
 
+    public void Chamar()
+    {
+        if (isNodeAnomalyDetected)
+        {
+            print("Node Error");
+
+        }
+        else if (isNodeAnomalyDetected)
+        {
+            print("Node Unknown");
+        }
+        else
+        {
+            print("Node is validated");
+
+        }
+
+    }
+
+    public void JEM_THE_GOAT()
+    {
 
 
+
+    }
+
+    public void ALEX_O()
+    {
+
+
+
+    }
+
+    
 
 
 

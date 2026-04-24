@@ -20,7 +20,11 @@ public class Nodestats : MonoBehaviour
     private float score = 0;
     // It can also be a public float but I prefer to keep this confidential
     private float scoreMultiplier = 10f;
-     // Your score will multiply if you continue to influence other nodes
+     // This is a decimal called Scoremultiplier and it is equal to 10
+     
+    // A score multiplier in Unity is a scripting technique (usually C#) used to increase the points earned by a player,
+
+    // In Unity, a score multiplier is used to boost engagement and increase points earned based on performance
 
     private bool Light_Yagami_is_Kira;
     // This is to detect if the code implemented will reiterate
@@ -62,7 +66,7 @@ public class Nodestats : MonoBehaviour
     public enum Statistics
     {
         Physics2D,
-        // Physics2D is a specialized simulation engine within game development (specifically Unity) used to managed two-dimensional Physical interactions. There's more to explain, but it will overcomplicate things
+        // Physics2D is a specialized simulation engine within game development (specifically Unity) used to managed two-dimensional Physical interactions. So it basically consists of two axes. There's more to explain, but it will overcomplicate things
         Clarification,
         // To give the node an understanding on how it's supposed to operate 
         Consildation,
@@ -72,9 +76,13 @@ public class Nodestats : MonoBehaviour
         Influences,
         // Used to make sure if there are positve/negative influences which either attract or repel
         maxIndegree,
+
         minIndegree,
+        // The indegree of a vertex A is the number of edges coming into A.
         Outdegree,
+        //The outdegree is the number of edges (x,a) in E for any x in V.
         Node_velocity,
+        // How fast a Node can travel in units per second
         Node_physics,
         // How fast/slow paced the node will move when linked to other nodes
         Node_Analytics,
@@ -121,16 +129,17 @@ public class Nodestats : MonoBehaviour
         if (isNodeAnomalyDetected)
         {
             print("Node Error");
+            // This line of code commands the identification of a Node that is an Anomaly, but in this case the Anomaly would be spotted
 
         }
         else if (isNodeAnomalyDetected)
         {
             print("Node is unknown");
-        }
+        }    // This line of code is unsure of if whether it's a neutral node or an Anomaly
         else
         {
             print("Node is validated");
-
+            // This line of code
         }
         // These bits of code will ingrain this into the node which could improve their energy levels
     }
@@ -139,6 +148,7 @@ public class Nodestats : MonoBehaviour
     {
         if (Node_Capacity == true)
             print("Size is adequate");
+
         else if (Node_Capacity == false)
         {
             print("Size is inadequate");
@@ -156,13 +166,13 @@ public class Nodestats : MonoBehaviour
     {
         if (Node_disc == true)
         {
-            print("Disc is working");
-
+            print("Disc is accurate");
+            // The Disc in a Node is representative of it's life span
 
         }
         else if (Node_disc == false)
         {
-            print("Disc is not working");
+            print("Disc is inaccurate");
         }
         // This is just me experimenting
     }

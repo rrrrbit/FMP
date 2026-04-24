@@ -15,7 +15,7 @@ public class Fundamental : MonoBehaviour
 {
     public bool isNode;
     GameObject FundamentalNode;
-
+    public bool NodeAmputation;
 
     private void Start()
     {
@@ -43,14 +43,20 @@ public class Fundamental : MonoBehaviour
 
     public enum node_influence
     {
-
+        
 
     }
 
     void Node_Amplifier()
     {
-
-
+        if (NodeAmputation == true)
+        {
+            print("Amputation is working");
+        }
+        else
+        {
+            print("Amputation is not working");
+        }
     }
 
 

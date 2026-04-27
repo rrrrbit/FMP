@@ -15,7 +15,9 @@ public class Nodestats : MonoBehaviour
     [SerializeField] Node Node;
     [SerializeField] Node Consolidation;
     [SerializeField] Node statistics;
+    // This points out how the nodes are powering up or if they're repelling against each other
     [SerializeField] Node experimentation;
+    // This is a statement that tells you how the Physics of the nodes will be adjusted
     private float elapsedTime = 0f;
     private float score = 0;
     // It can also be a public float but I prefer to keep this confidential
@@ -29,6 +31,7 @@ public class Nodestats : MonoBehaviour
     private bool Light_Yagami_is_Kira;
     // This is to detect if the code implemented will reiterate
    
+
     public class Stats
     {
         public int stat1;
@@ -188,11 +191,11 @@ public class Nodestats : MonoBehaviour
         {
             print("Demonstration is moderate");
         }
-       // This is how I will 
+       // This is how I can differentiate between what Node has the correct size and what Node doesn't
     }
     
 
-
+  
 
 
 

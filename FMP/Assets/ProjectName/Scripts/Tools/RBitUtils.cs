@@ -2,6 +2,7 @@ namespace RBitUtils
 {
 	using System;
     using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
     using UnityEngine;
     public static class Misc
     {
@@ -12,8 +13,8 @@ namespace RBitUtils
         {
             if (!self.Equals(other))
             {
-                other = self;
                 callback();
+                other = self; 
             }
         }
 
@@ -37,6 +38,10 @@ namespace RBitUtils
             foreach (T item in self) if (item != null) return false;
             return true;
         }
+
+        public static int Rows<T>(this T[,] self) => self.GetLength(0);
+        public static int Cols<T>(this T[,] self) => self.GetLength(1);
+        public static Vector2Int Dimensions<T>(this T[,] self) => new(self.GetLength(0), self.GetLength(1));
     }
 
     public static class LerpPlus
@@ -218,8 +223,10 @@ namespace RBitUtils
             new(Mathf.RoundToInt(v.x), Mathf.RoundToInt(v.y));
 
         public static Vector2 xz(this Vector3 v) => new(v.x, v.z);
+        public static Vector2 xy(this Vector3 v) => new(v.x, v.y);
 
         public static Vector3 xz(this Vector2 v, float y) => new(v.x, y, v.y);
+        public static Vector3 xy(this Vector2 v, float z = 0) => new(v.x, v.y, z);
 
         /// <summary>
         /// Multiplies two vectors componentwise. (Some fucking idiot decided Vector.Scale should be in-place)
@@ -257,8 +264,20 @@ namespace RBitUtils
         /// <returns></returns>
         public static Vector2 Distribute(this Vector2 vec, Func<float, float> func) => new Vector2(func(vec.x), func(vec.y));
         public static Vector3 Distribute(this Vector3 vec, Func<float, float> func) => new Vector3(func(vec.x), func(vec.y), func(vec.z));
-    
-		public static Vector3 ClampLength(this Vector3 v, float maxLength)
+
+        public static Vector2 ClampLength(this Vector2 v, float maxLength)
+        {
+            if (v.sqrMagnitude > maxLength * maxLength)
+            {
+                return v.normalized * maxLength;
+            }
+            return v;
+        }
+        public static Vector2 WithMag(this Vector2 v, float mag)
+        {
+            return v.normalized * mag;
+        }
+        public static Vector3 ClampLength(this Vector3 v, float maxLength)
 		{
 			if (v.sqrMagnitude > maxLength * maxLength)
 			{
@@ -266,7 +285,6 @@ namespace RBitUtils
 			}
 			return v;
 		}
-
 		public static Vector3 WithMag(this Vector3 v, float mag) {
 			return v.normalized * mag;
 		}

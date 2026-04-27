@@ -30,7 +30,10 @@ public class Nodestats : MonoBehaviour
 
     private bool Light_Yagami_is_Kira;
     // This is to detect if the code implemented will reiterate
-   
+
+    public bool node_colour;
+
+    
 
     public class Stats
     {
@@ -46,6 +49,7 @@ public class Nodestats : MonoBehaviour
         Vector2 Chamar;
         Vector3 Node_physics;
         Vector3 Node_velocity;
+        
 
 
     }
@@ -92,7 +96,18 @@ public class Nodestats : MonoBehaviour
         // This is only for data purposes
     }
 
-
+    public enum node_colours
+    {
+       red,
+       Green,
+       Blue,
+       pink,
+       orange,
+       Magenta,
+       black,
+       purple,
+       brown
+    }
     public void cancellation()
     {
         do
@@ -191,9 +206,9 @@ public class Nodestats : MonoBehaviour
         {
             print("Demonstration is moderate");
         }
-       // This is how I can differentiate between what Node has the correct size and what Node doesn't
+        // This is how I can differentiate between what Node has the correct size and what Node doesn't
+       
     }
-    
 
   
 

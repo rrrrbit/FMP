@@ -86,9 +86,7 @@ public class Idea : MonoBehaviour
     {  
         foreach (Node i in nodes)
         {
-            i.outdegree = jn[i].Values.Sum(x => Mathf.Abs(x));
-            //i.visual.transform.localScale = ( 1 + 4 * (i.minIndegree) / (maxIndegree - minIndegree)
-            i.outdegree = jn[i].Values.Sum(x => Mathf.Abs(x));
+           
             
 
 

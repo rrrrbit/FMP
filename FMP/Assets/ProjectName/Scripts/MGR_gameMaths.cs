@@ -64,18 +64,32 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     /// <summary>
     /// Parametric f(x) with an optional threshold and asymmetric shape. <a href="https://www.desmos.com/calculator/ygh3492ofo">See demo.</a>
     /// </summary>
-    /// <param name="x"></param>
+    /// <param name="xRaw"></param>
     /// <param name="activation">value of x where threshold is roughly fully open (0.99 hard coded).</param>
     /// <param name="steepness">Maximum gradient of threshold</param>
-    /// <param name="positive">Function describing behaviour when x >= 0.</param>
-    /// <param name="negative">Funcion describing behaviour when x &lt;j 0.</param>
     /// <returns></returns>
-    float ResponseCurve(float x, float activation, float steepness, Func<float, float> positive, Func<float, float> negative)
+    float MagicCurve(float xRaw, float activationPos, float activationNeg, float activationSteepnessPos, float activationSteepnessNeg, float curvaturePos, float curvatureNeg)
     {
-        float f = 0;
-        if (x >= 0) f = positive(x);
-        else f = -negative(Mathf.Abs(x));
-        return 1/(1+Mathf.Exp(rcConst-4*steepness*(x-activation))) * f;
+        float activation = 0;
+        float activationSteepness = 0;
+        float curvature = 0;
+        if (xRaw >= 0)
+        {
+            activation = activationPos;
+            activationSteepness = activationSteepnessPos;
+            curvature = curvaturePos;
+        }
+        else
+        {
+            activation = activationNeg;
+            activationSteepness = activationSteepnessNeg;
+            curvature = curvatureNeg;
+        }
+
+        float sigmoid = 1 / (1 - MathF.Exp(-4 * activationSteepness * (xRaw - activation)));
+        float curve = MathF.Pow(MathF.Log(curvature * xRaw + 1), 1/curvature);
+
+        return sigmoid * curve;
     }
     #endregion
 

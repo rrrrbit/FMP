@@ -91,6 +91,12 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         return sigmoid * curve;
     }
+
+    float BumpCurve(float x, float center, float peak, float width, float steepness)
+    {
+        return peak * Mathf.Exp(Mathf.Pow(-Mathf.Abs((x - center) / width), steepness));
+    }
+
     #endregion
 
     private void Start()

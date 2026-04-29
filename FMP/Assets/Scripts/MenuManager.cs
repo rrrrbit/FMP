@@ -4,7 +4,7 @@ using TMPro;
 
 public class MenuManager : MonoBehaviour
 {
-    public void LoadScene(string SceneName)
+    public void LoadScene()
     {
         SceneManager.LoadScene(1);
     }
@@ -14,6 +14,5 @@ public class MenuManager : MonoBehaviour
         Application.Quit();
     }
 
-
-
+    
 }

@@ -40,15 +40,15 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     float[,] inNext;
     float[,] iiNext;
     [Header("- Node Stats")]
-    float[] nodeComplexity;
-    BumpCurveParams[] nodeComplexityTolerance;
-    MagicCurveParams[] nodeEnthusiasm;
-    float[] nodeReach;
-    MagicCurveParams[] nodeSuggestibility; // rename conformity...?
-    MagicCurveParams[] nodeAdherence;
+    public float[] nodeComplexity;
+    public BumpCurveParams[] nodeComplexityTolerance;
+    public MagicCurveParams[] nodeEnthusiasm;
+    public float[] nodeReach;
+    public MagicCurveParams[] nodeSuggestibility; // rename conformity...?
+    public MagicCurveParams[] nodeAdherence;
     [Header("-- Idea Stats")]
-    float[] ideaComplexity;
-    MagicCurveParams[] ideaTolerance;
+    public float[] ideaComplexity;
+    public MagicCurveParams[] ideaTolerance;
     [Header("debug")]
 	public TextMeshProUGUI debugText;
     public List<float> debugFlatMtx;
@@ -73,9 +73,9 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     /// <returns></returns>
     float MagicCurve(float xRaw, MagicCurveParams param)
     {
-        float activation = 0;
-        float activationSteepness = 0;
-        float flatness = 0;
+        float activation;
+        float activationSteepness;
+        float flatness;
         if (xRaw >= 0)
         {
             activation = param.activationPos;
@@ -92,7 +92,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         float x = Mathf.Abs(xRaw);
 
         float sigmoid = 1 / (1 + Mathf.Exp(-Mathf.Log(99)-4 * activationSteepness * (x - activation)));
-        float curve = Mathf.Pow(Mathf.Log(flatness * x + 1), 1/flatness);
+        float curve = 1;//Mathf.Pow(Mathf.Log(flatness * x + 1), 1/flatness);
 
         return sigmoid * curve * Mathf.Sign(xRaw);
     }
@@ -144,11 +144,12 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         }
     }
 
-    float ManualSumInd(int range, Func<int, float> func)
+    float ManualSumInd(int excludeInd, int range, Func<int, float> func)
     {
         float accm = 0;
         for (int i = 0; i < range; i++)
         {
+            if (i == excludeInd) continue; // skip self
             var nanCatch = func(i);
             if (!float.IsFinite(nanCatch)) continue; // skip breakages
             accm += nanCatch;
@@ -180,8 +181,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             activationSteepnessPos = 1,
             activationSteepnessNeg = 1,
             
-            flatnessPos = 1,
-            flatnessNeg = 1,
+            flatnessPos = 10,
+            flatnessNeg = 10,
         };
         MagicCurveParams maxMagicCurve = new()
         {
@@ -313,24 +314,82 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         //n_n.mtx = nnNext; as expected does tank.
     }
 
+    void StepWithNext(float dt)
+    {
+        // in
+        for (int i = 0; i < ideas.Count; i++)
+        {
+            for (int n = 0; n < nodes.Count; n++)
+            {
+                inNext[i, n] = CalcIN(i, n);
+            }
+        }
+
+        // ni
+        for (int n = 0; n < nodes.Count; n++)
+        {
+            for (int i = 0; i < ideas.Count; i++)
+            {
+                niNext[n, i] += CalcDeltaNI(n, i) * dt;
+            }
+        }
+
+        // nn
+        for (int a = 0; a < nodes.Count; a++)
+        {
+            for (int b = 0; b < nodes.Count; b++)
+            {
+                if (a == b) continue;
+                nnNext[a, b] += CalcDeltaNN(a, b) * dt;
+            }
+        }
+
+        // update stats
+        for (int n = 0; n < nodes.Count; n++)
+        {
+            UpdateStat(n);
+        }
+
+        IN.mtx = inNext;
+
+        for (int i = 0; i < NI.mtx.Rows(); i++)
+        {
+            for (int j = 0; j < NI.mtx.Cols(); j++)
+            {
+                NI.mtx[i, j] += niNext[i, j];
+            }
+        }
+
+        for (int i = 0; i < NN.mtx.Rows(); i++)
+        {
+            for (int j = 0; j < NN.mtx.Cols(); j++)
+            {
+                NN.mtx[i, j] += nnNext[i, j];
+            }
+        }
+
+        nnNext = new float[nodes.Count(), nodes.Count()];
+        niNext = new float[nodes.Count(), ideas.Count()];
+    }
+
     void UpdateStat(int n)
     {
-
+        
     }
 
     float CalcIN(int i, int n)
     {
         // similarity to exemplar here
-        var agreement = ManualSumInd(ideas.Count, x => NI.mtx[n, x] * II.mtx[i, x]);
+        var agreement = ManualSumInd(i, ideas.Count, x => NI.mtx[n, x] * II.mtx[i, x]);
         return agreement; // + similarity
     }
 
     float CalcDeltaNI(int n, int i)
     {
-        float social = ManualSumInd(nodes.Count, x =>
+        float social = ManualSumInd(n, nodes.Count, x =>
             MagicCurve(NI.mtx[x, i], nodeEnthusiasm[x]) * MagicCurve(NN.mtx[n, x], nodeSuggestibility[n])
             );
-        float ideological = ManualSumInd(ideas.Count, x =>
+        float ideological = ManualSumInd(i, ideas.Count, x =>
             II.mtx[x, i] * MagicCurve(NI.mtx[n,x], nodeAdherence[n])
             );
         float complexity = BumpCurve(ideaComplexity[i] - nodeComplexity[n], nodeComplexityTolerance[n]);
@@ -340,10 +399,10 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
     float CalcDeltaNN(int n, int m)
     {
-        float social = ManualSumInd(nodes.Count, x =>
-            NN.mtx[x, m] * MagicCurve(NN.mtx[n, x], nodeSuggestibility[n])
+        float social = ManualSumInd(n, nodes.Count, x =>
+            MagicCurve(NN.mtx[x, m] * NN.mtx[n, x], nodeSuggestibility[n])
             ) + nodeReach[m];
-        float ideological = ManualSumInd(ideas.Count, x =>
+        float ideological = ManualSumInd(-1, ideas.Count, x =>
             IN.mtx[x,m] * MagicCurve(NI.mtx[n,x], nodeAdherence[n])
             );
 
@@ -354,7 +413,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	{
         NN.RecalculateStats();
         UpdateStatistics();
-        Step(Time.deltaTime * .1f);
+        StepWithNext(Time.deltaTime);
 	}
 
 	void UpdateStatistics()
@@ -478,6 +537,7 @@ public class AdjacencyMtx
     }
 }
 
+[Serializable]
 public struct MagicCurveParams
 {
     public float activationPos;
@@ -490,6 +550,7 @@ public struct MagicCurveParams
     public float flatnessNeg;
 }
 
+[Serializable]
 public struct BumpCurveParams
 {
     public float center;

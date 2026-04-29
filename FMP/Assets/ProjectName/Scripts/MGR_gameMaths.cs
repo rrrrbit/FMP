@@ -14,7 +14,8 @@ using UnityEngine.Rendering;
 
 public class MGR_gameMaths : MonoBehaviour, IGameMaths
 {
-	[Header("Misc")]
+    #region vars
+    [Header("Misc")]
 	public int startingNumberPeople;
 	public int startingNumberIdeas;
 	[Header("graph stats")]
@@ -52,18 +53,9 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     [Header("debug")]
 	public TextMeshProUGUI debugText;
     public List<float> debugFlatMtx;
-
+    #endregion
 
     #region utilities
-    /// <summary>
-    /// Mirror f(x) for positive x, to negative x. Good for making sigmoids
-    /// </summary>
-    /// <param name="f"></param>
-    /// <param name="x"></param>
-    /// <returns></returns>
-    float Symmetricise(Func<float, float> f, float x) => f(Mathf.Abs(x)) * Mathf.Sign(x);
-    float LogScaling(float x) => Symmetricise(x => Mathf.Log10(x + 1), x);
-    float RecScaling(float x, float k) => Symmetricise(x => 1 - (k / (x + k)), x);
     /// <summary>
     /// Parametric f(x) with an optional threshold and asymmetric shape. <a href="https://www.desmos.com/calculator/ygh3492ofo">See demo.</a>
     /// </summary>
@@ -92,7 +84,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         float x = Mathf.Abs(xRaw);
 
         float sigmoid = 1 / (1 + Mathf.Exp(-Mathf.Log(99)-4 * activationSteepness * (x - activation)));
-        float curve = 1;//Mathf.Pow(Mathf.Log(flatness * x + 1), 1/flatness);
+        float curve = Mathf.Pow(Mathf.Log(flatness * x + 1), 1/flatness);
 
         return sigmoid * curve * Mathf.Sign(xRaw);
     }
@@ -102,6 +94,39 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         return param.peak * Mathf.Exp(Mathf.Pow(-Mathf.Abs((x - param.center) / param.width), param.steepness));
     }
 
+    float ManualSum(int excludeInd, int range, Func<int, float> func)
+    {
+        float accm = 0;
+        for (int i = 0; i < range; i++)
+        {
+            if (i == excludeInd) continue; // skip self
+            var nanCatch = func(i);
+            if (!float.IsFinite(nanCatch)) continue; // skip breakages
+            accm += nanCatch;
+        }
+        return accm;
+    }
+    #endregion
+
+    #region main
+    private void Start()
+    {
+        InitLists();
+        InitStats();
+        InitMtx();
+
+        OnReadyForVisualisation?.Invoke();
+    }
+
+    private void Update()
+    {
+        NN.RecalculateStats();
+        UpdateStatistics();
+        StepWithNext(Time.deltaTime);
+    }
+    #endregion
+
+    #region init procs
     void InitFloatArr(ref float[] x, int length, float min, float max)
     {
         x = new float[length];
@@ -144,35 +169,23 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         }
     }
 
-    float ManualSumInd(int excludeInd, int range, Func<int, float> func)
+    void InitLists()
     {
-        float accm = 0;
-        for (int i = 0; i < range; i++)
+        nodes = new List<PersonNode>(startingNumberPeople);
+        for (int i = 0; i < startingNumberPeople; i++)
         {
-            if (i == excludeInd) continue; // skip self
-            var nanCatch = func(i);
-            if (!float.IsFinite(nanCatch)) continue; // skip breakages
-            accm += nanCatch;
+            nodes.Add(new PersonNode());
         }
-        return accm;
-    }
-    #endregion
-
-    private void Start()
-	{
-		// initialise lists of all nodes & ideas
-		nodes = new List<PersonNode>(startingNumberPeople);
-		for (int i = 0; i < startingNumberPeople; i++)
-		{
-			nodes.Add(new PersonNode());
-		}
 
         ideas = new List<IdeaNode>(startingNumberIdeas);
         for (int i = 0; i < startingNumberIdeas; i++)
         {
             ideas.Add(new IdeaNode());
         }
+    }
 
+    void InitStats()
+    {
         MagicCurveParams minMagicCurve = new()
         {
             activationPos = 2,
@@ -180,7 +193,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
             activationSteepnessPos = 1,
             activationSteepnessNeg = 1,
-            
+
             flatnessPos = 10,
             flatnessNeg = 10,
         };
@@ -215,7 +228,10 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         // idea stats
         InitFloatArr(ref ideaComplexity, startingNumberIdeas, .5f, 1);
         InitMagicCurves(ref ideaTolerance, startingNumberIdeas, minMagicCurve, maxMagicCurve);
+    }
 
+    void InitMtx()
+    {
         // initialise nn with random weights
         NN = new AdjacencyMtx(nodes, nodes);
         nnNext = new float[nodes.Count(), nodes.Count()];
@@ -225,9 +241,10 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             {
                 if (i == j) continue; // skip self-connections
                 float x = UnityEngine.Random.value * 2 - 1;
-                NN.mtx[i, j] = Mathf.Pow(x, 11) /10f;
+                NN.mtx[i, j] = 0;//Mathf.Pow(x, 11) /10f;
             }
         }
+        NN.mtx[0, 1] = 1;
 
         // initialise ni with random weights
         NI = new AdjacencyMtx(ideas, nodes);
@@ -263,11 +280,9 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
                 II.mtx[i, j] = x;
             }
         }
-
-
-
-        OnReadyForVisualisation?.Invoke();
-	}
+    }
+    
+    #endregion
 
     void Step(float dt)
     {
@@ -379,42 +394,34 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
     float CalcIN(int i, int n)
     {
-        // similarity to exemplar here
-        var agreement = ManualSumInd(i, ideas.Count, x => NI.mtx[n, x] * II.mtx[i, x]);
+        // similarity here
+        var agreement = ManualSum(i, ideas.Count, x => NI.mtx[n, x] * II.mtx[i, x]);
         return agreement; // + similarity
     }
 
     float CalcDeltaNI(int n, int i)
     {
-        float social = ManualSumInd(n, nodes.Count, x =>
-            MagicCurve(NI.mtx[x, i], nodeEnthusiasm[x]) * MagicCurve(NN.mtx[n, x], nodeSuggestibility[n])
+        float social = ManualSum(n, nodes.Count, x =>
+            MagicCurve(NI.mtx[x, i], nodeEnthusiasm[x]) * NN.mtx[n, x]
             );
-        float ideological = ManualSumInd(i, ideas.Count, x =>
-            II.mtx[x, i] * MagicCurve(NI.mtx[n,x], nodeAdherence[n])
+        float ideological = ManualSum(i, ideas.Count, x =>
+            II.mtx[x, i] * NI.mtx[n, x]
             );
         float complexity = BumpCurve(ideaComplexity[i] - nodeComplexity[n], nodeComplexityTolerance[n]);
 
-        return social + ideological * complexity;
+        return MagicCurve(social, nodeSuggestibility[n]) + MagicCurve(ideological, nodeAdherence[n]) * complexity;
     }
 
-    float CalcDeltaNN(int n, int m)
+    float CalcDeltaNN(int n, int m)//problem is here
     {
-        float social = ManualSumInd(n, nodes.Count, x =>
-            MagicCurve(NN.mtx[x, m] * NN.mtx[n, x], nodeSuggestibility[n])
-            ) + nodeReach[m];
-        float ideological = ManualSumInd(-1, ideas.Count, x =>
-            IN.mtx[x,m] * MagicCurve(NI.mtx[n,x], nodeAdherence[n])
-            );
+        float socialRaw = ManualSum(n, nodes.Count, x => NN.mtx[x, m] * NN.mtx[n, x]) + nodeReach[m];
+        //float social = ManualSumInd(n, nodes.Count, x =>
+        //    MagicCurve(NN.mtx[x, m] * NN.mtx[n, x], nodeSuggestibility[n])
+        //    ) + nodeReach[m];
+        float ideological = ManualSum(-1, ideas.Count, x => IN.mtx[x,m] * NI.mtx[n, x]);
 
-        return social * ideological;
+        return MagicCurve(socialRaw, nodeSuggestibility[n]) * MagicCurve(ideological, nodeAdherence[n]);
     }
-
-    private void Update()
-	{
-        NN.RecalculateStats();
-        UpdateStatistics();
-        StepWithNext(Time.deltaTime);
-	}
 
 	void UpdateStatistics()
 	{
@@ -522,6 +529,16 @@ public class AdjacencyMtx
         return sum;
     }
     public float GetIndegree(Node fromNode) => GetIndegree(nodes.FindIndex(x => x == fromNode));
+    
+    public float GetOutdegree(int from)
+    {
+        float sum = 0;
+        for (int to = 0; to < mtx.Cols(); to++)
+        {
+            sum += Mathf.Abs(mtx[from, to]);
+        }
+        return sum;
+    }
     public float[] FlatMtx()
     {
         float[] flat = new float[mtx.Length];

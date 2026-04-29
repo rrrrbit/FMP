@@ -13,6 +13,8 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	public float pairwiseForceThreshold = 0.01f;
 	public AnimationCurve sizeByIndegree;
 	public Gradient edgeColourGradient;
+	public float minColourEdge = -10;
+	public float maxColourEdge = 10;
 	[Header("Forces")]
 	public float padding = 10f;
 	public bool useScale = true;
@@ -125,7 +127,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 
                 //debug edge visualisation
                 Vector2 offs = new(dn.y, -dn.x);
-				Debug.DrawLine(p[i] + offs * lineGap + dn * r[i], p[j] + offs * lineGap - dn * r[j], edgeColourGradient.Evaluate((ij - graph.minWeight) / (graph.maxWeight - graph.minWeight)));
+				Debug.DrawLine(p[i] + offs * lineGap + dn * r[i], p[j] + offs * lineGap - dn * r[j], edgeColourGradient.Evaluate((ij - minColourEdge) / (maxColourEdge - minColourEdge)));
             }
 			
         }

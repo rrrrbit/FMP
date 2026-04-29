@@ -8,12 +8,14 @@ using UnityEngine.InputSystem;
 using UnityEngine.SocialPlatforms.Impl;
 public class Nodestats : MonoBehaviour
 {
+    
     [Header("Node Analytics")]
     // This is just a title for the Node data
     [SerializeField] Node Amplifier;
     [SerializeField] Node stats;
     [SerializeField] Node Node;
     [SerializeField] Node Consolidation;
+    [SerializeField] Node numbers;
     [SerializeField] Node statistics;
     // This points out how the nodes are powering up or if they're repelling against each other
     [SerializeField] Node experimentation;
@@ -96,18 +98,6 @@ public class Nodestats : MonoBehaviour
         // This is only for data purposes
     }
 
-    public enum node_colours
-    {
-       red,
-       Green,
-       Blue,
-       pink,
-       orange,
-       Magenta,
-       black,
-       purple,
-       brown
-    }
     public void cancellation()
     {
         do
@@ -210,7 +200,7 @@ public class Nodestats : MonoBehaviour
        
     }
 
-  
+ 
 
 
 

@@ -47,6 +47,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     public float[] nodeReach;
     public MagicCurveParams[] nodeSuggestibility; // rename conformity...?
     public MagicCurveParams[] nodeAdherence;
+    public MagicCurveParams[] socialDecay;
     [Header("-- Idea Stats")]
     public float[] ideaComplexity;
     public MagicCurveParams[] ideaTolerance;
@@ -224,6 +225,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         InitFloatArr(ref nodeReach, startingNumberPeople, 0.5f, 1);
         InitMagicCurves(ref nodeSuggestibility, startingNumberPeople, minMagicCurve, maxMagicCurve);
         InitMagicCurves(ref nodeAdherence, startingNumberPeople, minMagicCurve, maxMagicCurve);
+        InitMagicCurves(ref socialDecay, startingNumberPeople, minMagicCurve, maxMagicCurve);
 
         // idea stats
         InitFloatArr(ref ideaComplexity, startingNumberIdeas, .5f, 1);
@@ -412,15 +414,18 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         return MagicCurve(social, nodeSuggestibility[n]) + MagicCurve(ideological, nodeAdherence[n]) * complexity;
     }
 
-    float CalcDeltaNN(int n, int m)//problem is here
+    float CalcDeltaNN(int n, int m)
     {
-        float socialRaw = ManualSum(n, nodes.Count, x => NN.mtx[x, m] * NN.mtx[n, x]) + nodeReach[m];
+        float social = ManualSum(n, nodes.Count, x => NN.mtx[x, m] * NN.mtx[n, x]) + nodeReach[m];
         //float social = ManualSumInd(n, nodes.Count, x =>
         //    MagicCurve(NN.mtx[x, m] * NN.mtx[n, x], nodeSuggestibility[n])
         //    ) + nodeReach[m];
         float ideological = ManualSum(-1, ideas.Count, x => IN.mtx[x,m] * NI.mtx[n, x]);
 
-        return MagicCurve(socialRaw, nodeSuggestibility[n]) * MagicCurve(ideological, nodeAdherence[n]);
+        float nn2 = NN.mtx[n, m] * NN.mtx[n, m];
+        float decay = (NN.mtx[n, m] * NN.mtx[n,m])/() * -Mathf.Sign(NN.mtx[n,m]) / 3;
+
+        return MagicCurve(social, nodeSuggestibility[n]) * MagicCurve(ideological, nodeAdherence[n]) + decay;
     }
 
 	void UpdateStatistics()

@@ -705,20 +705,20 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: 0.2
-      outSlope: 0.2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.33333334
+      outWeight: 0
     - serializedVersion: 3
-      time: 100
-      value: 21
-      inSlope: 0.2
-      outSlope: 0.2
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 34
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -753,6 +753,8 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 3
     m_NumAlphaKeys: 4
+  minColourEdge: -2
+  maxColourEdge: 2
   padding: 0
   useScale: 1
   normaliseWeights: 0
@@ -812,6 +814,14 @@ MonoBehaviour:
   sumAbs: 0
   maxOutdegree: 0
   sumOutdegree: 0
+  nodeComplexity: []
+  nodeComplexityTolerance: []
+  nodeEnthusiasm: []
+  nodeReach: []
+  nodeSuggestibility: []
+  nodeAdherence: []
+  ideaComplexity: []
+  ideaTolerance: []
   debugText: {fileID: 0}
   debugFlatMtx: []
 --- !u!114 &884068269

@@ -16,8 +16,8 @@ public class Nodestats : MonoBehaviour
     [SerializeField] Node Consolidation;
     [SerializeField] Node statistics;
     [SerializeField] Node experimentation;
-    private float elapsedTime = 0f;
-    private float score = 0;
+    public float elapsedTime = 0f;
+    public float score = 0;
     // It can also be a public float but I prefer to keep this confidential
     private float scoreMultiplier = 10f;
      // This is a decimal called Scoremultiplier and it is equal to 10
@@ -162,20 +162,7 @@ public class Nodestats : MonoBehaviour
 
     }
 
-    private void Node_disc_congregation()
-    {
-        if (Node_disc == true)
-        {
-            print("Disc is accurate");
-            // The Disc in a Node is representative of it's life span
-
-        }
-        else if (Node_disc == false)
-        {
-            print("Disc is inaccurate");
-        }
-        // This is just me experimenting
-    }
+    
 
 
     public void Node_visuals()

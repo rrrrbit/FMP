@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 212051227}
   - component: {fileID: 212051226}
   - component: {fileID: 212051230}
+  - component: {fileID: 212051231}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -236,6 +237,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49441391984aa5e468d6e7a31fafbc1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &212051231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212051225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0a2d393ab0d13042b6e5b4c74167cd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &314296128
 GameObject:
   m_ObjectHideFlags: 0
@@ -286,6 +299,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 836895411}
+  - {fileID: 575781225}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &456049833
@@ -481,12 +495,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 575781222}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 314296130}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &836895410
 GameObject:
@@ -883,37 +897,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1323708800}
   m_CullTransparentMesh: 1
---- !u!1 &1480849144
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1480849145}
-  m_Layer: 0
-  m_Name: Savegame
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1480849145
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1480849144}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 570.60535, y: 262.88754, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1860090294
 GameObject:
   m_ObjectHideFlags: 0
@@ -926,6 +909,7 @@ GameObject:
   - component: {fileID: 1860090298}
   - component: {fileID: 1860090297}
   - component: {fileID: 1860090296}
+  - component: {fileID: 1860090299}
   m_Layer: 5
   m_Name: 'Exit '
   m_TagString: Untagged
@@ -997,9 +981,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 212051230}
-        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: ExitGame
+      - m_Target: {fileID: 212051231}
+        m_TargetAssemblyTypeName: Exitgame, Assembly-CSharp
+        m_MethodName: OnclickExitgame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1047,6 +1031,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1860090294}
   m_CullTransparentMesh: 1
+--- !u!114 &1860090299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1860090294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b893cf2a54491e6488ee2d0b3c636884, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sizeDifference: 1.3
 --- !u!1 &1910749725
 GameObject:
   m_ObjectHideFlags: 0
@@ -1059,6 +1056,7 @@ GameObject:
   - component: {fileID: 1910749729}
   - component: {fileID: 1910749728}
   - component: {fileID: 1910749727}
+  - component: {fileID: 1910749730}
   m_Layer: 5
   m_Name: Play
   m_TagString: Untagged
@@ -1133,7 +1131,7 @@ MonoBehaviour:
       - m_Target: {fileID: 212051230}
         m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
         m_MethodName: LoadScene
-        m_Mode: 5
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1180,6 +1178,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1910749725}
   m_CullTransparentMesh: 1
+--- !u!114 &1910749730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1910749725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b893cf2a54491e6488ee2d0b3c636884, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sizeDifference: 1.3
 --- !u!1 &2123418772
 GameObject:
   m_ObjectHideFlags: 0
@@ -1323,6 +1334,4 @@ SceneRoots:
   - {fileID: 846054315}
   - {fileID: 456049835}
   - {fileID: 212051229}
-  - {fileID: 575781225}
   - {fileID: 314296130}
-  - {fileID: 1480849145}

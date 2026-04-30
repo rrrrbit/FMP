@@ -18,13 +18,13 @@ public class Nodestats : MonoBehaviour
     [SerializeField] Node Consolidation;
     [SerializeField] Node numbers;
     [SerializeField] Node statistics;
+    public float score = 0;
+    public float  elapsedTime = 0;
+    private float scoreMultiplier = 10f;
     // This points out how the nodes are powering up or if they're repelling against each other
     [SerializeField] Node experimentation;
     // This is a statement that tells you how the Physics of the nodes will be adjusted
-    private float elapsedTime = 0f;
-    private float score = 0;
     // It can also be a public float but I prefer to keep this confidential
-    private float scoreMultiplier = 10f;
      // This is a decimal called Scoremultiplier and it is equal to 10
      
     // A score multiplier in Unity is a scripting technique (usually C#) used to increase the points earned by a player,
@@ -35,7 +35,7 @@ public class Nodestats : MonoBehaviour
     // This is to detect if the code implemented will reiterate
 
     public bool node_colour;
-
+    public bool isMicheal;
     
 
     public class Stats
@@ -171,19 +171,9 @@ public class Nodestats : MonoBehaviour
 
     }
 
-    private void Node_disc_congregation()
+    public void Node_Micheal()
     {
-        if (Node_disc == true)
-        {
-            print("Disc is accurate");
-            // The Disc in a Node is representative of it's life span
 
-        }
-        else if (Node_disc == false)
-        {
-            print("Disc is inaccurate");
-        }
-        // This is just me experimenting
     }
 
 

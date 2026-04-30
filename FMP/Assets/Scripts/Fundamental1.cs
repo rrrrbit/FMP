@@ -12,7 +12,7 @@ using System;
 
 
 public class Fundamental : MonoBehaviour
-{
+{   
     public bool isNode;
     GameObject FundamentalNode;
     public bool NodeAmputation;
@@ -39,7 +39,7 @@ public class Fundamental : MonoBehaviour
     public float Indegree;
     public float Node_physics;
 
-
+  
 
     public enum node_influence
     {

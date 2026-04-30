@@ -16,7 +16,9 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 {
     #region vars
     [Header("Misc")]
-	public int startingNumberPeople;
+    public float timescale = 1;
+
+    public int startingNumberPeople;
 	public int startingNumberIdeas;
 	[Header("graph stats")]
 	public float max;
@@ -40,17 +42,29 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     float[,] niNext;
     float[,] inNext;
     float[,] iiNext;
+    int nodesCount;
+    int ideasCount;
     [Header("- Node Stats")]
+    public NodeStats[] nodeStats;
+
     public float[] nodeComplexity;
     public BumpCurveParams[] nodeComplexityTolerance;
     public MagicCurveParams[] nodeEnthusiasm;
     public float[] nodeReach;
     public MagicCurveParams[] nodeSuggestibility; // rename conformity...?
     public MagicCurveParams[] nodeAdherence;
-    public MagicCurveParams[] socialDecay;
+    public MagicCurveParams[] nodeSocialAttention;
     [Header("-- Idea Stats")]
     public float[] ideaComplexity;
     public MagicCurveParams[] ideaTolerance;
+
+    public float[] exemplarNodeComplexity;
+    public BumpCurveParams[] exemplarNodeComplexityTolerance;
+    public MagicCurveParams[] exemplarNodeEnthusiasm;
+    public float[] exemplarNodeReach;
+    public MagicCurveParams[] exemplarNodeSuggestibility; // rename conformity...?
+    public MagicCurveParams[] exemplarNodeAdherence;
+    public MagicCurveParams[] exemplarNodeSocialAttention;
     [Header("debug")]
 	public TextMeshProUGUI debugText;
     public List<float> debugFlatMtx;
@@ -85,14 +99,14 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         float x = Mathf.Abs(xRaw);
 
         float sigmoid = 1 / (1 + Mathf.Exp(-Mathf.Log(99)-4 * activationSteepness * (x - activation)));
-        float curve = Mathf.Pow(Mathf.Log(flatness * x + 1), 1/flatness);
+        float curve = flatness == 0 ? x : Mathf.Log(flatness * x + 1)/flatness;
 
         return sigmoid * curve * Mathf.Sign(xRaw);
     }
 
     float BumpCurve(float x, BumpCurveParams param)
     {
-        return param.peak * Mathf.Exp(Mathf.Pow(-Mathf.Abs((x - param.center) / param.width), param.steepness));
+        return param.peak * Mathf.Exp(-Mathf.Pow(Mathf.Abs((x - param.center) / param.width), param.steepness));
     }
 
     float ManualSum(int excludeInd, int range, Func<int, float> func)
@@ -106,6 +120,31 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             accm += nanCatch;
         }
         return accm;
+    }
+
+    MagicCurveParams RandomMagicCurve(MagicCurveParams min, MagicCurveParams max)
+    {
+        return new MagicCurveParams()
+        {
+            activationPos = UnityEngine.Random.Range(min.activationPos, max.activationPos),
+            activationSteepnessPos = UnityEngine.Random.Range(min.activationSteepnessPos, max.activationSteepnessPos),
+            flatnessPos = UnityEngine.Random.Range(min.flatnessPos, max.flatnessPos),
+
+            activationNeg = UnityEngine.Random.Range(min.activationNeg, max.activationNeg),
+            activationSteepnessNeg = UnityEngine.Random.Range(min.activationSteepnessNeg, max.activationSteepnessNeg),
+            flatnessNeg = UnityEngine.Random.Range(min.flatnessNeg, max.flatnessNeg)
+        };
+    }
+
+    BumpCurveParams RandomBumpCurve(BumpCurveParams min, BumpCurveParams max)
+    {
+        return new BumpCurveParams()
+        {
+            center = UnityEngine.Random.Range(min.center, max.center),
+            peak = UnityEngine.Random.Range(min.peak, max.peak),
+            width = UnityEngine.Random.Range(min.width, max.width),
+            steepness = UnityEngine.Random.Range(min.steepness, max.steepness),
+        };
     }
     #endregion
 
@@ -123,7 +162,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     {
         NN.RecalculateStats();
         UpdateStatistics();
-        StepWithNext(Time.deltaTime);
+        StepWithNext(Time.deltaTime * timescale);
     }
     #endregion
 
@@ -154,7 +193,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             };
         }
     }
-
     void InitBumpCurves(ref BumpCurveParams[] x, int length, BumpCurveParams min, BumpCurveParams max)
     {
         x = new BumpCurveParams[length];
@@ -183,10 +221,14 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         {
             ideas.Add(new IdeaNode());
         }
+
+        nodesCount = nodes.Count();
+        ideasCount = ideas.Count();
     }
 
     void InitStats()
     {
+        #region default curves
         MagicCurveParams minMagicCurve = new()
         {
             activationPos = 2,
@@ -210,6 +252,29 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             flatnessNeg = 10,
         };
 
+        MagicCurveParams socDecMinCurve = new()
+        {
+            activationPos = 5,
+            activationNeg = 5,
+
+            activationSteepnessPos = .5f,
+            activationSteepnessNeg = .5f,
+
+            flatnessPos = .5f,
+            flatnessNeg = .5f,
+        };
+        MagicCurveParams socDecMaxCurve = new()
+        {
+            activationPos = 10,
+            activationNeg = 10,
+
+            activationSteepnessPos = .25f,
+            activationSteepnessNeg = .25f,
+
+            flatnessPos = 2,
+            flatnessNeg = 2,
+        };
+
         BumpCurveParams minBumpCurve = new()
         {
             center = -1,
@@ -217,15 +282,38 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             width = 1,
             steepness = 2,
         };
+        BumpCurveParams maxBumpCurve = new()
+        {
+            center = 1,
+            peak = 1.5f,
+            width = 3,
+            steepness = 5,
+        };
+        #endregion
 
         // node stats
+        nodeStats = new NodeStats[nodesCount];
+        for(int i = 0; i < nodesCount; i++)
+        {
+            nodeStats[i] = new NodeStats()
+            {
+                complexity = UnityEngine.Random.Range(.5f, 1),
+                complexityTolerance = RandomBumpCurve(minBumpCurve, maxBumpCurve),
+                enthusiasm = RandomMagicCurve(minMagicCurve, maxMagicCurve),
+                reach = UnityEngine.Random.Range(.5f, 4),
+                suggestibility = RandomMagicCurve(minMagicCurve, maxMagicCurve),
+                adherence = RandomMagicCurve(minMagicCurve, maxMagicCurve),
+                socialAttention = RandomMagicCurve(socDecMinCurve, socDecMaxCurve),
+            };
+        }
+         
         InitFloatArr(ref nodeComplexity, startingNumberPeople, 0.5f, 1);
-        InitBumpCurves(ref nodeComplexityTolerance, startingNumberPeople, minBumpCurve, minBumpCurve);
+        InitBumpCurves(ref nodeComplexityTolerance, startingNumberPeople, minBumpCurve, maxBumpCurve);
         InitMagicCurves(ref nodeEnthusiasm, startingNumberPeople, minMagicCurve, maxMagicCurve);
         InitFloatArr(ref nodeReach, startingNumberPeople, 0.5f, 1);
         InitMagicCurves(ref nodeSuggestibility, startingNumberPeople, minMagicCurve, maxMagicCurve);
         InitMagicCurves(ref nodeAdherence, startingNumberPeople, minMagicCurve, maxMagicCurve);
-        InitMagicCurves(ref socialDecay, startingNumberPeople, minMagicCurve, maxMagicCurve);
+        InitMagicCurves(ref nodeSocialAttention, startingNumberPeople, socDecMinCurve, socDecMaxCurve);
 
         // idea stats
         InitFloatArr(ref ideaComplexity, startingNumberIdeas, .5f, 1);
@@ -234,12 +322,14 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
     void InitMtx()
     {
+        
+
         // initialise nn with random weights
         NN = new AdjacencyMtx(nodes, nodes);
-        nnNext = new float[nodes.Count(), nodes.Count()];
-        for (int i = 0; i < nodes.Count; i++)
+        nnNext = new float[nodesCount, nodesCount];
+        for (int i = 0; i < nodesCount; i++)
         {
-            for (int j = 0; j < nodes.Count; j++)
+            for (int j = 0; j < nodesCount; j++)
             {
                 if (i == j) continue; // skip self-connections
                 float x = UnityEngine.Random.value * 2 - 1;
@@ -250,10 +340,10 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         // initialise ni with random weights
         NI = new AdjacencyMtx(ideas, nodes);
-        niNext = new float[nodes.Count(), ideas.Count()];
-        for (int i = 0; i < nodes.Count; i++)
+        niNext = new float[nodesCount, ideasCount];
+        for (int i = 0; i < nodesCount; i++)
         {
-            for (int j = 0; j < ideas.Count; j++)
+            for (int j = 0; j < ideasCount; j++)
             {
                 float x = UnityEngine.Random.value * 2 - 1;
                 NI.mtx[i, j] = x;
@@ -262,10 +352,10 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         // initialise in to 0s
         IN = new AdjacencyMtx(nodes, ideas);
-        inNext = new float[ideas.Count(), nodes.Count()];
-        for (int i = 0; i < ideas.Count; i++)
+        inNext = new float[ideasCount, nodesCount];
+        for (int i = 0; i < ideasCount; i++)
         {
-            for (int j = 0; j < nodes.Count; j++)
+            for (int j = 0; j < nodesCount; j++)
             {
                 IN.mtx[i, j] = 0;
             }
@@ -273,9 +363,9 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         // initialise ii with random weights
         II = new AdjacencyMtx(ideas, ideas);
-        for (int i = 0; i < ideas.Count; i++)
+        for (int i = 0; i < ideasCount; i++)
         {
-            for (int j = 0; j < ideas.Count; j++)
+            for (int j = 0; j < ideasCount; j++)
             {
                 if (i == j) continue; // skip self-connections
                 float x = UnityEngine.Random.value * 2 - 1;
@@ -293,27 +383,27 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         // but might tank performance. fix l8r
 
         // in
-        for (int i = 0; i < ideas.Count; i++)
+        for (int i = 0; i < ideasCount; i++)
         {
-            for (int n = 0; n < nodes.Count; n++)
+            for (int n = 0; n < nodesCount; n++)
             {
                 IN.mtx[i, n] = CalcIN(i, n);
             }
         }
 
         // ni
-        for (int n = 0; n < nodes.Count; n++)
+        for (int n = 0; n < nodesCount; n++)
         {
-            for (int i = 0; i < ideas.Count; i++)
+            for (int i = 0; i < ideasCount; i++)
             {
                 NI.mtx[n, i] += CalcDeltaNI(n, i) * dt;
             }
         }
 
         // nn
-        for (int a = 0; a < nodes.Count; a++)
+        for (int a = 0; a < nodesCount; a++)
         {
-            for (int b = 0; b < nodes.Count; b++)
+            for (int b = 0; b < nodesCount; b++)
             {
                 if (a == b) continue;
                 NN.mtx[a, b] += CalcDeltaNN(a, b) * dt;
@@ -321,9 +411,9 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         }
 
         // update stats
-        for (int n = 0; n < nodes.Count; n++)
+        for (int n = 0; n < nodesCount; n++)
         {
-            UpdateStat(n);
+            UpdateStats(n);
         }
 
         //i_n.mtx = inNext;
@@ -364,7 +454,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         // update stats
         for (int n = 0; n < nodes.Count; n++)
         {
-            UpdateStat(n);
+            //UpdateStat(n);
         }
 
         IN.mtx = inNext;
@@ -389,7 +479,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         niNext = new float[nodes.Count(), ideas.Count()];
     }
 
-    void UpdateStat(int n)
+    void UpdateStats(int n)
     {
         
     }
@@ -397,35 +487,35 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     float CalcIN(int i, int n)
     {
         // similarity here
-        var agreement = ManualSum(i, ideas.Count, x => NI.mtx[n, x] * II.mtx[i, x]);
+        var agreement = ManualSum(i, ideasCount, x => NI.mtx[n, x] * II.mtx[i, x]);
         return agreement; // + similarity
     }
 
     float CalcDeltaNI(int n, int i)
     {
-        float social = ManualSum(n, nodes.Count, x =>
-            MagicCurve(NI.mtx[x, i], nodeEnthusiasm[x]) * NN.mtx[n, x]
+        float social = ManualSum(n, nodesCount, x =>
+            MagicCurve(NI.mtx[x, i], nodeStats[x].enthusiasm) * NN.mtx[n, x]
             );
-        float ideological = ManualSum(i, ideas.Count, x =>
+        float ideological = ManualSum(i, ideasCount, x =>
             II.mtx[x, i] * NI.mtx[n, x]
             );
-        float complexity = BumpCurve(ideaComplexity[i] - nodeComplexity[n], nodeComplexityTolerance[n]);
+        float complexity = BumpCurve(ideaComplexity[i] - nodeStats[n].complexity, nodeStats[n].complexityTolerance);
 
-        return MagicCurve(social, nodeSuggestibility[n]) + MagicCurve(ideological, nodeAdherence[n]) * complexity;
+        return MagicCurve(social, nodeStats[n].suggestibility) + MagicCurve(ideological, nodeStats[n].adherence) * complexity;
     }
 
     float CalcDeltaNN(int n, int m)
     {
-        float social = ManualSum(n, nodes.Count, x => NN.mtx[x, m] * NN.mtx[n, x]) + nodeReach[m];
+        float social = ManualSum(n, nodesCount, x => NN.mtx[x, m] * NN.mtx[n, x]) + nodeStats[m].reach;
         //float social = ManualSumInd(n, nodes.Count, x =>
         //    MagicCurve(NN.mtx[x, m] * NN.mtx[n, x], nodeSuggestibility[n])
         //    ) + nodeReach[m];
-        float ideological = ManualSum(-1, ideas.Count, x => IN.mtx[x,m] * NI.mtx[n, x]);
+        float ideological = ManualSum(-1, ideasCount, x => IN.mtx[x,m] * NI.mtx[n, x]);
 
-        float nn2 = NN.mtx[n, m] * NN.mtx[n, m];
-        float decay = (NN.mtx[n, m] * NN.mtx[n,m])/() * -Mathf.Sign(NN.mtx[n,m]) / 3;
+        //float nn2 = NN.mtx[n, m] * NN.mtx[n, m];
+        float decay = -MagicCurve(NN.mtx[n, m], nodeStats[n].socialAttention);
 
-        return MagicCurve(social, nodeSuggestibility[n]) * MagicCurve(ideological, nodeAdherence[n]) + decay;
+        return MagicCurve(social, nodeStats[n].suggestibility) * MagicCurve(ideological, nodeStats[n].adherence) + decay;
     }
 
 	void UpdateStatistics()
@@ -434,7 +524,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 		min = NN.minWeight;
 		maxAbs = NN.maxAbsWeight;
 		sumAbs = NN.sumAbsWeight;
-		maxOutdegree = NN.maxOutdegree;
+		maxOutdegree = NN.maxIndegree;
         debugFlatMtx = NN.FlatMtx().ToList();
 	}
 }
@@ -465,9 +555,7 @@ public class AdjacencyMtx
     public float minWeight;
     public float maxAbsWeight;
     public float sumAbsWeight;
-    public float maxOutdegree;
-
-    //public static implicit operator float[,](AdjacencyMtx adjMtx) => adjMtx.mtx; fuck
+    public float maxIndegree;
 
     /// <summary>
     /// Construct a matrix [y,x] with From as rows and To as columns.
@@ -489,7 +577,7 @@ public class AdjacencyMtx
         minWeight = Mathf.Min(FlatMtx());
         maxAbsWeight = Mathf.Max(FlatMtx().Select(x => Mathf.Abs(x)).ToArray());
         sumAbsWeight = FlatMtx().Sum(x => Mathf.Abs(x));
-        maxOutdegree = nodes.Max(x => GetIndegree(x));
+        maxIndegree = nodes.Max(x => GetIndegree(x)); // !!!!!!!! change indegree visualisation to use geometric mean as it better ignores few, strong connections and emphasises many connections.
     }
 
     /// <summary>
@@ -579,4 +667,16 @@ public struct BumpCurveParams
     public float peak;
     public float width;
     public float steepness;
+}
+
+[Serializable]
+public struct NodeStats
+{
+    public float complexity;
+    public BumpCurveParams complexityTolerance;
+    public MagicCurveParams enthusiasm;
+    public float reach;
+    public MagicCurveParams suggestibility; // rename conformity...?
+    public MagicCurveParams adherence;
+    public MagicCurveParams socialAttention;
 }

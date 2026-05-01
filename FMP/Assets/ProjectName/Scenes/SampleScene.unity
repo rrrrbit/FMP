@@ -807,8 +807,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timescale: 1
-  startingNumberPeople: 3
-  startingNumberIdeas: 2
+  startingNumberPeople: 25
+  startingNumberIdeas: 5
   max: 0
   min: 0
   maxAbs: 0

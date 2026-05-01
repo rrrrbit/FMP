@@ -15,7 +15,7 @@ using UnityEngine.Rendering;
 
 public class MGR_gameMaths : MonoBehaviour, IGameMaths
 {
-    #region vars
+#region vars
     [Header("Misc")]
     public float timescale = 1;
 
@@ -48,6 +48,9 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     [Header("- Node Stats")]
     public NodeStats[] nodeStats;
     public NodeStats[] nodeTargetStats;
+
+    public NodeStats nodeStatsMin;
+    public NodeStats nodeStatsMax;
     [Header("-- Idea Stats")]
     public float[] ideaComplexity;
     public MagicCurveParams[] ideaTolerance;
@@ -57,7 +60,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     public List<float> debugFlatMtx;
     #endregion
 
-    #region utilities
+#region utilities
     /// <summary>
     /// Parametric f(x) with an optional threshold and asymmetric shape. <a href="https://www.desmos.com/calculator/ygh3492ofo">See demo.</a>
     /// </summary>
@@ -151,7 +154,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     }
     #endregion
 
-    #region main
+#region main
     private void Start()
     {   
         InitLists();
@@ -164,12 +167,12 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     private void Update()
     {
         NN.RecalculateStats();
-        UpdateStatistics();
+        UpdateGraphStatistics();
         StepWithNext(Time.deltaTime * timescale);
     }
     #endregion
 
-    #region init procs
+#region init procs
     void InitFloatArr(ref float[] x, int length, float min, float max)
     {
         x = new float[length];
@@ -385,8 +388,10 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             }
         }
     }
-    
+
     #endregion
+
+#region calculations
 
     void Step(float dt)
     {
@@ -527,7 +532,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
                 center = WeightAvStat(x => x.complexityTolerance.center),
                 peak = WeightAvStat(x => x.complexityTolerance.peak),
                 steepness = WeightAvStat(x => x.complexityTolerance.steepness),
-                width = WeightAvStat(x => x.complexityTolerance.peak),
+                width = WeightAvStat(x => x.complexityTolerance.width),
             },
             enthusiasm = new MagicCurveParams()
             {
@@ -568,6 +573,50 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             }
         };
     }
+    
+    NodeStats ClampStats(NodeStats stats, NodeStats min, NodeStats max)
+    {
+        float ClampFloatStat(Func<NodeStats, float> stat) => Mathf.Clamp(stat(stats), stat(min), stat(max));
+        MagicCurveParams ClampMagicCurveStat(Func<NodeStats, MagicCurveParams> stat)
+        {
+            float ClampMagicCurveParam(Func<MagicCurveParams, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
+            return new()
+            {
+                activationNeg = ClampMagicCurveParam(x => x.activationNeg),
+                activationPos = ClampMagicCurveParam(x => x.activationPos),
+                activationSteepnessNeg = ClampMagicCurveParam(x => x.activationSteepnessNeg),
+                activationSteepnessPos = ClampMagicCurveParam(x => x.activationSteepnessPos),
+                flatnessNeg = ClampMagicCurveParam(x => x.flatnessNeg),
+                flatnessPos = ClampMagicCurveParam(x => x.flatnessPos),
+            };
+        }
+
+        BumpCurveParams ClampBumpCurveStat(Func<NodeStats, BumpCurveParams> stat)
+        {
+            float ClampBumpCurveParam(Func<BumpCurveParams, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
+            return new()
+            {
+                center = ClampBumpCurveParam(x => x.center),
+                peak = ClampBumpCurveParam(x => x.peak),
+                width = ClampBumpCurveParam(x => x.width),
+                steepness = ClampBumpCurveParam(x => x.steepness),
+            };
+        }
+        
+        NodeStats clamped = new NodeStats()
+        {
+            complexity = ClampFloatStat(x => x.complexity),
+            complexityTolerance = ClampBumpCurveStat(x => x.complexityTolerance),
+            enthusiasm = ClampMagicCurveStat(x => x.enthusiasm),
+            reach = ClampFloatStat(x => x.reach),
+            suggestibility = ClampMagicCurveStat(x => x.suggestibility),
+            adherence = ClampMagicCurveStat(x => x.adherence),
+            socialAttention = ClampMagicCurveStat(x => x.socialAttention),
+        };
+
+        return clamped;
+    }
+
     void UpdateStats(int n, float dt)
     {
         float CalcDelta(Func<NodeStats, float> stat)
@@ -612,6 +661,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         nodeStats[n].socialAttention.flatnessNeg += CalcDelta(x => x.socialAttention.flatnessNeg);
         nodeStats[n].socialAttention.flatnessPos += CalcDelta(x => x.socialAttention.flatnessPos);
     }
+    
     float CalcIN(int i, int n)
     {
         // similarity here
@@ -646,7 +696,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         return MagicCurve(social, nodeStats[n].suggestibility) * MagicCurve(ideological, nodeStats[n].adherence) + decay;
     }
 
-	void UpdateStatistics()
+	void UpdateGraphStatistics()
 	{
 		max = NN.maxWeight;
 		min = NN.minWeight;
@@ -655,6 +705,9 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 		maxOutdegree = NN.maxIndegree;
         debugFlatMtx = NN.FlatMtx().ToList();
 	}
+
+    #endregion
+
 }
 
 [System.Serializable]
@@ -786,6 +839,19 @@ public struct MagicCurveParams
     
     public float flatnessPos;
     public float flatnessNeg;
+
+    public static MagicCurveParams operator +(MagicCurveParams a, MagicCurveParams b)
+    {
+        return new()
+        {
+            activationNeg = a.activationNeg + b.activationNeg,
+            activationPos = a.activationPos + b.activationPos,
+            activationSteepnessNeg = a.activationSteepnessNeg + b.activationSteepnessNeg,
+            activationSteepnessPos = a.activationSteepnessPos + b.activationSteepnessPos,
+            flatnessNeg = a.flatnessPos + b.flatnessNeg,
+            flatnessPos = a.flatnessPos + b.flatnessPos,
+        };
+    }
 }
 
 [Serializable]

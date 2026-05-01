@@ -8,6 +8,8 @@ public class VisualNodePerson : VisualNode
     [SerializeField]float[] niEdges;
     [SerializeField]float[] inEdges;
     [SerializeField]float[] nnEdgesTo;
+    [SerializeField] NodeStats stats;
+    [SerializeField] NodeStats targetStats;
 
     private void Start()
     {
@@ -31,5 +33,8 @@ public class VisualNodePerson : VisualNode
 
         inEdges = game.IN.GetEdgesTo(id);
         nnEdgesTo = game.NN.GetEdgesTo(id);
+
+        stats = game.nodeStats[id];
+        targetStats = game.nodeTargetStats[id];
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 public class HoverEnlarger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public float sizeDifference = 1.3f;
+    public float sizeDifference = 1.25f;
 
     private Vector2 originalSize;
     private RectTransform rectTransform;

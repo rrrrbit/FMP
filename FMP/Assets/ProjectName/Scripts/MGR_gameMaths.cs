@@ -498,6 +498,48 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         
     }
+    NodeStats ClampStats(NodeStats stats, NodeStats min, NodeStats max)
+    {
+        float ClampFloatStat(Func<NodeStats, float> stat) => Mathf.Clamp(stat(stats), stat(min), stat(max));
+        MagicCurveParams ClampMagicCurveStat(Func<NodeStats, MagicCurveParams> stat)
+        {
+            float ClampMagicCurveParam(Func<MagicCurveParams, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
+            return new()
+            {
+                activationNeg = ClampMagicCurveParam(x => x.activationNeg),
+                activationPos = ClampMagicCurveParam(x => x.activationPos),
+                activationSteepnessNeg = ClampMagicCurveParam(x => x.activationSteepnessNeg),
+                activationSteepnessPos = ClampMagicCurveParam(x => x.activationSteepnessPos),
+                flatnessNeg = ClampMagicCurveParam(x => x.flatnessNeg),
+                flatnessPos = ClampMagicCurveParam(x => x.flatnessPos),
+            };
+        }
+
+        BumpCurveParams ClampBumpCurveStat(Func<NodeStats, BumpCurveParams> stat)
+        {
+            float ClampBumpCurveParam(Func<BumpCurveParams, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
+            return new()
+            {
+                center = ClampBumpCurveParam(x => x.center),
+                peak = ClampBumpCurveParam(x => x.peak),
+                width = ClampBumpCurveParam(x => x.width),
+                steepness = ClampBumpCurveParam(x => x.steepness),
+            };
+        }
+        
+        NodeStats clamped = new NodeStats()
+        {
+            complexity = ClampFloatStat(x => x.complexity),
+            complexityTolerance = ClampBumpCurveStat(x => x.complexityTolerance),
+            enthusiasm = ClampMagicCurveStat(x => x.enthusiasm),
+            reach = ClampFloatStat(x => x.reach),
+            suggestibility = ClampMagicCurveStat(x => x.suggestibility),
+            adherence = ClampMagicCurveStat(x => x.adherence),
+            socialAttention = ClampMagicCurveStat(x => x.socialAttention),
+        };
+
+        return clamped;
+    }
 
     void UpdateTargetStats(int n)
     {
@@ -572,50 +614,10 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
                 flatnessPos = WeightAvStat(x => x.socialAttention.flatnessPos),
             }
         };
+
+        nodeTargetStats[n] = ClampStats(nodeTargetStats[n], nodeStatsMin, nodeStatsMax);
     }
     
-    NodeStats ClampStats(NodeStats stats, NodeStats min, NodeStats max)
-    {
-        float ClampFloatStat(Func<NodeStats, float> stat) => Mathf.Clamp(stat(stats), stat(min), stat(max));
-        MagicCurveParams ClampMagicCurveStat(Func<NodeStats, MagicCurveParams> stat)
-        {
-            float ClampMagicCurveParam(Func<MagicCurveParams, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
-            return new()
-            {
-                activationNeg = ClampMagicCurveParam(x => x.activationNeg),
-                activationPos = ClampMagicCurveParam(x => x.activationPos),
-                activationSteepnessNeg = ClampMagicCurveParam(x => x.activationSteepnessNeg),
-                activationSteepnessPos = ClampMagicCurveParam(x => x.activationSteepnessPos),
-                flatnessNeg = ClampMagicCurveParam(x => x.flatnessNeg),
-                flatnessPos = ClampMagicCurveParam(x => x.flatnessPos),
-            };
-        }
-
-        BumpCurveParams ClampBumpCurveStat(Func<NodeStats, BumpCurveParams> stat)
-        {
-            float ClampBumpCurveParam(Func<BumpCurveParams, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
-            return new()
-            {
-                center = ClampBumpCurveParam(x => x.center),
-                peak = ClampBumpCurveParam(x => x.peak),
-                width = ClampBumpCurveParam(x => x.width),
-                steepness = ClampBumpCurveParam(x => x.steepness),
-            };
-        }
-        
-        NodeStats clamped = new NodeStats()
-        {
-            complexity = ClampFloatStat(x => x.complexity),
-            complexityTolerance = ClampBumpCurveStat(x => x.complexityTolerance),
-            enthusiasm = ClampMagicCurveStat(x => x.enthusiasm),
-            reach = ClampFloatStat(x => x.reach),
-            suggestibility = ClampMagicCurveStat(x => x.suggestibility),
-            adherence = ClampMagicCurveStat(x => x.adherence),
-            socialAttention = ClampMagicCurveStat(x => x.socialAttention),
-        };
-
-        return clamped;
-    }
 
     void UpdateStats(int n, float dt)
     {
@@ -660,6 +662,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         nodeStats[n].socialAttention.activationSteepnessPos += CalcDelta(x => x.socialAttention.activationSteepnessPos);
         nodeStats[n].socialAttention.flatnessNeg += CalcDelta(x => x.socialAttention.flatnessNeg);
         nodeStats[n].socialAttention.flatnessPos += CalcDelta(x => x.socialAttention.flatnessPos);
+
+        nodeStats[n] = ClampStats(nodeStats[n], nodeStatsMin, nodeStatsMax);
     }
     
     float CalcIN(int i, int n)

@@ -807,8 +807,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timescale: 1
-  startingNumberPeople: 25
-  startingNumberIdeas: 5
+  startingNumberPeople: 3
+  startingNumberIdeas: 2
   max: 0
   min: 0
   maxAbs: 0
@@ -816,22 +816,10 @@ MonoBehaviour:
   maxOutdegree: 0
   sumOutdegree: 0
   nodeStats: []
-  nodeComplexity: []
-  nodeComplexityTolerance: []
-  nodeEnthusiasm: []
-  nodeReach: []
-  nodeSuggestibility: []
-  nodeAdherence: []
-  nodeSocialAttention: []
+  nodeTargetStats: []
   ideaComplexity: []
   ideaTolerance: []
-  exemplarNodeComplexity: []
-  exemplarNodeComplexityTolerance: []
-  exemplarNodeEnthusiasm: []
-  exemplarNodeReach: []
-  exemplarNodeSuggestibility: []
-  exemplarNodeAdherence: []
-  exemplarNodeSocialAttention: []
+  ideaExemplar: []
   debugText: {fileID: 0}
   debugFlatMtx: []
 --- !u!114 &884068269

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using TMPro;
 using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
@@ -87,12 +88,24 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         float sigmoid = 1 / (1 + Mathf.Exp(-Mathf.Log(99)-4 * activationSteepness * (x - activation)));
         float curve = flatness == 0 ? x : Mathf.Log(flatness * x + 1)/flatness;
 
-        return sigmoid * curve * Mathf.Sign(xRaw);
+        float total = sigmoid * curve * Mathf.Sign(xRaw);
+        if (!float.IsFinite(total))
+        {
+            Debug.LogWarning("caught NaN in magicCurve");
+            return 0;
+        }
+        return total;
     }
 
     float BumpCurve(float x, BumpCurveParams param)
     {
-        return param.peak * Mathf.Exp(-Mathf.Pow(Mathf.Abs((x - param.center) / param.width), param.steepness));
+        float total = param.peak * Mathf.Exp(-Mathf.Pow(Mathf.Abs((x - param.center) / param.width), param.steepness));
+        if (!float.IsFinite(total))
+        {
+            Debug.LogWarning("caught NaN in bumpCurve");
+            return 0;
+        }
+        return total;
     }
 
     float ManualSum(int excludeInd, int range, Func<int, float> func)
@@ -102,7 +115,11 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         {
             if (i == excludeInd) continue; // skip self
             var nanCatch = func(i);
-            if (!float.IsFinite(nanCatch)) continue; // skip breakages
+            if (!float.IsFinite(nanCatch)) // skip breakages
+            {
+                Debug.LogWarning("caught NaN in sum at index " + i);
+                continue;
+            }
             accm += nanCatch;
         }
         return accm;
@@ -136,7 +153,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
     #region main
     private void Start()
-    {
+    {   
         InitLists();
         InitStats();
         InitMtx();
@@ -450,7 +467,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         for (int n = 0; n < nodesCount; n++)
         {
             UpdateTargetStats(n);
-            UpdateStats(n);
+            UpdateStats(n, dt);
         }
 
         IN.mtx = inNext;
@@ -490,68 +507,73 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             mappedNN[m] = MagicCurve(NN.mtx[n, m], nodeStats[n].suggestibility);
         }
 
-        float totalWeight = ManualSum(-1, ideasCount, x => mappedNI[x]) + ManualSum(n, nodesCount, x => mappedNN[x]);
+        float totalIdeasWeight = ManualSum(-1, ideasCount, x => mappedNI[x]);
+        float totalNodesWeight = ManualSum(n, nodesCount, x => mappedNN[x]);
+        float totalWeight = totalIdeasWeight + totalNodesWeight + 1;
 
-        float WeightAvStat(Func<int, float> ideaExemplarStat, Func<int, float> nodeStat)
+        float WeightAvStat(Func<NodeStats, float> stat)
         {
-            return (ManualSum(-1, ideasCount, x => ideaExemplarStat(x) * mappedNI[x]) + ManualSum(n, nodesCount, x => nodeStat(x) * mappedNN[x]))/totalWeight;
+            float sumIdeaExmplr = ManualSum(-1, ideasCount, x => stat(ideaExemplar[x]) * mappedNI[x]);
+            float sumNodes = ManualSum(n, nodesCount, x => stat(nodeStats[x]) * mappedNN[x]);
+
+            return (sumIdeaExmplr + sumNodes + stat(nodeStats[n]))/(totalWeight);
         }
 
         nodeTargetStats[n] = new()  
         {
-            complexity = WeightAvStat(x => ideaExemplar[x].complexity, x => nodeStats[x].complexity),
+            complexity = WeightAvStat(x => x.complexity),
             complexityTolerance = new BumpCurveParams()
             {
-                center = WeightAvStat(x => ideaExemplar[x].complexityTolerance.center, x => nodeStats[x].complexityTolerance.center),
-                peak = WeightAvStat(x => ideaExemplar[x].complexityTolerance.peak, x => nodeStats[x].complexityTolerance.peak),
-                steepness = WeightAvStat(x => ideaExemplar[x].complexityTolerance.steepness, x => nodeStats[x].complexityTolerance.steepness),
-                width = WeightAvStat(x => ideaExemplar[x].complexityTolerance.width, x => nodeStats[x].complexityTolerance.width),
+                center = WeightAvStat(x => x.complexityTolerance.center),
+                peak = WeightAvStat(x => x.complexityTolerance.peak),
+                steepness = WeightAvStat(x => x.complexityTolerance.steepness),
+                width = WeightAvStat(x => x.complexityTolerance.peak),
             },
             enthusiasm = new MagicCurveParams()
             {
-                activationNeg = WeightAvStat(x => ideaExemplar[x].enthusiasm.activationNeg, x => nodeStats[x].enthusiasm.activationNeg),
-                activationPos = WeightAvStat(x => ideaExemplar[x].enthusiasm.activationPos, x => nodeStats[x].enthusiasm.activationPos),
-                activationSteepnessNeg = WeightAvStat(x => ideaExemplar[x].enthusiasm.activationSteepnessNeg, x => nodeStats[x].enthusiasm.activationSteepnessNeg),
-                activationSteepnessPos = WeightAvStat(x => ideaExemplar[x].enthusiasm.activationSteepnessPos, x => nodeStats[x].enthusiasm.activationSteepnessPos),
-                flatnessNeg = WeightAvStat(x => ideaExemplar[x].enthusiasm.flatnessNeg, x => nodeStats[x].enthusiasm.flatnessNeg),
-                flatnessPos = WeightAvStat(x => ideaExemplar[x].enthusiasm.flatnessPos, x => nodeStats[x].enthusiasm.flatnessPos),
+                activationNeg = WeightAvStat(x => x.enthusiasm.activationNeg),
+                activationPos = WeightAvStat(x => x.enthusiasm.activationPos),
+                activationSteepnessNeg = WeightAvStat(x => x.enthusiasm.activationSteepnessNeg),
+                activationSteepnessPos = WeightAvStat(x => x.enthusiasm.activationSteepnessPos),
+                flatnessNeg = WeightAvStat(x => x.enthusiasm.flatnessNeg),
+                flatnessPos = WeightAvStat(x => x.enthusiasm.flatnessPos),
             },
-            reach = WeightAvStat(x => ideaExemplar[x].reach, x => nodeStats[x].reach),
+            reach = WeightAvStat(x => x.reach),
             suggestibility = new MagicCurveParams()
             {
-                activationNeg = WeightAvStat(x => ideaExemplar[x].suggestibility.activationNeg, x => nodeStats[x].suggestibility.activationNeg),
-                activationPos = WeightAvStat(x => ideaExemplar[x].suggestibility.activationPos, x => nodeStats[x].suggestibility.activationPos),
-                activationSteepnessNeg = WeightAvStat(x => ideaExemplar[x].suggestibility.activationSteepnessNeg, x => nodeStats[x].suggestibility.activationSteepnessNeg),
-                activationSteepnessPos = WeightAvStat(x => ideaExemplar[x].suggestibility.activationSteepnessPos, x => nodeStats[x].suggestibility.activationSteepnessPos),
-                flatnessNeg = WeightAvStat(x => ideaExemplar[x].suggestibility.flatnessNeg, x => nodeStats[x].suggestibility.flatnessNeg),
-                flatnessPos = WeightAvStat(x => ideaExemplar[x].suggestibility.flatnessPos, x => nodeStats[x].suggestibility.flatnessPos),
+                activationNeg = WeightAvStat(x => x.suggestibility.activationNeg),
+                activationPos = WeightAvStat(x => x.suggestibility.activationPos),
+                activationSteepnessNeg = WeightAvStat(x => x.suggestibility.activationSteepnessNeg),
+                activationSteepnessPos = WeightAvStat(x => x.suggestibility.activationSteepnessPos),
+                flatnessNeg = WeightAvStat(x => x.suggestibility.flatnessNeg),
+                flatnessPos = WeightAvStat(x => x.suggestibility.flatnessPos),
             },
             adherence = new MagicCurveParams()
             {
-                activationNeg = WeightAvStat(x => ideaExemplar[x].adherence.activationNeg, x => nodeStats[x].adherence.activationNeg),
-                activationPos = WeightAvStat(x => ideaExemplar[x].adherence.activationPos, x => nodeStats[x].adherence.activationPos),
-                activationSteepnessNeg = WeightAvStat(x => ideaExemplar[x].adherence.activationSteepnessNeg, x => nodeStats[x].adherence.activationSteepnessNeg),
-                activationSteepnessPos = WeightAvStat(x => ideaExemplar[x].adherence.activationSteepnessPos, x => nodeStats[x].adherence.activationSteepnessPos),
-                flatnessNeg = WeightAvStat(x => ideaExemplar[x].adherence.flatnessNeg, x => nodeStats[x].adherence.flatnessNeg),
-                flatnessPos = WeightAvStat(x => ideaExemplar[x].adherence.flatnessPos, x => nodeStats[x].adherence.flatnessPos),
+                activationNeg = WeightAvStat(x => x.adherence.activationNeg),
+                activationPos = WeightAvStat(x => x.adherence.activationPos),
+                activationSteepnessNeg = WeightAvStat(x => x.adherence.activationSteepnessNeg),
+                activationSteepnessPos = WeightAvStat(x => x.adherence.activationSteepnessPos),
+                flatnessNeg = WeightAvStat(x => x.adherence.flatnessNeg),
+                flatnessPos = WeightAvStat(x => x.adherence.flatnessPos),
             },
             socialAttention = new MagicCurveParams()
             {
-                activationNeg = WeightAvStat(x => ideaExemplar[x].socialAttention.activationNeg, x => nodeStats[x].socialAttention.activationNeg),
-                activationPos = WeightAvStat(x => ideaExemplar[x].socialAttention.activationPos, x => nodeStats[x].socialAttention.activationPos),
-                activationSteepnessNeg = WeightAvStat(x => ideaExemplar[x].socialAttention.activationSteepnessNeg, x => nodeStats[x].socialAttention.activationSteepnessNeg),
-                activationSteepnessPos = WeightAvStat(x => ideaExemplar[x].socialAttention.activationSteepnessPos, x => nodeStats[x].socialAttention.activationSteepnessPos),
-                flatnessNeg = WeightAvStat(x => ideaExemplar[x].socialAttention.flatnessNeg, x => nodeStats[x].socialAttention.flatnessNeg),
-                flatnessPos = WeightAvStat(x => ideaExemplar[x].socialAttention.flatnessPos, x => nodeStats[x].socialAttention.flatnessPos),
+                activationNeg = WeightAvStat(x => x.socialAttention.activationNeg),
+                activationPos = WeightAvStat(x => x.socialAttention.activationPos),
+                activationSteepnessNeg = WeightAvStat(x => x.socialAttention.activationSteepnessNeg),
+                activationSteepnessPos = WeightAvStat(x => x.socialAttention.activationSteepnessPos),
+                flatnessNeg = WeightAvStat(x => x.socialAttention.flatnessNeg),
+                flatnessPos = WeightAvStat(x => x.socialAttention.flatnessPos),
             }
         };
     }
-    void UpdateStats(int n)
+    void UpdateStats(int n, float dt)
     {
         float CalcDelta(Func<NodeStats, float> stat)
         {
             float d = (stat(nodeTargetStats[n]) - stat(nodeStats[n])); // fucked
-            return d * d * -Mathf.Sign(d) / 2;
+            return d * d * -Mathf.Sign(d) / 2 * dt;
         }
         nodeStats[n].complexity += CalcDelta(x => x.complexity);
 

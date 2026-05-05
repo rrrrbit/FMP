@@ -84,6 +84,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
         {
 			obj[i] = Instantiate(visualNodePrefab);
 			obj[i].id = i;
+			obj[i].gameObject.name = "Node "+obj[i].id.ToString();
 			p[i] = Random.insideUnitCircle * 1;
 			v[i] = Vector2.zero;
 			a[i] = Vector2.zero;

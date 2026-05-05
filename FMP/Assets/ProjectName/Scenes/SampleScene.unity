@@ -817,7 +817,6 @@ MonoBehaviour:
   sumOutdegree: 0
   nodeStats: []
   nodeStatsDelta: []
-  nodeTargetStats: []
   nodeStatsMin:
     complexity: -16
     complexityTolerance:
@@ -830,30 +829,30 @@ MonoBehaviour:
       activationNeg: 2
       activationSteepnessPos: 1
       activationSteepnessNeg: 1
-      flatnessPos: 0
-      flatnessNeg: 0
+      strengthPos: 0
+      strengthNeg: 0
     reach: 0
     suggestibility:
       activationPos: 2
       activationNeg: 2
       activationSteepnessPos: 1
       activationSteepnessNeg: 1
-      flatnessPos: 0
-      flatnessNeg: 0
+      strengthPos: 0
+      strengthNeg: 0
     adherence:
       activationPos: 2
       activationNeg: 2
       activationSteepnessPos: 1
       activationSteepnessNeg: 1
-      flatnessPos: 0
-      flatnessNeg: 0
+      strengthPos: 0
+      strengthNeg: 0
     socialAttention:
       activationPos: 2
       activationNeg: 2
       activationSteepnessPos: 1
       activationSteepnessNeg: 1
-      flatnessPos: 0
-      flatnessNeg: 0
+      strengthPos: 0
+      strengthNeg: 0
   nodeStatsMax:
     complexity: 16
     complexityTolerance:
@@ -866,30 +865,30 @@ MonoBehaviour:
       activationNeg: 32
       activationSteepnessPos: 1
       activationSteepnessNeg: 1
-      flatnessPos: 2.147484e+9
-      flatnessNeg: 2.1474836e+9
+      strengthPos: 32
+      strengthNeg: 32
     reach: 32
     suggestibility:
       activationPos: 32
       activationNeg: 32
       activationSteepnessPos: 1
       activationSteepnessNeg: 1
-      flatnessPos: 2.1474836e+9
-      flatnessNeg: 2.1474836e+9
+      strengthPos: 32
+      strengthNeg: 32
     adherence:
       activationPos: 32
       activationNeg: 32
       activationSteepnessPos: 1
       activationSteepnessNeg: 1
-      flatnessPos: 2.1474836e+9
-      flatnessNeg: 2.1474836e+9
+      strengthPos: 32
+      strengthNeg: 32
     socialAttention:
       activationPos: 32
       activationNeg: 32
       activationSteepnessPos: 1
       activationSteepnessNeg: 1
-      flatnessPos: 2.1474836e+9
-      flatnessNeg: 2.1474836e+9
+      strengthPos: 32
+      strengthNeg: 32
   ideaComplexity: []
   ideaTolerance: []
   ideaExemplar: []

@@ -35,6 +35,5 @@ public class VisualNodePerson : VisualNode
         nnEdgesTo = game.NN.GetEdgesTo(id);
 
         stats = game.nodeStats[id];
-        targetStats = game.nodeTargetStats[id];
     }
 }

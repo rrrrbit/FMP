@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using TMPro;
+using UnityEditor.Experimental.GraphView;
 using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.InputSystem.Utilities;
@@ -48,7 +49,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     [Header("- Node Stats")]
     public NodeStats[] nodeStats;
 	public NodeStats[] nodeStatsDelta;
-    public NodeStats[] nodeTargetStats;
 
     public NodeStats nodeStatsMin;
     public NodeStats nodeStatsMax;
@@ -73,25 +73,24 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     {
         float activation;
         float activationSteepness;
-        float flatness;
+        float strength;
         if (xRaw >= 0)
         {
             activation = param.activationPos;
             activationSteepness = param.activationSteepnessPos;
-            flatness = param.strengthPos;
+            strength = param.strengthPos;
         }
         else
         {
             activation = param.activationNeg;
             activationSteepness = param.activationSteepnessNeg;
-            flatness = param.strengthNeg;
+            strength = param.strengthNeg;
         }
         
         float x = Mathf.Abs(xRaw);
 
         float sigmoid = 1 / (1 + Mathf.Exp(-Mathf.Log(99)-4 * activationSteepness * (x - activation)));
-        float curve = flatness - flatness * Mathf.Exp(-x/flatness);
-
+        float curve = strength>0? strength - strength * Mathf.Exp(-x / strength):0;
         float total = sigmoid * curve * Mathf.Sign(xRaw);
         if (!float.IsFinite(total))
         {
@@ -169,7 +168,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     {
         NN.RecalculateStats();
         UpdateGraphStatistics();
-        StepWithNext(Time.deltaTime * timescale);
+        Step(Time.deltaTime * timescale);
     }
     #endregion
 
@@ -300,7 +299,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         // node stats
         nodeStats = new NodeStats[nodesCount];
-        nodeTargetStats = new NodeStats[nodesCount];
 		nodeStatsDelta = new NodeStats[nodesCount];
 		for (int i = 0; i < nodesCount; i++)
         {
@@ -314,7 +312,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
                 adherence = RandomMagicCurve(minMagicCurve, maxMagicCurve),
                 socialAttention = RandomMagicCurve(socDecMinCurve, socDecMaxCurve),
             };
-            nodeTargetStats[i] = nodeStats[i];
         }
 
         // idea stats
@@ -394,53 +391,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     #endregion
 
 #region calculations
-
     void Step(float dt)
-    {
-        // weights are read for calculations and also written in the same pass.
-        // same issue as graph view physics, read and write should be done in seperate passes.
-        // but might tank performance. fix l8r
-
-        // in
-        for (int i = 0; i < ideasCount; i++)
-        {
-            for (int n = 0; n < nodesCount; n++)
-            {
-                IN.mtx[i, n] = CalcIN(i, n);
-            }
-        }
-
-        // ni
-        for (int n = 0; n < nodesCount; n++)
-        {
-            for (int i = 0; i < ideasCount; i++)
-            {
-                NI.mtx[n, i] += CalcDeltaNI(n, i) * dt;
-            }
-        }
-
-        // nn
-        for (int a = 0; a < nodesCount; a++)
-        {
-            for (int b = 0; b < nodesCount; b++)
-            {
-                if (a == b) continue;
-                NN.mtx[a, b] += CalcDeltaNN(a, b) * dt;
-            }
-        }
-
-        // update stats
-        for (int n = 0; n < nodesCount; n++)
-        {
-            UpdateTargetStats(n);
-        }
-
-        //i_n.mtx = inNext;
-        //n_i.mtx = niNext;
-        //n_n.mtx = nnNext; as expected does tank.
-    }
-
-    void StepWithNext(float dt)
     {
         // in
         for (int i = 0; i < ideas.Count; i++)
@@ -542,131 +493,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         };
 
         return clamped;
-    }
-
-    void UpdateTargetStats(int n)
-    {
-        float[] mappedNI = new float[ideasCount];
-        float[] mappedNN = new float[nodesCount];
-        for (int i = 0; i < ideasCount; i++)
-        {
-            mappedNI[i] = MagicCurve(NI.mtx[n, i], nodeStats[n].adherence);
-        }
-        for (int m = 0; m < nodesCount; m++)
-        {
-            mappedNN[m] = MagicCurve(NN.mtx[n, m], nodeStats[n].suggestibility);
-        }
-
-        float totalIdeasWeight = ManualSum(-1, ideasCount, x => mappedNI[x]);
-        float totalNodesWeight = ManualSum(n, nodesCount, x => mappedNN[x]);
-        float totalWeight = totalIdeasWeight + totalNodesWeight + 1;
-
-        float WeightAvStat(Func<NodeStats, float> stat)
-        {
-            float sumIdeaExmplr = ManualSum(-1, ideasCount, x => stat(ideaExemplar[x]) * mappedNI[x]);
-            float sumNodes = ManualSum(n, nodesCount, x => stat(nodeStats[x]) * mappedNN[x]);
-
-            return (sumIdeaExmplr + sumNodes + stat(nodeStats[n]))/(totalWeight);
-        }
-
-        nodeTargetStats[n] = new()  
-        {
-            complexity = WeightAvStat(x => x.complexity),
-            complexityTolerance = new BumpCurveParams()
-            {
-                center = WeightAvStat(x => x.complexityTolerance.center),
-                peak = WeightAvStat(x => x.complexityTolerance.peak),
-                steepness = WeightAvStat(x => x.complexityTolerance.steepness),
-                width = WeightAvStat(x => x.complexityTolerance.width),
-            },
-            enthusiasm = new MagicCurveParams()
-            {
-                activationNeg = WeightAvStat(x => x.enthusiasm.activationNeg),
-                activationPos = WeightAvStat(x => x.enthusiasm.activationPos),
-                activationSteepnessNeg = WeightAvStat(x => x.enthusiasm.activationSteepnessNeg),
-                activationSteepnessPos = WeightAvStat(x => x.enthusiasm.activationSteepnessPos),
-                strengthNeg = WeightAvStat(x => x.enthusiasm.strengthNeg),
-                strengthPos = WeightAvStat(x => x.enthusiasm.strengthPos),
-            },
-            reach = WeightAvStat(x => x.reach),
-            suggestibility = new MagicCurveParams()
-            {
-                activationNeg = WeightAvStat(x => x.suggestibility.activationNeg),
-                activationPos = WeightAvStat(x => x.suggestibility.activationPos),
-                activationSteepnessNeg = WeightAvStat(x => x.suggestibility.activationSteepnessNeg),
-                activationSteepnessPos = WeightAvStat(x => x.suggestibility.activationSteepnessPos),
-                strengthNeg = WeightAvStat(x => x.suggestibility.strengthNeg),
-                strengthPos = WeightAvStat(x => x.suggestibility.strengthPos),
-            },
-            adherence = new MagicCurveParams()
-            {
-                activationNeg = WeightAvStat(x => x.adherence.activationNeg),
-                activationPos = WeightAvStat(x => x.adherence.activationPos),
-                activationSteepnessNeg = WeightAvStat(x => x.adherence.activationSteepnessNeg),
-                activationSteepnessPos = WeightAvStat(x => x.adherence.activationSteepnessPos),
-                strengthNeg = WeightAvStat(x => x.adherence.strengthNeg),
-                strengthPos = WeightAvStat(x => x.adherence.strengthPos),
-            },
-            socialAttention = new MagicCurveParams()
-            {
-                activationNeg = WeightAvStat(x => x.socialAttention.activationNeg),
-                activationPos = WeightAvStat(x => x.socialAttention.activationPos),
-                activationSteepnessNeg = WeightAvStat(x => x.socialAttention.activationSteepnessNeg),
-                activationSteepnessPos = WeightAvStat(x => x.socialAttention.activationSteepnessPos),
-                strengthNeg = WeightAvStat(x => x.socialAttention.strengthNeg),
-                strengthPos = WeightAvStat(x => x.socialAttention.strengthPos),
-            }
-        };
-
-        nodeTargetStats[n] = ClampStats(nodeTargetStats[n], nodeStatsMin, nodeStatsMax);
-    }
-    
-
-    void UpdateStats(int n, float dt)
-    {
-        float CalcDelta(Func<NodeStats, float> stat)
-        {
-            float d = (stat(nodeTargetStats[n]) - stat(nodeStats[n])); // fucked
-            return MagicCurve(Mathf.Abs(d), nodeStats[n].suggestibility) * -Mathf.Sign(d) * dt;
-        }
-        nodeStats[n].complexity += CalcDelta(x => x.complexity);
-
-        nodeStats[n].complexityTolerance.steepness += CalcDelta(x => x.complexityTolerance.steepness);
-        nodeStats[n].complexityTolerance.width += CalcDelta(x => x.complexityTolerance.width);
-        nodeStats[n].complexityTolerance.center += CalcDelta(x => x.complexityTolerance.center);
-        nodeStats[n].complexityTolerance.peak += CalcDelta(x => x.complexityTolerance.peak);
-
-        nodeStats[n].enthusiasm.activationNeg += CalcDelta(x => x.enthusiasm.activationNeg);
-        nodeStats[n].enthusiasm.activationPos += CalcDelta(x => x.enthusiasm.activationPos);
-        nodeStats[n].enthusiasm.activationSteepnessNeg += CalcDelta(x => x.enthusiasm.activationSteepnessNeg);
-        nodeStats[n].enthusiasm.activationSteepnessPos += CalcDelta(x => x.enthusiasm.activationSteepnessPos);
-        nodeStats[n].enthusiasm.strengthNeg += CalcDelta(x => x.enthusiasm.strengthNeg);
-        nodeStats[n].enthusiasm.strengthPos += CalcDelta(x => x.enthusiasm.strengthPos);
-
-        nodeStats[n].reach += CalcDelta(x => x.reach);
-
-        nodeStats[n].suggestibility.activationNeg += CalcDelta(x => x.suggestibility.activationNeg);
-        nodeStats[n].suggestibility.activationPos += CalcDelta(x => x.suggestibility.activationPos);
-        nodeStats[n].suggestibility.activationSteepnessNeg += CalcDelta(x => x.suggestibility.activationSteepnessNeg);
-        nodeStats[n].suggestibility.activationSteepnessPos += CalcDelta(x => x.suggestibility.activationSteepnessPos);
-        nodeStats[n].suggestibility.strengthNeg += CalcDelta(x => x.suggestibility.strengthNeg);
-        nodeStats[n].suggestibility.strengthPos += CalcDelta(x => x.suggestibility.strengthPos);
-
-        nodeStats[n].adherence.activationNeg += CalcDelta(x => x.adherence.activationNeg);
-        nodeStats[n].adherence.activationPos += CalcDelta(x => x.adherence.activationPos);
-        nodeStats[n].adherence.activationSteepnessNeg += CalcDelta(x => x.adherence.activationSteepnessNeg);
-        nodeStats[n].adherence.activationSteepnessPos += CalcDelta(x => x.adherence.activationSteepnessPos);
-        nodeStats[n].adherence.strengthNeg += CalcDelta(x => x.adherence.strengthNeg);
-        nodeStats[n].adherence.strengthPos += CalcDelta(x => x.adherence.strengthPos);
-
-        nodeStats[n].socialAttention.activationNeg += CalcDelta(x => x.socialAttention.activationNeg);
-        nodeStats[n].socialAttention.activationPos += CalcDelta(x => x.socialAttention.activationPos);
-        nodeStats[n].socialAttention.activationSteepnessNeg += CalcDelta(x => x.socialAttention.activationSteepnessNeg);
-        nodeStats[n].socialAttention.activationSteepnessPos += CalcDelta(x => x.socialAttention.activationSteepnessPos);
-        nodeStats[n].socialAttention.strengthNeg += CalcDelta(x => x.socialAttention.strengthNeg);
-        nodeStats[n].socialAttention.strengthPos += CalcDelta(x => x.socialAttention.strengthPos);
-
-        nodeStats[n] = ClampStats(nodeStats[n], nodeStatsMin, nodeStatsMax);
     }
     
 	float CalcDeltaStat(int n, Func<NodeStats, float> stat)

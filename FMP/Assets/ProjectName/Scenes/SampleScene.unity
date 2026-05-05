@@ -817,6 +817,78 @@ MonoBehaviour:
   sumOutdegree: 0
   nodeStats: []
   nodeTargetStats: []
+  nodeStatsMin:
+    complexity: -2.147484e+9
+    complexityTolerance:
+      center: -2.1474836e+9
+      peak: 0
+      width: 1
+      steepness: 2
+    enthusiasm:
+      activationPos: 0
+      activationNeg: 0
+      activationSteepnessPos: 0
+      activationSteepnessNeg: 0
+      flatnessPos: 1
+      flatnessNeg: 1
+    reach: 0
+    suggestibility:
+      activationPos: 0
+      activationNeg: 0
+      activationSteepnessPos: 0
+      activationSteepnessNeg: 0
+      flatnessPos: 1
+      flatnessNeg: 1
+    adherence:
+      activationPos: 0
+      activationNeg: 0
+      activationSteepnessPos: 0
+      activationSteepnessNeg: 0
+      flatnessPos: 1
+      flatnessNeg: 1
+    socialAttention:
+      activationPos: 0
+      activationNeg: 0
+      activationSteepnessPos: 0
+      activationSteepnessNeg: 0
+      flatnessPos: 1
+      flatnessNeg: 1
+  nodeStatsMax:
+    complexity: 2.147484e+9
+    complexityTolerance:
+      center: 2.1474836e+9
+      peak: 0
+      width: 0
+      steepness: 0
+    enthusiasm:
+      activationPos: 2.1474836e+9
+      activationNeg: 2.147484e+9
+      activationSteepnessPos: 2.147484e+9
+      activationSteepnessNeg: 2.1474836e+9
+      flatnessPos: 2.1474836e+9
+      flatnessNeg: 2.1474836e+9
+    reach: 2.1474836e+9
+    suggestibility:
+      activationPos: 2.1474836e+9
+      activationNeg: 2.1474836e+9
+      activationSteepnessPos: 2.1474836e+9
+      activationSteepnessNeg: 2.1474836e+9
+      flatnessPos: 2.1474836e+9
+      flatnessNeg: 2.1474836e+9
+    adherence:
+      activationPos: 2.1474836e+9
+      activationNeg: 2.1474836e+9
+      activationSteepnessPos: 2.1474836e+9
+      activationSteepnessNeg: 2.1474836e+9
+      flatnessPos: 2.1474836e+9
+      flatnessNeg: 2.1474836e+9
+    socialAttention:
+      activationPos: 2.1474836e+9
+      activationNeg: 2.1474836e+9
+      activationSteepnessPos: 2.1474836e+9
+      activationSteepnessNeg: 2.1474836e+9
+      flatnessPos: 2.1474836e+9
+      flatnessNeg: 2.1474836e+9
   ideaComplexity: []
   ideaTolerance: []
   ideaExemplar: []

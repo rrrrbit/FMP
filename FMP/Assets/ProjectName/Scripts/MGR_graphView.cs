@@ -127,10 +127,14 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 
                 //debug edge visualisation
                 Vector2 offs = new(dn.y, -dn.x);
-				Debug.DrawLine(p[i] + offs * lineGap + dn * r[i], p[j] + offs * lineGap - dn * r[j], edgeColourGradient.Evaluate((ij - minColourEdge) / (maxColourEdge - minColourEdge)));
-            }
-			
-        }
+
+				Vector2 startPoint = p[i] + offs * lineGap + dn * r[i];
+				Vector2 endPoint = p[j] + offs * lineGap - dn * r[j];
+				Debug.DrawLine(startPoint, endPoint, edgeColourGradient.Evaluate((ij - minColourEdge) / (maxColourEdge - minColourEdge)));
+				Debug.DrawLine(endPoint, endPoint + (offs-dn), edgeColourGradient.Evaluate((ij - minColourEdge) / (maxColourEdge - minColourEdge)));
+			}
+
+		}
         for (int i = 0; i < nodeCount; i++) // integrate
         {
             if (!float.IsFinite(a[i].sqrMagnitude))

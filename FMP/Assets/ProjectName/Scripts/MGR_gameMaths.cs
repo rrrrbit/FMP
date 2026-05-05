@@ -39,14 +39,15 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     public AdjacencyMtx IN;
     public AdjacencyMtx II;
     [Header("-- Internal")]
-    float[,] nnNext;
-    float[,] niNext;
+    float[,] nnDelta;
+    float[,] niDelta;
     float[,] inNext;
     float[,] iiNext;
     int nodesCount;
     int ideasCount;
     [Header("- Node Stats")]
     public NodeStats[] nodeStats;
+	public NodeStats[] nodeStatsDelta;
     public NodeStats[] nodeTargetStats;
 
     public NodeStats nodeStatsMin;
@@ -300,7 +301,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         // node stats
         nodeStats = new NodeStats[nodesCount];
         nodeTargetStats = new NodeStats[nodesCount];
-        for (int i = 0; i < nodesCount; i++)
+		nodeStatsDelta = new NodeStats[nodesCount];
+		for (int i = 0; i < nodesCount; i++)
         {
             nodeStats[i] = new NodeStats()
             {
@@ -341,7 +343,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         // initialise nn with random weights
         NN = new AdjacencyMtx(nodes, nodes);
-        nnNext = new float[nodesCount, nodesCount];
+        nnDelta = new float[nodesCount, nodesCount];
         for (int i = 0; i < nodesCount; i++)
         {
             for (int j = 0; j < nodesCount; j++)
@@ -355,7 +357,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         // initialise ni with random weights
         NI = new AdjacencyMtx(ideas, nodes);
-        niNext = new float[nodesCount, ideasCount];
+        niDelta = new float[nodesCount, ideasCount];
         for (int i = 0; i < nodesCount; i++)
         {
             for (int j = 0; j < ideasCount; j++)
@@ -454,7 +456,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         {
             for (int i = 0; i < ideas.Count; i++)
             {
-                niNext[n, i] += CalcDeltaNI(n, i) * dt;
+                niDelta[n, i] = CalcDeltaNI(n, i);
             }
         }
 
@@ -464,24 +466,24 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             for (int b = 0; b < nodes.Count; b++)
             {
                 if (a == b) continue;
-                nnNext[a, b] += CalcDeltaNN(a, b) * dt;
+                nnDelta[a, b] = CalcDeltaNN(a, b);
             }
         }
 
-        // update stats
+        // stats
         for (int n = 0; n < nodesCount; n++)
         {
-            UpdateTargetStats(n);
-            UpdateStats(n, dt);
+			CalcDeltaStats(n);
         }
 
+		// update all
         IN.mtx = inNext;
 
         for (int i = 0; i < NI.mtx.Rows(); i++)
         {
             for (int j = 0; j < NI.mtx.Cols(); j++)
             {
-                NI.mtx[i, j] += niNext[i, j];
+                NI.mtx[i, j] += niDelta[i, j] * dt;
             }
         }
 
@@ -489,15 +491,15 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         {
             for (int j = 0; j < NN.mtx.Cols(); j++)
             {
-                NN.mtx[i, j] += nnNext[i, j];
+                NN.mtx[i, j] += nnDelta[i, j] * dt;
             }
         }
 
-        nnNext = new float[nodes.Count(), nodes.Count()];
-        niNext = new float[nodes.Count(), ideas.Count()];
-
-        
-    }
+		for (int n = 0; n < nodesCount; n++)
+		{
+			nodeStats[n] += nodeStatsDelta[n] * dt;
+		}
+	}
     NodeStats ClampStats(NodeStats stats, NodeStats min, NodeStats max)
     {
         float ClampFloatStat(Func<NodeStats, float> stat) => Mathf.Clamp(stat(stats), stat(min), stat(max));
@@ -624,7 +626,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         float CalcDelta(Func<NodeStats, float> stat)
         {
             float d = (stat(nodeTargetStats[n]) - stat(nodeStats[n])); // fucked
-            return d * d * -Mathf.Sign(d) / 2 * dt;
+            return MagicCurve(Mathf.Abs(d), nodeStats[n].suggestibility) * -Mathf.Sign(d) * dt;
         }
         nodeStats[n].complexity += CalcDelta(x => x.complexity);
 
@@ -666,6 +668,61 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         nodeStats[n] = ClampStats(nodeStats[n], nodeStatsMin, nodeStatsMax);
     }
     
+	float CalcDeltaStat(int n, Func<NodeStats, float> stat)
+	{
+		float social = ManualSum(n, nodesCount, x =>
+			(stat(nodeStats[x]) - stat(nodeStats[n])) * NN.mtx[n, x]
+			);
+
+		float ideological = ManualSum(-1, ideasCount, x =>
+			(stat(ideaExemplar[x]) - stat(nodeStats[n])) * NI.mtx[n, x]
+			);
+
+		return MagicCurve(social, nodeStats[n].suggestibility) + MagicCurve(ideological, nodeStats[n].adherence);
+	}
+
+	void CalcDeltaStats(int n)
+	{
+		nodeStatsDelta[n].complexity += CalcDeltaStat(n, x => x.complexity);
+
+		nodeStatsDelta[n].complexityTolerance.steepness += CalcDeltaStat(n, x => x.complexityTolerance.steepness);
+		nodeStatsDelta[n].complexityTolerance.width += CalcDeltaStat(n, x => x.complexityTolerance.width);
+		nodeStatsDelta[n].complexityTolerance.center += CalcDeltaStat(n, x => x.complexityTolerance.center);
+		nodeStatsDelta[n].complexityTolerance.peak +=	CalcDeltaStat(n, x => x.complexityTolerance.peak);
+
+		nodeStatsDelta[n].enthusiasm.activationNeg += CalcDeltaStat(n, x => x.enthusiasm.activationNeg);
+		nodeStatsDelta[n].enthusiasm.activationPos += CalcDeltaStat(n, x => x.enthusiasm.activationPos);
+		nodeStatsDelta[n].enthusiasm.activationSteepnessNeg += CalcDeltaStat(n, x => x.enthusiasm.activationSteepnessNeg);
+		nodeStatsDelta[n].enthusiasm.activationSteepnessPos += CalcDeltaStat(n, x => x.enthusiasm.activationSteepnessPos);
+		nodeStatsDelta[n].enthusiasm.flatnessNeg += CalcDeltaStat(n, x => x.enthusiasm.flatnessNeg);
+		nodeStatsDelta[n].enthusiasm.flatnessPos += CalcDeltaStat(n, x => x.enthusiasm.flatnessPos);
+
+		nodeStatsDelta[n].reach += CalcDeltaStat(n, x => x.reach);
+
+		nodeStatsDelta[n].suggestibility.activationNeg += CalcDeltaStat(n, x => x.suggestibility.activationNeg);
+		nodeStatsDelta[n].suggestibility.activationPos += CalcDeltaStat(n, x => x.suggestibility.activationPos);
+		nodeStatsDelta[n].suggestibility.activationSteepnessNeg += CalcDeltaStat(n, x => x.suggestibility.activationSteepnessNeg);
+		nodeStatsDelta[n].suggestibility.activationSteepnessPos += CalcDeltaStat(n, x => x.suggestibility.activationSteepnessPos);
+		nodeStatsDelta[n].suggestibility.flatnessNeg += CalcDeltaStat(n, x => x.suggestibility.flatnessNeg);
+		nodeStatsDelta[n].suggestibility.flatnessPos += CalcDeltaStat(n, x => x.suggestibility.flatnessPos);
+
+		nodeStatsDelta[n].adherence.activationNeg += CalcDeltaStat(n, x => x.adherence.activationNeg);
+		nodeStatsDelta[n].adherence.activationPos += CalcDeltaStat(n, x => x.adherence.activationPos);
+		nodeStatsDelta[n].adherence.activationSteepnessNeg += CalcDeltaStat(n, x => x.adherence.activationSteepnessNeg);
+		nodeStatsDelta[n].adherence.activationSteepnessPos += CalcDeltaStat(n, x => x.adherence.activationSteepnessPos);
+		nodeStatsDelta[n].adherence.flatnessNeg += CalcDeltaStat(n, x => x.adherence.flatnessNeg);
+		nodeStatsDelta[n].adherence.flatnessPos += CalcDeltaStat(n, x => x.adherence.flatnessPos);
+
+		nodeStatsDelta[n].socialAttention.activationNeg += CalcDeltaStat(n, x => x.socialAttention.activationNeg);
+		nodeStatsDelta[n].socialAttention.activationPos += CalcDeltaStat(n, x => x.socialAttention.activationPos);
+		nodeStatsDelta[n].socialAttention.activationSteepnessNeg += CalcDeltaStat(n, x => x.socialAttention.activationSteepnessNeg);
+		nodeStatsDelta[n].socialAttention.activationSteepnessPos += CalcDeltaStat(n, x => x.socialAttention.activationSteepnessPos);
+		nodeStatsDelta[n].socialAttention.flatnessNeg += CalcDeltaStat(n, x => x.socialAttention.flatnessNeg);
+		nodeStatsDelta[n].socialAttention.flatnessPos += CalcDeltaStat(n, x => x.socialAttention.flatnessPos);
+
+		nodeStatsDelta[n] = ClampStats(nodeStatsDelta[n], nodeStatsMin, nodeStatsMax);
+	}
+
     float CalcIN(int i, int n)
     {
         // similarity here
@@ -856,6 +913,19 @@ public struct MagicCurveParams
             flatnessPos = a.flatnessPos + b.flatnessPos,
         };
     }
+
+	public static MagicCurveParams operator *(MagicCurveParams a, float b)
+	{
+		return new()
+		{
+			activationNeg = a.activationNeg * b,
+			activationPos = a.activationPos * b,
+			activationSteepnessNeg = a.activationSteepnessNeg * b,
+			activationSteepnessPos = a.activationSteepnessPos * b,
+			flatnessNeg = a.flatnessPos * b,
+			flatnessPos = a.flatnessPos * b,
+		};
+	}
 }
 
 [Serializable]
@@ -865,6 +935,27 @@ public struct BumpCurveParams
     public float peak;
     public float width;
     public float steepness;
+	public static BumpCurveParams operator +(BumpCurveParams a, BumpCurveParams b)
+	{
+		return new()
+		{
+			center = a.center + b.center,
+			peak = a.peak + b.peak,
+			width = a.width + b.width,
+			steepness = a.steepness + b.steepness,
+		};
+	}
+
+	public static BumpCurveParams operator *(BumpCurveParams a, float b)
+	{
+		return new()
+		{
+			center = a.center * b,
+			peak = a.peak * b,
+			width = a.width * b,
+			steepness = a.steepness * b,
+		};
+	}
 }
 
 [Serializable]
@@ -877,4 +968,32 @@ public struct NodeStats
     public MagicCurveParams suggestibility; // rename conformity...?
     public MagicCurveParams adherence;
     public MagicCurveParams socialAttention;
+
+	public static NodeStats operator +(NodeStats a, NodeStats b)
+	{
+		return new()
+		{
+			complexity = a.complexity + b.complexity,
+			complexityTolerance = a.complexityTolerance + b.complexityTolerance,
+			enthusiasm = a.enthusiasm + b.enthusiasm,
+			reach = a.reach + b.reach,
+			suggestibility = a.suggestibility + b.suggestibility,
+			adherence = a.adherence + b.adherence,
+			socialAttention = a.socialAttention + b.socialAttention,
+		};
+	}
+
+	public static NodeStats operator *(NodeStats a, float b)
+	{
+		return new()
+		{
+			complexity = a.complexity * b,
+			complexityTolerance = a.complexityTolerance * b,
+			enthusiasm = a.enthusiasm * b,
+			reach = a.reach * b,
+			suggestibility = a.suggestibility * b,
+			adherence = a.adherence * b,
+			socialAttention = a.socialAttention * b,
+		};
+	}
 }

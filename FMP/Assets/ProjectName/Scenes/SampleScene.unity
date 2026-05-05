@@ -759,10 +759,10 @@ MonoBehaviour:
   useScale: 1
   normaliseWeights: 1
   symmetriseWeights: 1
-  centeringStrength: 1
+  centeringStrength: 0
   dragStrength: 5
   clusterStrength: 0
-  attractionStrength: 4
+  attractionStrength: 10
   attractionByWeight:
     serializedVersion: 2
     m_Curve:
@@ -776,22 +776,22 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 1
+      time: 10
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0.22066085
+      outSlope: 0.22066085
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.15111113
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  attractionType: 0
+  attractionType: 2
   repulsionStrength: 100
-  repulsionType: 1
-  calculatedPairs: 0
-  totalPairs: 0
+  repulsionType: 0
+  calculatedPairs: 600
+  totalPairs: 625
   visualNodePrefab: {fileID: 8003208030640895489, guid: e4227e8697f29a146bcde6987d96a048, type: 3}
   nodeCount: 25
 --- !u!114 &884068268
@@ -816,7 +816,80 @@ MonoBehaviour:
   maxOutdegree: 0
   sumOutdegree: 0
   nodeStats: []
+  nodeStatsDelta: []
   nodeTargetStats: []
+  nodeStatsMin:
+    complexity: -2.147484e+9
+    complexityTolerance:
+      center: -2.147484e+9
+      peak: 0
+      width: 1
+      steepness: 2
+    enthusiasm:
+      activationPos: 0
+      activationNeg: 0
+      activationSteepnessPos: 0
+      activationSteepnessNeg: 0
+      flatnessPos: 1
+      flatnessNeg: 1
+    reach: 0
+    suggestibility:
+      activationPos: 0
+      activationNeg: 0
+      activationSteepnessPos: 0
+      activationSteepnessNeg: 0
+      flatnessPos: 1
+      flatnessNeg: 1
+    adherence:
+      activationPos: 0
+      activationNeg: 0
+      activationSteepnessPos: 0
+      activationSteepnessNeg: 0
+      flatnessPos: 1
+      flatnessNeg: 1
+    socialAttention:
+      activationPos: 0
+      activationNeg: 0
+      activationSteepnessPos: 0
+      activationSteepnessNeg: 0
+      flatnessPos: 1
+      flatnessNeg: 1
+  nodeStatsMax:
+    complexity: 2.147484e+9
+    complexityTolerance:
+      center: 2.1474836e+9
+      peak: 1.5
+      width: 2.147484e+9
+      steepness: 2.147484e+9
+    enthusiasm:
+      activationPos: 2.1474836e+9
+      activationNeg: 2.147484e+9
+      activationSteepnessPos: 2.147484e+9
+      activationSteepnessNeg: 2.1474836e+9
+      flatnessPos: 2.1474836e+9
+      flatnessNeg: 2.1474836e+9
+    reach: 2.1474836e+9
+    suggestibility:
+      activationPos: 2.1474836e+9
+      activationNeg: 2.1474836e+9
+      activationSteepnessPos: 2.1474836e+9
+      activationSteepnessNeg: 2.1474836e+9
+      flatnessPos: 2.1474836e+9
+      flatnessNeg: 2.1474836e+9
+    adherence:
+      activationPos: 2.1474836e+9
+      activationNeg: 2.1474836e+9
+      activationSteepnessPos: 2.1474836e+9
+      activationSteepnessNeg: 2.1474836e+9
+      flatnessPos: 2.1474836e+9
+      flatnessNeg: 2.1474836e+9
+    socialAttention:
+      activationPos: 2.1474836e+9
+      activationNeg: 2.1474836e+9
+      activationSteepnessPos: 2.1474836e+9
+      activationSteepnessNeg: 2.1474836e+9
+      flatnessPos: 2.1474836e+9
+      flatnessNeg: 2.1474836e+9
   ideaComplexity: []
   ideaTolerance: []
   ideaExemplar: []

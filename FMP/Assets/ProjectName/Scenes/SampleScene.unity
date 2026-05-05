@@ -819,75 +819,75 @@ MonoBehaviour:
   nodeStatsDelta: []
   nodeTargetStats: []
   nodeStatsMin:
-    complexity: -2.147484e+9
+    complexity: -16
     complexityTolerance:
-      center: -2.147484e+9
+      center: -16
       peak: 0
       width: 1
       steepness: 2
     enthusiasm:
-      activationPos: 0
-      activationNeg: 0
-      activationSteepnessPos: 0
-      activationSteepnessNeg: 0
-      flatnessPos: 1
-      flatnessNeg: 1
+      activationPos: 2
+      activationNeg: 2
+      activationSteepnessPos: 1
+      activationSteepnessNeg: 1
+      flatnessPos: 0
+      flatnessNeg: 0
     reach: 0
     suggestibility:
-      activationPos: 0
-      activationNeg: 0
-      activationSteepnessPos: 0
-      activationSteepnessNeg: 0
-      flatnessPos: 1
-      flatnessNeg: 1
+      activationPos: 2
+      activationNeg: 2
+      activationSteepnessPos: 1
+      activationSteepnessNeg: 1
+      flatnessPos: 0
+      flatnessNeg: 0
     adherence:
-      activationPos: 0
-      activationNeg: 0
-      activationSteepnessPos: 0
-      activationSteepnessNeg: 0
-      flatnessPos: 1
-      flatnessNeg: 1
+      activationPos: 2
+      activationNeg: 2
+      activationSteepnessPos: 1
+      activationSteepnessNeg: 1
+      flatnessPos: 0
+      flatnessNeg: 0
     socialAttention:
-      activationPos: 0
-      activationNeg: 0
-      activationSteepnessPos: 0
-      activationSteepnessNeg: 0
-      flatnessPos: 1
-      flatnessNeg: 1
+      activationPos: 2
+      activationNeg: 2
+      activationSteepnessPos: 1
+      activationSteepnessNeg: 1
+      flatnessPos: 0
+      flatnessNeg: 0
   nodeStatsMax:
-    complexity: 2.147484e+9
+    complexity: 16
     complexityTolerance:
-      center: 2.1474836e+9
+      center: 16
       peak: 1.5
-      width: 2.147484e+9
-      steepness: 2.147484e+9
+      width: 4
+      steepness: 2
     enthusiasm:
-      activationPos: 2.1474836e+9
-      activationNeg: 2.147484e+9
-      activationSteepnessPos: 2.147484e+9
-      activationSteepnessNeg: 2.1474836e+9
-      flatnessPos: 2.1474836e+9
+      activationPos: 32
+      activationNeg: 32
+      activationSteepnessPos: 1
+      activationSteepnessNeg: 1
+      flatnessPos: 2.147484e+9
       flatnessNeg: 2.1474836e+9
-    reach: 2.1474836e+9
+    reach: 32
     suggestibility:
-      activationPos: 2.1474836e+9
-      activationNeg: 2.1474836e+9
-      activationSteepnessPos: 2.1474836e+9
-      activationSteepnessNeg: 2.1474836e+9
+      activationPos: 32
+      activationNeg: 32
+      activationSteepnessPos: 1
+      activationSteepnessNeg: 1
       flatnessPos: 2.1474836e+9
       flatnessNeg: 2.1474836e+9
     adherence:
-      activationPos: 2.1474836e+9
-      activationNeg: 2.1474836e+9
-      activationSteepnessPos: 2.1474836e+9
-      activationSteepnessNeg: 2.1474836e+9
+      activationPos: 32
+      activationNeg: 32
+      activationSteepnessPos: 1
+      activationSteepnessNeg: 1
       flatnessPos: 2.1474836e+9
       flatnessNeg: 2.1474836e+9
     socialAttention:
-      activationPos: 2.1474836e+9
-      activationNeg: 2.1474836e+9
-      activationSteepnessPos: 2.1474836e+9
-      activationSteepnessNeg: 2.1474836e+9
+      activationPos: 32
+      activationNeg: 32
+      activationSteepnessPos: 1
+      activationSteepnessNeg: 1
       flatnessPos: 2.1474836e+9
       flatnessNeg: 2.1474836e+9
   ideaComplexity: []

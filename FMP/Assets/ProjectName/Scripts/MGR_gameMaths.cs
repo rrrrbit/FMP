@@ -71,26 +71,24 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     /// <returns></returns>
     float MagicCurve(float xRaw, MagicCurveParams param)
     {
-        float activation;
-        float activationSteepness;
         float strength;
+        float threshold;
         if (xRaw >= 0)
         {
-            activation = param.activationPos;
-            activationSteepness = param.activationSteepnessPos;
             strength = param.strengthPos;
+            threshold = param.thresholdPos;
         }
         else
         {
-            activation = param.activationNeg;
-            activationSteepness = param.activationSteepnessNeg;
             strength = param.strengthNeg;
+            threshold = param.thresholdNeg;
         }
         
         float x = Mathf.Abs(xRaw);
+        float x2 = x * x;
 
-        float sigmoid = 1 / (1 + Mathf.Exp(-Mathf.Log(99)-4 * activationSteepness * (x - activation)));
-        float curve = strength>0? strength - strength * Mathf.Exp(-x / strength):0;
+        float sigmoid =  x < threshold ? -x2 / (2*threshold*x - 2*x2 - threshold*threshold) : 1;
+        float curve = strength>0 ? strength - strength * Mathf.Exp(-x / strength) : 0;
         float total = sigmoid * curve * Mathf.Sign(xRaw);
         if (!float.IsFinite(total))
         {
@@ -132,13 +130,11 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     {
         return new MagicCurveParams()
         {
-            activationPos = UnityEngine.Random.Range(min.activationPos, max.activationPos),
-            activationSteepnessPos = UnityEngine.Random.Range(min.activationSteepnessPos, max.activationSteepnessPos),
+            thresholdPos = UnityEngine.Random.Range(min.thresholdPos, max.thresholdPos),
             strengthPos = UnityEngine.Random.Range(min.strengthPos, max.strengthPos),
 
-            activationNeg = UnityEngine.Random.Range(min.activationNeg, max.activationNeg),
-            activationSteepnessNeg = UnityEngine.Random.Range(min.activationSteepnessNeg, max.activationSteepnessNeg),
-            strengthNeg = UnityEngine.Random.Range(min.strengthNeg, max.strengthNeg)
+            thresholdNeg = UnityEngine.Random.Range(min.thresholdNeg, max.thresholdNeg),
+            strengthNeg = UnityEngine.Random.Range(min.strengthNeg, max.strengthNeg),
         };
     }
 
@@ -187,16 +183,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         x = new MagicCurveParams[length];
         for (int i = 0; i < length; i++)
         {
-            x[i] = new MagicCurveParams()
-            {
-                activationPos = UnityEngine.Random.Range(min.activationPos, max.activationPos),
-                activationSteepnessPos = UnityEngine.Random.Range(min.activationSteepnessPos, max.activationSteepnessPos),
-                strengthPos = UnityEngine.Random.Range(min.strengthPos, max.strengthPos),
-
-                activationNeg = UnityEngine.Random.Range(min.activationNeg, max.activationNeg),
-                activationSteepnessNeg = UnityEngine.Random.Range(min.activationSteepnessNeg, max.activationSteepnessNeg),
-                strengthNeg = UnityEngine.Random.Range(min.strengthNeg, max.strengthNeg)
-            };
+            x[i] = RandomMagicCurve(min,max);
         }
     }
     void InitBumpCurves(ref BumpCurveParams[] x, int length, BumpCurveParams min, BumpCurveParams max)
@@ -204,13 +191,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         x = new BumpCurveParams[length];
         for (int i = 0; i < length; i++)
         {
-            x[i] = new BumpCurveParams()
-            {
-                center = UnityEngine.Random.Range(min.center, max.center),
-                peak = UnityEngine.Random.Range(min.peak, max.peak),
-                width = UnityEngine.Random.Range(min.width, max.width),
-                steepness = UnityEngine.Random.Range(min.steepness, max.steepness),
-            };
+            x[i] = RandomBumpCurve(min,max);
         }
     }
 
@@ -237,22 +218,16 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         #region default curves
         MagicCurveParams minMagicCurve = new()
         {
-            activationPos = 2,
-            activationNeg = 2,
-
-            activationSteepnessPos = 1,
-            activationSteepnessNeg = 1,
+            thresholdPos = 2,
+            thresholdNeg = 2,
 
             strengthPos = 0.1f,
             strengthNeg = 0.1f,
         };
         MagicCurveParams maxMagicCurve = new()
         {
-            activationPos = 10,
-            activationNeg = 10,
-
-            activationSteepnessPos = 1,
-            activationSteepnessNeg = 1,
+            thresholdPos = 10,
+            thresholdNeg = 10,
 
             strengthPos = 2,
             strengthNeg = 2,
@@ -260,22 +235,16 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
         MagicCurveParams socDecMinCurve = new()
         {
-            activationPos = 5,
-            activationNeg = 5,
-
-            activationSteepnessPos = .5f,
-            activationSteepnessNeg = .5f,
+            thresholdPos = 5,
+            thresholdNeg = 5,
 
             strengthPos = .5f,
             strengthNeg = .5f,
         };
         MagicCurveParams socDecMaxCurve = new()
         {
-            activationPos = 10,
-            activationNeg = 10,
-
-            activationSteepnessPos = .25f,
-            activationSteepnessNeg = .25f,
+            thresholdPos = 20,
+            thresholdNeg = 20,
 
             strengthPos = 2,
             strengthNeg = 2,
@@ -460,10 +429,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             float ClampMagicCurveParam(Func<MagicCurveParams, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
             return new()
             {
-                activationNeg = ClampMagicCurveParam(x => x.activationNeg),
-                activationPos = ClampMagicCurveParam(x => x.activationPos),
-                activationSteepnessNeg = ClampMagicCurveParam(x => x.activationSteepnessNeg),
-                activationSteepnessPos = ClampMagicCurveParam(x => x.activationSteepnessPos),
+                thresholdNeg = ClampMagicCurveParam(x => x.thresholdNeg),
+                thresholdPos = ClampMagicCurveParam(x => x.thresholdPos),
                 strengthNeg = ClampMagicCurveParam(x => x.strengthNeg),
                 strengthPos = ClampMagicCurveParam(x => x.strengthPos),
             };
@@ -517,33 +484,25 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 		nodeStatsDelta[n].complexityTolerance.center = CalcDeltaStat(n, x => x.complexityTolerance.center);
 		nodeStatsDelta[n].complexityTolerance.peak =	CalcDeltaStat(n, x => x.complexityTolerance.peak);
 
-		nodeStatsDelta[n].enthusiasm.activationNeg = CalcDeltaStat(n, x => x.enthusiasm.activationNeg);
-		nodeStatsDelta[n].enthusiasm.activationPos = CalcDeltaStat(n, x => x.enthusiasm.activationPos);
-		nodeStatsDelta[n].enthusiasm.activationSteepnessNeg = CalcDeltaStat(n, x => x.enthusiasm.activationSteepnessNeg);
-		nodeStatsDelta[n].enthusiasm.activationSteepnessPos = CalcDeltaStat(n, x => x.enthusiasm.activationSteepnessPos);
+        nodeStatsDelta[n].enthusiasm.thresholdNeg = CalcDeltaStat(n, x => x.enthusiasm.thresholdNeg);
+        nodeStatsDelta[n].enthusiasm.thresholdPos = CalcDeltaStat(n, x => x.enthusiasm.thresholdPos);
 		nodeStatsDelta[n].enthusiasm.strengthNeg = CalcDeltaStat(n, x => x.enthusiasm.strengthNeg);
 		nodeStatsDelta[n].enthusiasm.strengthPos = CalcDeltaStat(n, x => x.enthusiasm.strengthPos);
 
 		nodeStatsDelta[n].reach = CalcDeltaStat(n, x => x.reach);
 
-		nodeStatsDelta[n].suggestibility.activationNeg = CalcDeltaStat(n, x => x.suggestibility.activationNeg);
-		nodeStatsDelta[n].suggestibility.activationPos = CalcDeltaStat(n, x => x.suggestibility.activationPos);
-		nodeStatsDelta[n].suggestibility.activationSteepnessNeg = CalcDeltaStat(n, x => x.suggestibility.activationSteepnessNeg);
-		nodeStatsDelta[n].suggestibility.activationSteepnessPos = CalcDeltaStat(n, x => x.suggestibility.activationSteepnessPos);
+        nodeStatsDelta[n].suggestibility.thresholdNeg = CalcDeltaStat(n, x => x.suggestibility.thresholdNeg);
+        nodeStatsDelta[n].suggestibility.thresholdPos = CalcDeltaStat(n, x => x.suggestibility.thresholdPos);
 		nodeStatsDelta[n].suggestibility.strengthNeg = CalcDeltaStat(n, x => x.suggestibility.strengthNeg);
 		nodeStatsDelta[n].suggestibility.strengthPos = CalcDeltaStat(n, x => x.suggestibility.strengthPos);
 
-		nodeStatsDelta[n].adherence.activationNeg = CalcDeltaStat(n, x => x.adherence.activationNeg);
-		nodeStatsDelta[n].adherence.activationPos = CalcDeltaStat(n, x => x.adherence.activationPos);
-		nodeStatsDelta[n].adherence.activationSteepnessNeg = CalcDeltaStat(n, x => x.adherence.activationSteepnessNeg);
-		nodeStatsDelta[n].adherence.activationSteepnessPos = CalcDeltaStat(n, x => x.adherence.activationSteepnessPos);
+        nodeStatsDelta[n].adherence.thresholdNeg = CalcDeltaStat(n, x => x.adherence.thresholdNeg);
+        nodeStatsDelta[n].adherence.thresholdPos = CalcDeltaStat(n, x => x.adherence.thresholdPos);
 		nodeStatsDelta[n].adherence.strengthNeg = CalcDeltaStat(n, x => x.adherence.strengthNeg);
 		nodeStatsDelta[n].adherence.strengthPos = CalcDeltaStat(n, x => x.adherence.strengthPos);
 
-		nodeStatsDelta[n].socialAttention.activationNeg = CalcDeltaStat(n, x => x.socialAttention.activationNeg);
-		nodeStatsDelta[n].socialAttention.activationPos = CalcDeltaStat(n, x => x.socialAttention.activationPos);
-		nodeStatsDelta[n].socialAttention.activationSteepnessNeg = CalcDeltaStat(n, x => x.socialAttention.activationSteepnessNeg);
-		nodeStatsDelta[n].socialAttention.activationSteepnessPos = CalcDeltaStat(n, x => x.socialAttention.activationSteepnessPos);
+        nodeStatsDelta[n].socialAttention.thresholdNeg = CalcDeltaStat(n, x => x.socialAttention.thresholdNeg);
+        nodeStatsDelta[n].socialAttention.thresholdPos = CalcDeltaStat(n, x => x.socialAttention.thresholdPos);
 		nodeStatsDelta[n].socialAttention.strengthNeg = CalcDeltaStat(n, x => x.socialAttention.strengthNeg);
 		nodeStatsDelta[n].socialAttention.strengthPos = CalcDeltaStat(n, x => x.socialAttention.strengthPos);
 
@@ -719,11 +678,8 @@ public class AdjacencyMtx
 [Serializable]
 public struct MagicCurveParams
 {
-    public float activationPos;
-    public float activationNeg;
-
-    public float activationSteepnessPos;
-    public float activationSteepnessNeg;
+    public float thresholdPos;
+    public float thresholdNeg;
     
     public float strengthPos;
     public float strengthNeg;
@@ -732,10 +688,9 @@ public struct MagicCurveParams
     {
         return new()
         {
-            activationNeg = a.activationNeg + b.activationNeg,
-            activationPos = a.activationPos + b.activationPos,
-            activationSteepnessNeg = a.activationSteepnessNeg + b.activationSteepnessNeg,
-            activationSteepnessPos = a.activationSteepnessPos + b.activationSteepnessPos,
+            thresholdNeg = a.thresholdNeg + b.thresholdNeg,
+            thresholdPos = a.thresholdPos + b.thresholdPos,
+            
             strengthNeg = a.strengthPos + b.strengthNeg,
             strengthPos = a.strengthPos + b.strengthPos,
         };
@@ -745,11 +700,10 @@ public struct MagicCurveParams
 	{
 		return new()
 		{
-			activationNeg = a.activationNeg * b,
-			activationPos = a.activationPos * b,
-			activationSteepnessNeg = a.activationSteepnessNeg * b,
-			activationSteepnessPos = a.activationSteepnessPos * b,
-			strengthNeg = a.strengthPos * b,
+			thresholdPos = a.thresholdPos * b,
+            thresholdNeg = a.thresholdNeg * b,
+            
+            strengthNeg = a.strengthPos * b,
 			strengthPos = a.strengthPos * b,
 		};
 	}

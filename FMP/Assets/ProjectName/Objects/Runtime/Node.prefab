@@ -187,6 +187,7 @@ GameObject:
   - component: {fileID: 4773160439233436703}
   - component: {fileID: 5967507920949871521}
   - component: {fileID: 8003208030640895489}
+  - component: {fileID: 6475351339052707319}
   m_Layer: 0
   m_Name: Node
   m_TagString: Untagged
@@ -333,3 +334,42 @@ MonoBehaviour:
       strengthNeg: 0
     extroversion: 0
     avoidance: 0
+  mouseOver: 0
+  dragging: 0
+  toMouse: {x: 0, y: 0}
+--- !u!58 &6475351339052707319
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2956038023147323852}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.5

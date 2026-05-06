@@ -1,6 +1,7 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class UI_bg : MonoBehaviour
+public class UI_bg : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -14,12 +15,12 @@ public class UI_bg : MonoBehaviour
         
     }
 
-    private void OnMouseEnter()
+    void IPointerEnterHandler.OnPointerEnter(UnityEngine.EventSystems.PointerEventData eventData)
     {
         print("over bg");
     }
 
-    private void OnMouseExit()
+    void IPointerExitHandler.OnPointerExit(UnityEngine.EventSystems.PointerEventData eventData)
     {
         print("mouse exit bg");
     }

@@ -1,7 +1,8 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class VisualNodePerson : VisualNode
+public class VisualNodePerson : VisualNode, IPointerEnterHandler, IPointerExitHandler
 {
     MGR_gameMaths game;
     [SerializeField] TextMeshPro text;
@@ -41,13 +42,13 @@ public class VisualNodePerson : VisualNode
         dstats = game.nodeStatsDelta[id];
     }
 
-    private void OnMouseEnter()
+    void IPointerEnterHandler.OnPointerEnter(UnityEngine.EventSystems.PointerEventData eventData)
     {
-        mouseOver = true;
+        print("over bg node");
     }
 
-    private void OnMouseExit()
+    void IPointerExitHandler.OnPointerExit(UnityEngine.EventSystems.PointerEventData eventData)
     {
-        mouseOver = false;
+        print("mouse exit bg node");
     }
 }

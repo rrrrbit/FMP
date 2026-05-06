@@ -56,7 +56,7 @@ public class GameCamera : MonoBehaviour
 
     void AddCallbacks()
     {
-        input.gameActions.Scroll.performed += Zoom;
+        input.generalActions.Scroll.performed += Zoom;
         print("added callbacks");
     }
 
@@ -121,11 +121,5 @@ public class GameCamera : MonoBehaviour
         Vector3 p2 = cam.ScreenToWorldPoint(Vector2.one.xy(zDepth));
 
         return screenDelta.Scaled(p2-p1);
-    }
-
-    private void OnMouseEnter()
-    {
-        print("mouse over");
-
     }
 }

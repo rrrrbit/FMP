@@ -33,6 +33,8 @@ public class GameCamera : MonoBehaviour
     public Camera midCam, frontCam;
     Vector3 targetPos;
     public float targetZoom = 1;
+
+    bool panning;
     float prevZoom;
 
     public Spring zoomEasing;
@@ -91,6 +93,16 @@ public class GameCamera : MonoBehaviour
         midCam.orthographicSize = currentZoom;
         //frontCam.orthographicSize = currentZoom;
 
+        if (input.gameActions.PanBtn.WasPressedThisFrame())
+        {
+
+        }
+
+        if (input.gameActions.PanBtn.WasReleasedThisFrame())
+        {
+            panning = false;
+        }
+
         if (input.gameActions.PanBtn.IsPressed())
         {
             
@@ -109,5 +121,11 @@ public class GameCamera : MonoBehaviour
         Vector3 p2 = cam.ScreenToWorldPoint(Vector2.one.xy(zDepth));
 
         return screenDelta.Scaled(p2-p1);
+    }
+
+    private void OnMouseEnter()
+    {
+        print("mouse over");
+
     }
 }

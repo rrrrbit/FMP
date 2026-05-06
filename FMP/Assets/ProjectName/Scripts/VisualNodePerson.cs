@@ -4,12 +4,15 @@ using UnityEngine;
 public class VisualNodePerson : VisualNode
 {
     MGR_gameMaths game;
-    [SerializeField]TextMeshPro text;
-    [SerializeField]float[] niEdges;
-    [SerializeField]float[] inEdges;
-    [SerializeField]float[] nnEdgesTo;
+    [SerializeField] TextMeshPro text;
+    [SerializeField] float[] niEdges;
+    [SerializeField] float[] inEdges;
+    [SerializeField] float[] nnEdgesTo;
     [SerializeField] NodeStats stats;
     [SerializeField] NodeStats dstats;
+    [SerializeField] bool mouseOver;
+    [SerializeField] bool dragging;
+    [SerializeField] Vector2 toMouse;
 
     private void Start()
     {
@@ -36,5 +39,15 @@ public class VisualNodePerson : VisualNode
 
         stats = game.nodeStats[id];
         dstats = game.nodeStatsDelta[id];
+    }
+
+    private void OnMouseEnter()
+    {
+        mouseOver = true;
+    }
+
+    private void OnMouseExit()
+    {
+        mouseOver = false;
     }
 }

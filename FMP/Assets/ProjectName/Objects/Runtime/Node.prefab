@@ -280,4 +280,56 @@ MonoBehaviour:
   id: 0
   onScreen: 1
   text: {fileID: 8059651175184013901}
-  edges: []
+  niEdges: []
+  inEdges: []
+  nnEdgesTo: []
+  stats:
+    complexity: 0
+    complexityTolerance:
+      center: 0
+      peak: 0
+      width: 0
+      steepness: 0
+    enthusiasm:
+      thresholdPos: 0
+      thresholdNeg: 0
+      strengthPos: 0
+      strengthNeg: 0
+    reach: 0
+    suggestibility:
+      thresholdPos: 0
+      thresholdNeg: 0
+      strengthPos: 0
+      strengthNeg: 0
+    adherence:
+      thresholdPos: 0
+      thresholdNeg: 0
+      strengthPos: 0
+      strengthNeg: 0
+    extroversion: 0
+    avoidance: 0
+  dstats:
+    complexity: 0
+    complexityTolerance:
+      center: 0
+      peak: 0
+      width: 0
+      steepness: 0
+    enthusiasm:
+      thresholdPos: 0
+      thresholdNeg: 0
+      strengthPos: 0
+      strengthNeg: 0
+    reach: 0
+    suggestibility:
+      thresholdPos: 0
+      thresholdNeg: 0
+      strengthPos: 0
+      strengthNeg: 0
+    adherence:
+      thresholdPos: 0
+      thresholdNeg: 0
+      strengthPos: 0
+      strengthNeg: 0
+    extroversion: 0
+    avoidance: 0

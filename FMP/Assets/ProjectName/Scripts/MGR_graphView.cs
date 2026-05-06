@@ -43,7 +43,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	}
 	public RepulsionTypes repulsionType;
 	[Header("Runtime & Refs")]
-	[SerializeField] int calculatedPairs;
+	[SerializeField] int debug_calculatedPairs;
 	[SerializeField] int totalPairs;
 	public VisualNode visualNodePrefab;
 	public int nodeCount;
@@ -96,7 +96,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 
 	void UpdateView(float dt)
 	{
-		calculatedPairs = 0;
+		debug_calculatedPairs = 0;
 		for (int i = 0; i < nodeCount; i++) // nodewise forces and some calcs
         {
             r[i] = sizeByIndegree.Evaluate(graph.GetIndegree(i));
@@ -124,7 +124,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
                 Vector2 dn = d.normalized;
 
                 a[i] += PairwiseForce(i, j, d, w, padding);
-				calculatedPairs += 1;
+				debug_calculatedPairs += 1;
 
                 //debug edge visualisation
                 Vector2 offs = new(dn.y, -dn.x);

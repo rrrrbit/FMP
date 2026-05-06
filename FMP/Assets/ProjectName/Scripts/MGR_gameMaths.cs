@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using TMPro;
+using Unity.Mathematics;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
@@ -87,9 +88,17 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         float x = Mathf.Abs(xRaw);
         float x2 = x * x;
 
-        float sigmoid =  x < threshold ? -x2 / (2*threshold*x - 2*x2 - threshold*threshold) : 1;
-        float curve = strength>0 ? strength - strength * Mathf.Exp(-x / strength) : 0;
-        float total = sigmoid * curve * Mathf.Sign(xRaw);
+        float curve;
+        float activation =  x < threshold ? -x2 / (2*threshold*x - 2*x2 - threshold*threshold) : 1;
+        if (param.diverge)
+        {
+            curve = strength > 0 ? strength * Mathf.Log(x / strength + 1) : 0;
+        }
+        else
+        {
+            curve = strength > 0 ? strength - strength * Mathf.Exp(-x / strength) : 0;
+        }
+            float total = activation * curve * Mathf.Sign(xRaw);
         if (!float.IsFinite(total))
         {
             Debug.LogWarning("caught NaN in magicCurve");
@@ -135,6 +144,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
             thresholdNeg = UnityEngine.Random.Range(min.thresholdNeg, max.thresholdNeg),
             strengthNeg = UnityEngine.Random.Range(min.strengthNeg, max.strengthNeg),
+
+            diverge = UnityEngine.Random.value >= .5f ? min.diverge : max.diverge,
         };
     }
 
@@ -421,6 +432,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             nodeStats[n] = ClampStats(nodeStats[n], nodeStatsMin, nodeStatsMax);
 		}
 	}
+
+#region - stat
     NodeStats ClampStats(NodeStats stats, NodeStats min, NodeStats max)
     {
         float ClampFloatStat(Func<NodeStats, float> stat) => Mathf.Clamp(stat(stats), stat(min), stat(max));
@@ -508,7 +521,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
 		nodeStatsDelta[n] = ClampStats(nodeStatsDelta[n], nodeStatsMin, nodeStatsMax);
 	}
-
+    #endregion
     float CalcIN(int i, int n)
     {
         // similarity here
@@ -683,6 +696,8 @@ public struct MagicCurveParams
     
     public float strengthPos;
     public float strengthNeg;
+
+    public bool diverge;
 
     public static MagicCurveParams operator +(MagicCurveParams a, MagicCurveParams b)
     {

@@ -825,34 +825,30 @@ MonoBehaviour:
       width: 1
       steepness: 2
     enthusiasm:
-      activationPos: 2
-      activationNeg: 2
-      activationSteepnessPos: 1
-      activationSteepnessNeg: 1
+      thresholdPos: 0
+      thresholdNeg: 0
       strengthPos: 0
       strengthNeg: 0
+      diverge: 0
     reach: 0
     suggestibility:
-      activationPos: 2
-      activationNeg: 2
-      activationSteepnessPos: 1
-      activationSteepnessNeg: 1
+      thresholdPos: 0
+      thresholdNeg: 0
       strengthPos: 0
       strengthNeg: 0
+      diverge: 0
     adherence:
-      activationPos: 2
-      activationNeg: 2
-      activationSteepnessPos: 1
-      activationSteepnessNeg: 1
+      thresholdPos: 0
+      thresholdNeg: 0
       strengthPos: 0
       strengthNeg: 0
+      diverge: 0
     socialAttention:
-      activationPos: 2
-      activationNeg: 2
-      activationSteepnessPos: 1
-      activationSteepnessNeg: 1
-      strengthPos: 0
-      strengthNeg: 0
+      thresholdPos: 0
+      thresholdNeg: 0
+      strengthPos: 8
+      strengthNeg: 8
+      diverge: 1
   nodeStatsMax:
     complexity: 16
     complexityTolerance:
@@ -861,34 +857,30 @@ MonoBehaviour:
       width: 4
       steepness: 2
     enthusiasm:
-      activationPos: 32
-      activationNeg: 32
-      activationSteepnessPos: 1
-      activationSteepnessNeg: 1
+      thresholdPos: 8
+      thresholdNeg: 8
       strengthPos: 32
       strengthNeg: 32
+      diverge: 0
     reach: 32
     suggestibility:
-      activationPos: 32
-      activationNeg: 32
-      activationSteepnessPos: 1
-      activationSteepnessNeg: 1
+      thresholdPos: 8
+      thresholdNeg: 8
       strengthPos: 32
       strengthNeg: 32
+      diverge: 0
     adherence:
-      activationPos: 32
-      activationNeg: 32
-      activationSteepnessPos: 1
-      activationSteepnessNeg: 1
+      thresholdPos: 8
+      thresholdNeg: 8
       strengthPos: 32
       strengthNeg: 32
+      diverge: 0
     socialAttention:
-      activationPos: 32
-      activationNeg: 32
-      activationSteepnessPos: 1
-      activationSteepnessNeg: 1
+      thresholdPos: 0
+      thresholdNeg: 0
       strengthPos: 32
       strengthNeg: 32
+      diverge: 1
   ideaComplexity: []
   ideaTolerance: []
   ideaExemplar: []

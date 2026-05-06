@@ -829,26 +829,19 @@ MonoBehaviour:
       thresholdNeg: 0
       strengthPos: 0
       strengthNeg: 0
-      diverge: 0
     reach: 0
     suggestibility:
       thresholdPos: 0
       thresholdNeg: 0
       strengthPos: 0
       strengthNeg: 0
-      diverge: 0
     adherence:
       thresholdPos: 0
       thresholdNeg: 0
       strengthPos: 0
       strengthNeg: 0
-      diverge: 0
-    socialAttention:
-      thresholdPos: 0
-      thresholdNeg: 0
-      strengthPos: 8
-      strengthNeg: 8
-      diverge: 1
+    extroversion: 0.5
+    avoidance: 1
   nodeStatsMax:
     complexity: 16
     complexityTolerance:
@@ -857,30 +850,23 @@ MonoBehaviour:
       width: 4
       steepness: 2
     enthusiasm:
-      thresholdPos: 8
-      thresholdNeg: 8
-      strengthPos: 32
-      strengthNeg: 32
-      diverge: 0
+      thresholdPos: 32
+      thresholdNeg: 32
+      strengthPos: 8
+      strengthNeg: 8
     reach: 32
     suggestibility:
-      thresholdPos: 8
-      thresholdNeg: 8
-      strengthPos: 32
-      strengthNeg: 32
-      diverge: 0
+      thresholdPos: 32
+      thresholdNeg: 32
+      strengthPos: 8
+      strengthNeg: 8
     adherence:
-      thresholdPos: 8
-      thresholdNeg: 8
-      strengthPos: 32
-      strengthNeg: 32
-      diverge: 0
-    socialAttention:
-      thresholdPos: 0
-      thresholdNeg: 0
-      strengthPos: 32
-      strengthNeg: 32
-      diverge: 1
+      thresholdPos: 32
+      thresholdNeg: 32
+      strengthPos: 7.88
+      strengthNeg: 8
+    extroversion: 8
+    avoidance: 8
   ideaComplexity: []
   ideaTolerance: []
   ideaExemplar: []

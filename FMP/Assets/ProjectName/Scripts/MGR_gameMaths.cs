@@ -88,17 +88,10 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         float x = Mathf.Abs(xRaw);
         float x2 = x * x;
 
-        float curve;
+        float curve = strength > 0 ? strength - strength * Mathf.Exp(-x / strength) : 0;
         float activation =  x < threshold ? -x2 / (2*threshold*x - 2*x2 - threshold*threshold) : 1;
-        if (param.diverge)
-        {
-            curve = strength > 0 ? strength * Mathf.Log(x / strength + 1) : 0;
-        }
-        else
-        {
-            curve = strength > 0 ? strength - strength * Mathf.Exp(-x / strength) : 0;
-        }
-            float total = activation * curve * Mathf.Sign(xRaw);
+
+        float total = activation * curve * Mathf.Sign(xRaw);
         if (!float.IsFinite(total))
         {
             Debug.LogWarning("caught NaN in magicCurve");
@@ -144,8 +137,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
             thresholdNeg = UnityEngine.Random.Range(min.thresholdNeg, max.thresholdNeg),
             strengthNeg = UnityEngine.Random.Range(min.strengthNeg, max.strengthNeg),
-
-            diverge = UnityEngine.Random.value >= .5f ? min.diverge : max.diverge,
         };
     }
 
@@ -290,7 +281,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
                 reach = UnityEngine.Random.Range(.5f, 4),
                 suggestibility = RandomMagicCurve(minMagicCurve, maxMagicCurve),
                 adherence = RandomMagicCurve(minMagicCurve, maxMagicCurve),
-                socialAttention = RandomMagicCurve(socDecMinCurve, socDecMaxCurve),
+                extroversion = UnityEngine.Random.Range(.5f, 4),
+                avoidance = UnityEngine.Random.Range(.5f, 4),
             };
         }
 
@@ -309,7 +301,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
                 reach = UnityEngine.Random.Range(.5f, 4),
                 suggestibility = RandomMagicCurve(minMagicCurve, maxMagicCurve),
                 adherence = RandomMagicCurve(minMagicCurve, maxMagicCurve),
-                socialAttention = RandomMagicCurve(socDecMinCurve, socDecMaxCurve),
+                extroversion = UnityEngine.Random.Range(.5f, 4),
+                avoidance = UnityEngine.Random.Range(.5f, 4),
             };
         }
     }
@@ -469,7 +462,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             reach = ClampFloatStat(x => x.reach),
             suggestibility = ClampMagicCurveStat(x => x.suggestibility),
             adherence = ClampMagicCurveStat(x => x.adherence),
-            socialAttention = ClampMagicCurveStat(x => x.socialAttention),
+            extroversion = ClampFloatStat(x => x.extroversion),
+            avoidance = ClampFloatStat(x => x.avoidance),
         };
 
         return clamped;
@@ -514,12 +508,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 		nodeStatsDelta[n].adherence.strengthNeg = CalcDeltaStat(n, x => x.adherence.strengthNeg);
 		nodeStatsDelta[n].adherence.strengthPos = CalcDeltaStat(n, x => x.adherence.strengthPos);
 
-        nodeStatsDelta[n].socialAttention.thresholdNeg = CalcDeltaStat(n, x => x.socialAttention.thresholdNeg);
-        nodeStatsDelta[n].socialAttention.thresholdPos = CalcDeltaStat(n, x => x.socialAttention.thresholdPos);
-		nodeStatsDelta[n].socialAttention.strengthNeg = CalcDeltaStat(n, x => x.socialAttention.strengthNeg);
-		nodeStatsDelta[n].socialAttention.strengthPos = CalcDeltaStat(n, x => x.socialAttention.strengthPos);
-
-		nodeStatsDelta[n] = ClampStats(nodeStatsDelta[n], nodeStatsMin, nodeStatsMax);
+        nodeStatsDelta[n].extroversion = CalcDeltaStat(n, x => x.extroversion);
+        nodeStatsDelta[n].avoidance = CalcDeltaStat(n, x => x.avoidance);
 	}
     #endregion
     float CalcIN(int i, int n)
@@ -551,7 +541,18 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         float ideological = ManualSum(-1, ideasCount, x => IN.mtx[x,m] * NI.mtx[n, x]);
 
         //float nn2 = NN.mtx[n, m] * NN.mtx[n, m];
-        float decay = -MagicCurve(NN.mtx[n, m], nodeStats[n].socialAttention);
+        float dScaled;
+        if (NN.mtx[n, m] >= 0)
+        {
+            dScaled = NN.mtx[n, m] / nodeStats[n].extroversion;
+        }
+        else
+        {
+            dScaled = NN.mtx[n,m] * nodeStats[n].avoidance;
+        }
+
+
+        float decay = - dScaled * dScaled * Mathf.Sign(NN.mtx[n, m]);
 
         return MagicCurve(social, nodeStats[n].suggestibility) * MagicCurve(ideological, nodeStats[n].adherence) + decay;
     }
@@ -697,15 +698,13 @@ public struct MagicCurveParams
     public float strengthPos;
     public float strengthNeg;
 
-    public bool diverge;
-
     public static MagicCurveParams operator +(MagicCurveParams a, MagicCurveParams b)
     {
         return new()
         {
             thresholdNeg = a.thresholdNeg + b.thresholdNeg,
             thresholdPos = a.thresholdPos + b.thresholdPos,
-            
+
             strengthNeg = a.strengthPos + b.strengthNeg,
             strengthPos = a.strengthPos + b.strengthPos,
         };
@@ -713,14 +712,14 @@ public struct MagicCurveParams
 
 	public static MagicCurveParams operator *(MagicCurveParams a, float b)
 	{
-		return new()
-		{
-			thresholdPos = a.thresholdPos * b,
+        return new()
+        {
+            thresholdPos = a.thresholdPos * b,
             thresholdNeg = a.thresholdNeg * b,
-            
+
             strengthNeg = a.strengthPos * b,
-			strengthPos = a.strengthPos * b,
-		};
+            strengthPos = a.strengthPos * b,
+        };
 	}
 }
 
@@ -763,7 +762,8 @@ public struct NodeStats
     public float reach;
     public MagicCurveParams suggestibility; // rename conformity...?
     public MagicCurveParams adherence;
-    public MagicCurveParams socialAttention;
+    public float extroversion;
+    public float avoidance;
 
 	public static NodeStats operator +(NodeStats a, NodeStats b)
 	{
@@ -775,7 +775,8 @@ public struct NodeStats
 			reach = a.reach + b.reach,
 			suggestibility = a.suggestibility + b.suggestibility,
 			adherence = a.adherence + b.adherence,
-			socialAttention = a.socialAttention + b.socialAttention,
+            extroversion = a.extroversion + b.extroversion,
+            avoidance = a.avoidance + b.avoidance,
 		};
 	}
 
@@ -789,7 +790,8 @@ public struct NodeStats
 			reach = a.reach * b,
 			suggestibility = a.suggestibility * b,
 			adherence = a.adherence * b,
-			socialAttention = a.socialAttention * b,
+            extroversion = a.extroversion * b,
+            avoidance = a.avoidance * b,
 		};
 	}
 }

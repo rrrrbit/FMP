@@ -431,7 +431,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2090233356}
   m_HandleRect: {fileID: 2090233355}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -775,7 +775,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.00004196167, y: 0.000010643649}
+  m_AnchoredPosition: {x: 0.00004196167, y: -0.000020980835}
   m_SizeDelta: {x: 498, y: 691.86}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &564968367
@@ -840,7 +840,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -702.3402, y: -184.75}
+  m_AnchoredPosition: {x: -702.3403, y: -184.75}
   m_SizeDelta: {x: -1404.67, y: -369.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &637802479
@@ -2437,8 +2437,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   midCam: {fileID: 2138412822}
-  delta: {x: 0, y: 0, z: 0}
-  prevPos: {x: 0, y: 0, z: 0}
+  relativeDelta: {x: 0, y: 0, z: 0}
+  prevRelativePos: {x: 0, y: 0, z: 0}
+  relativePos: {x: 0, y: 0, z: 0}
   pos: {x: 0, y: 0, z: 0}
 --- !u!212 &1939759921
 SpriteRenderer:

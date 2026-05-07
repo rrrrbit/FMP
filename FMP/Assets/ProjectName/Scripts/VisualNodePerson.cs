@@ -25,6 +25,7 @@ public class VisualNodePerson : VisualNode, IPointerEnterHandler, IPointerExitHa
         int strongestId = 0;
         float strongestWeight = 0;
         niEdges = game.NI.GetEdgesFrom(id);
+
 		for(int i = 0; i < niEdges.Length; i++)
 		{
             if (niEdges[i] > strongestWeight)
@@ -33,6 +34,7 @@ public class VisualNodePerson : VisualNode, IPointerEnterHandler, IPointerExitHa
                 strongestWeight = niEdges[i];
             }
 		}
+
         text.text = strongestId.ToString();
 
         inEdges = game.IN.GetEdgesTo(id);

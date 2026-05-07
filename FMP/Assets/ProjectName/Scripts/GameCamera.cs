@@ -87,13 +87,11 @@ public class GameCamera : MonoBehaviour
         currentZoom = zoomEasing.Update(Time.deltaTime, targetZoom);
         currentZoom.CheckChange(ref prevZoom, UpdateZoom);
         transform.position += input.gameActions.Pan.ReadValue<Vector2>().xy().Scaled(panSpeed) * currentZoom * Time.deltaTime;
-        //cam.orthographicSize = currentZoom;
         midCam.orthographicSize = currentZoom;
-        //frontCam.orthographicSize = currentZoom;
 
         if (input.gameActions.PanBtn.WasPressedThisFrame())
         {
-
+            // if click reaches the bg then pan.
         }
 
         if (input.gameActions.PanBtn.WasReleasedThisFrame())
@@ -105,7 +103,6 @@ public class GameCamera : MonoBehaviour
         {
 
             transform.position -= input.pointer.relativeDelta;
-            //Mouse.current.delta.ReadValue().xy() / currentZoom / cam.aspect / 2
         }
     }
 

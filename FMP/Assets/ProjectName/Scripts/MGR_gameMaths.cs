@@ -35,6 +35,8 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     [Header("- Lists")]
 	public List<PersonNode> nodes;
     public List<IdeaNode> ideas;
+    public int nodesCount;
+    public int ideasCount;
     [Header("- Matrices")]
 	public AdjacencyMtx NN;
     public AdjacencyMtx NI;
@@ -45,8 +47,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     float[,] niDelta;
     float[,] inNext;
     float[,] iiNext;
-    int nodesCount;
-    int ideasCount;
     [Header("- Node Stats")]
     public NodeStats[] nodeStats;
 	public NodeStats[] nodeStatsDelta;

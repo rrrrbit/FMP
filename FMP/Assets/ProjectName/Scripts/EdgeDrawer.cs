@@ -50,7 +50,7 @@ public class EdgeDrawer : MonoBehaviour
         edges = new Edge[edgePairs.Length];
         for(int pair = 0; pair < edgePairs.Length; pair++)
         {
-            //edges[pair].from = view.
+            //  edges[pair].from = view.
         }
     }
 

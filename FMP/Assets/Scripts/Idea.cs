@@ -1,8 +1,6 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using System.Linq;
 
 public class Idea : MonoBehaviour

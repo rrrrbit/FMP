@@ -12,19 +12,19 @@ public class UI_nodeViewer : MonoBehaviour
     public GameObject[] ideaBars;
     public GameObject ideaBarPrefab;
 
-    MGR_gameMaths gameMaths;
+    MGR_gameMaths game;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        gameMaths = Managers.Get<MGR_gameMaths>();
-        gameMaths.OnReadyForVisualisation += InitIdeaBars;
+        game = Managers.Get<MGR_gameMaths>();
+        game.OnReadyForVisualisation += InitIdeaBars;
     }
 
     void InitIdeaBars()
     {
-        ideaBars = new GameObject[gameMaths.ideasCount];
-        for (int i = 0; gameMaths.ideasCount > 0; i++)
+        ideaBars = new GameObject[game.ideasCount];
+        for (int i = 0; i < game.ideasCount; i++)
         {
             if (ideaBars[i] == null)
             {
@@ -48,10 +48,10 @@ public class UI_nodeViewer : MonoBehaviour
 
     void UpdateViewer()
     {
-        NodeStats stats = gameMaths.nodeStats[nodeIndex];
+        NodeStats stats = game.nodeStats[nodeIndex];
         texts.text = (
               "Complexity: " + Round(stats.complexity) +
-            "\nComplexity Tolerance: " + Round(stats.complexityTolerance.center) + 
+            "\nComplexity Tolerance: " + Round(stats.complexityTolerance.width) + 
             "\nEnthusiasm: <color=#FF0000>" + Round(stats.enthusiasm.strengthPos) + "</color> / <color=#00FF00>" + Round(stats.enthusiasm.strengthNeg) + "</color>" +
             "\nReach: " + Round(stats.reach) +
             "\nSuggestibility: <color=#FF0000>" + Round(stats.suggestibility.strengthPos) + "</color> / <color=#00FF00>" + Round(stats.suggestibility.strengthNeg) + "</color>" +
@@ -66,17 +66,19 @@ public class UI_nodeViewer : MonoBehaviour
     void UpdateIdeaBars()
     {
         float maxAbsNI = 0;
-        for (int i = 0; gameMaths.ideasCount > 0; i++)
+        
+        for (int i = 0; i < game.ideasCount; i++)
         {
-            if (Mathf.Abs(gameMaths.NI.mtx[nodeIndex, i]) > Mathf.Abs(maxAbsNI))
+            print(i);
+            if (Mathf.Abs(game.NI.mtx[nodeIndex, i]) > Mathf.Abs(maxAbsNI))
             {
-                maxAbsNI = gameMaths.NI.mtx[nodeIndex, i];
+                maxAbsNI = game.NI.mtx[nodeIndex, i];
             }
         }
 
-        for (int i = 0; gameMaths.ideasCount > 0; i++)
+        for (int i = 0; i < game.ideasCount; i++)
         {
-            ideaBars[i].GetComponent<UI_twoWayBar>().value = gameMaths.NI.mtx[nodeIndex, i] / maxAbsNI;
+            ideaBars[i].GetComponent<UI_twoWayBar>().value = game.NI.mtx[nodeIndex, i] / maxAbsNI;
         }
     }
 }

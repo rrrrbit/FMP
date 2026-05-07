@@ -15,7 +15,6 @@ public class UI_twoWayBar : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        print(parent.sizeDelta.y);
         fill = transform.GetChild(0).GetComponent<RectTransform>();
         if (value >= 0)
         {

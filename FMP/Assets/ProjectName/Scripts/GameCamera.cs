@@ -77,9 +77,7 @@ public class GameCamera : MonoBehaviour
     {
         ZoomOnPoint(
             currentZoom/prevZoom,
-            midCam.ScreenToWorldPoint(
-                Mouse.current.position.ReadValue().xy(-transform.position.z)
-                )
+            input.pointer.pos.xy()
             );
     }
 
@@ -105,12 +103,8 @@ public class GameCamera : MonoBehaviour
 
         if (input.gameActions.PanBtn.IsPressed())
         {
-            
-            transform.position -= ScreenToWorldDelta(
-                midCam, 
-                Mouse.current.delta.ReadValue(), 
-                transform.position.z
-                );
+
+            transform.position -= input.pointer.relativeDelta;
             //Mouse.current.delta.ReadValue().xy() / currentZoom / cam.aspect / 2
         }
     }

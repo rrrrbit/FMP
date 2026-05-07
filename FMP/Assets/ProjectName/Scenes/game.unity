@@ -775,7 +775,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.00006484985, y: 0.00003878487}
+  m_AnchoredPosition: {x: 0.00004196167, y: 0.000010643649}
   m_SizeDelta: {x: 498, y: 691.86}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &564968367
@@ -840,7 +840,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -702.3401, y: -184.75}
+  m_AnchoredPosition: {x: -702.3402, y: -184.75}
   m_SizeDelta: {x: -1404.67, y: -369.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &637802479
@@ -897,7 +897,7 @@ MonoBehaviour:
   texts: {fileID: 1845849691}
   ideaBarsContainer: {fileID: 131947168}
   ideaBars: []
-  ideaBarPrefab: {fileID: 0}
+  ideaBarPrefab: {fileID: 7441641959104510895, guid: 729b95f9b1924d74087a941d0ea17256, type: 3}
 --- !u!1 &744623399
 GameObject:
   m_ObjectHideFlags: 0
@@ -1302,7 +1302,7 @@ MonoBehaviour:
     complexity: -16
     complexityTolerance:
       center: -16
-      peak: 0
+      peak: 1
       width: 1
       steepness: 2
     enthusiasm:
@@ -1314,13 +1314,13 @@ MonoBehaviour:
     suggestibility:
       thresholdPos: 0
       thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
+      strengthPos: 0.2
+      strengthNeg: 0.2
     adherence:
       thresholdPos: 0
       thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
+      strengthPos: 0.2
+      strengthNeg: 0.2
     extroversion: 0.5
     avoidance: 1
   nodeStatsMax:
@@ -1377,7 +1377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c9a9119507ee794b8818f6628890721, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointer: {fileID: 0}
+  pointer: {fileID: 1939759920}
 --- !u!114 &884068271
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2215,7 +2215,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 191.38}
+  m_SizeDelta: {x: 0, y: 1070.65}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1845849691
 MonoBehaviour:
@@ -2237,9 +2237,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'gay sex: 0
+  m_text: 'gay sex: 9999999999
 
-    placeholder
+    <b>kindly</b> ignore the placeholder text
+
 
     afdsa
 
@@ -2417,7 +2418,7 @@ GameObject:
   - component: {fileID: 1939759921}
   - component: {fileID: 1939759920}
   m_Layer: 0
-  m_Name: MousePos
+  m_Name: Pointer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

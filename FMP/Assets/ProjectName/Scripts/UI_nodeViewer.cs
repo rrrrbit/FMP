@@ -69,7 +69,6 @@ public class UI_nodeViewer : MonoBehaviour
         
         for (int i = 0; i < game.ideasCount; i++)
         {
-            print(i);
             if (Mathf.Abs(game.NI.mtx[nodeIndex, i]) > Mathf.Abs(maxAbsNI))
             {
                 maxAbsNI = game.NI.mtx[nodeIndex, i];

@@ -48,7 +48,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	public VisualNode visualNodePrefab;
 	public int nodeCount;
 	MGR_gameMaths gameMaths;
-	AdjacencyMtx graph;
+	public AdjacencyMtx graph;
 	VisualNode[] obj;
 
 	public struct VisualNodeProperties

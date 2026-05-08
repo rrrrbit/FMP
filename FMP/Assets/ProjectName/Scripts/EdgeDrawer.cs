@@ -1,6 +1,7 @@
 using RBitUtils;
 using Unity.Burst;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class EdgeDrawer : MonoBehaviour
 {
@@ -11,24 +12,34 @@ public class EdgeDrawer : MonoBehaviour
     MeshFilter mf;
     MeshRenderer mr;
 
+	int vertCount = 10;
     Vector3[] verts;
     int[] tris;
 	Vector2[] uvs;
 
 	[SerializeField] AnimationCurve widthByWeight;
-	[SerializeField] bool normaliseWeight = true;
+	[SerializeField] float width;
+	[SerializeField] float maxWorldWidth;
+    [SerializeField] float endsFadeLength = 0.2f;
+    [SerializeField] bool normaliseWeight = true;
     [SerializeField] float colourMinWeight = -2f;
 	[SerializeField] float colourMaxWeight = 2f;
+
+	[SerializeField] bool constantScreenWidth = true;
 
 	Vector2Int[] edgePairs;
 
 	public float offCenter = 0.1f;
 	public float arrowHeadSize = 3f;
+
+	[SerializeField] GameCamera cam;
 	class Edge
     {
         public Vector3 from, to;
         public float width;
-		public Vector2 uv;
+		public Vector2 uvFrom;
+		public Vector2 uvTo;
+        public Vector2 uvMiddle;
     }
     Edge[] edges;
 
@@ -44,9 +55,9 @@ public class EdgeDrawer : MonoBehaviour
 			edges[i] = new Edge();
 		}
 
-		verts = new Vector3[edgePairs.Length * 5];
-		uvs = new Vector2[edgePairs.Length * 5];
-		tris = new int[edgePairs.Length * 3 * 3];
+		verts = new Vector3[edgePairs.Length * vertCount];
+		uvs = new Vector2[edgePairs.Length * vertCount];
+		tris = new int[edgePairs.Length * (vertCount-2) * 3];
 
 		mf = GetComponent<MeshFilter>();
 		mf.mesh = new Mesh();
@@ -75,9 +86,23 @@ public class EdgeDrawer : MonoBehaviour
 
 			edges[pair].from = from.p + dir * from.r * 0.9f; 
 			edges[pair].to = to.p - dir * to.r;
-			edges[pair].width = widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? view.graph.maxAbsWeight : 1f));
-			edges[pair].uv = new Vector2((weight - colourMinWeight) / (colourMaxWeight - colourMinWeight), 0);
-		}
+
+			float widthMult = (constantScreenWidth ? ((cam.currentZoom-maxWorldWidth) /(1-Mathf.Exp(cam.currentZoom - maxWorldWidth))) + maxWorldWidth : 1);
+
+
+            edges[pair].width = width * widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? view.graph.maxAbsWeight : 1f)) * widthMult;
+
+			float u = (weight - colourMinWeight) / (colourMaxWeight - colourMinWeight);
+			float vFrom = view.vn[edgePairs[pair].x].obj.onScreen ? 1 : 0;
+            float vTo = view.vn[edgePairs[pair].y].obj.onScreen ? 1 : 0;
+            float vMiddle = view.vn[edgePairs[pair].x].obj.onScreen && view.vn[edgePairs[pair].y].obj.onScreen ? 1 : 0;
+
+
+
+            edges[pair].uvFrom = new Vector2(u, vFrom);
+			edges[pair].uvTo = new Vector2(u,vFrom);
+            edges[pair].uvMiddle = new Vector2(u, vMiddle);
+        }
 	}
 
 	void UpdateColours()
@@ -85,61 +110,107 @@ public class EdgeDrawer : MonoBehaviour
 		int vert = 0;
 		foreach(Edge edge in edges)
 		{
-			uvs[vert++] = edge.uv;
-			uvs[vert++] = edge.uv;
-			uvs[vert++] = edge.uv;
-			uvs[vert++] = edge.uv;
-			uvs[vert++] = edge.uv;
-		}
+            uvs[vert++] = edge.uvFrom;
+
+            uvs[vert++] = edge.uvMiddle;
+            uvs[vert++] = edge.uvMiddle;
+
+            uvs[vert++] = edge.uvTo;
+            uvs[vert++] = edge.uvTo;
+            uvs[vert++] = edge.uvTo;
+            uvs[vert++] = edge.uvTo;
+
+            uvs[vert++] = edge.uvMiddle;
+            uvs[vert++] = edge.uvMiddle;
+
+            uvs[vert++] = edge.uvFrom;
+        }
 
 		mf.mesh.uv = uvs;
 	}
 
 	void UpdateMesh()
 	{
-		int vert = 0;
+        int vert = 0;
 		foreach(Edge edge in edges)
 		{
-			Vector3 dir = (edge.to - edge.from).normalized;
-			Vector3 perp = new(-dir.y, dir.x);
+            Vector3 dir = (edge.to - edge.from).normalized;
+            Vector3 perp = new(-dir.y, dir.x);
+            Vector3 Offset(float x, float y) => dir * x + perp * y;
 
-			/*
-			                2
-			                |`\
-			4---------------3  `\
+            /* verts:
+							5
+							|`\
+			9---8-------7---6  `\
 			|                    `\
-			0----------------------`1
+			0---1-------2---3------`4
 
-			tris: 123 043 013
-			 */
-			verts[vert++] = perp * offCenter + edge.from;
+			*/
+            verts[vert++] = edge.from;
+            verts[vert++] = edge.from + Offset(endsFadeLength, 0);
+            verts[vert++] = edge.to + Offset(-edge.width * 2 - endsFadeLength, 0);
+            verts[vert++] = edge.to + Offset(-edge.width * 2, 0);
+            verts[vert++] = edge.to;
 
-			verts[vert++] = perp * offCenter + edge.to;
-			verts[vert++] = perp * offCenter + edge.to + perp * edge.width * arrowHeadSize - dir * edge.width * arrowHeadSize;
-			verts[vert++] = perp * offCenter + edge.to + perp * edge.width * 1 - dir * edge.width * arrowHeadSize;
+            verts[vert++] = edge.to + Offset(-edge.width * 2, edge.width * 2);
 
-			verts[vert++] = perp * offCenter + edge.from + perp * edge.width * 1;
-		}
+            verts[vert++] = edge.to + Offset(-edge.width * 2, edge.width);
+
+            verts[vert++] = edge.to + Offset(-edge.width * 2 - endsFadeLength, edge.width);
+            verts[vert++] = edge.from + Offset(endsFadeLength, edge.width);
+            verts[vert++] = edge.from + Offset(0, edge.width);
+        }
 
 		vert = 0;
 		int tri = 0;
 		foreach(Edge edge in edges)
 		{
 
-			tris[tri++] = vert + 0;
-			tris[tri++] = vert + 4;
-			tris[tri++] = vert + 3;
+            /* tris: 
 
-			tris[tri++] = vert + 1;
-			tris[tri++] = vert + 3;
-			tris[tri++] = vert + 2;
+			019
+			189
 
-			tris[tri++] = vert + 0;
-			tris[tri++] = vert + 3;
-			tris[tri++] = vert + 1;
+			128
+			278
 
-			vert += 5;
-		}
+			237
+			367
+
+			345
+
+			*/
+
+            tris[tri++] = vert + 0;
+            tris[tri++] = vert + 1;
+            tris[tri++] = vert + 9;
+
+            tris[tri++] = vert + 1;
+            tris[tri++] = vert + 8;
+            tris[tri++] = vert + 9;
+
+            tris[tri++] = vert + 1;
+            tris[tri++] = vert + 2;
+            tris[tri++] = vert + 8;
+
+            tris[tri++] = vert + 2;
+            tris[tri++] = vert + 7;
+            tris[tri++] = vert + 8;
+
+            tris[tri++] = vert + 2;
+            tris[tri++] = vert + 3;
+            tris[tri++] = vert + 7;
+
+            tris[tri++] = vert + 3;
+            tris[tri++] = vert + 6;
+            tris[tri++] = vert + 7;
+
+            tris[tri++] = vert + 3;
+            tris[tri++] = vert + 4;
+            tris[tri++] = vert + 5;
+
+            vert += vertCount;
+        }
 
 		mf.mesh.RecalculateBounds();
 		mf.mesh.vertices = verts;

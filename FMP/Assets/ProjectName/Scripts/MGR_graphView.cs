@@ -49,10 +49,10 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	public int nodeCount;
 	MGR_gameMaths gameMaths;
 	public AdjacencyMtx graph;
-	VisualNode[] obj;
 
 	public struct VisualNodeProperties
 	{
+		public VisualNode obj;
 		public Vector2 p, v, a;
 		public float r;
 	}
@@ -79,14 +79,13 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	{
 		graph = gameMaths.NN;
 		nodeCount = graph.nodes.Count;
-		obj = new VisualNode[nodeCount];
 		vn = new VisualNodeProperties[nodeCount];
 
-        for (int i = 0; i < obj.Length; i++)
+        for (int i = 0; i < nodeCount; i++)
         {
-			obj[i] = Instantiate(visualNodePrefab);
-			obj[i].id = i;
-			obj[i].gameObject.name = "Node "+obj[i].id.ToString();
+			vn[i].obj = Instantiate(visualNodePrefab);
+			vn[i].obj.id = i;
+			vn[i].obj.gameObject.name = "Node "+vn[i].obj.id.ToString();
 
 			vn[i].p = Random.insideUnitCircle * 1;
 			vn[i].v = Vector2.zero;
@@ -164,8 +163,8 @@ public class MGR_graphView : MonoBehaviour, IGraphView
                 p = Vector3.zero;
             }
 
-			obj[i].transform.position = p;
-			obj[i].transform.localScale = vn[i].r * 2 * Vector3.one;
+			vn[i].obj.transform.position = p;
+			vn[i].obj.transform.localScale = vn[i].r * 2 * Vector3.one;
 
 			vn[i].p = p;
 			vn[i].v = v;

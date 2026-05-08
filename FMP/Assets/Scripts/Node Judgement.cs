@@ -3,14 +3,26 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 public class NodeJudgement : MonoBehaviour
 {
+
+    public int Node_calculations = 4;
     public bool Node_opinion;
     public bool Node_attitude;
     public bool Idea_judgement;
     public bool Idea_agreement;
-    
+
+    private void Start()
+    {
+        Node_opinions();
+        Node_attitudes();
 
 
+    }
 
+    private void Update()
+    {
+        idea_judgement();
+        Idea_agreements();
+    }
     public void Node_opinions()
     {
         if (Node_opinion == true)
@@ -72,12 +84,7 @@ public class NodeJudgement : MonoBehaviour
 
     }
 
-    public void Shantalle()
-    {
-        
-
-    }
-
+    
 
 
 

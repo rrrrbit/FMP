@@ -16,7 +16,8 @@ public class EdgeDrawer : MonoBehaviour
 	Vector2[] uvs;
 
 	[SerializeField] AnimationCurve widthByWeight;
-	[SerializeField] float colourMinWeight = -2f;
+	[SerializeField] bool normaliseWeight = true;
+    [SerializeField] float colourMinWeight = -2f;
 	[SerializeField] float colourMaxWeight = 2f;
 
 	Vector2Int[] edgePairs;
@@ -72,9 +73,9 @@ public class EdgeDrawer : MonoBehaviour
 			float weight = mtx[edgePairs[pair].x, edgePairs[pair].y];
 			Vector2 dir = (to.p - from.p).normalized;
 
-			edges[pair].from = from.p + dir * from.r; // r could be removed
+			edges[pair].from = from.p + dir * from.r * 0.9f; 
 			edges[pair].to = to.p - dir * to.r;
-			edges[pair].width = widthByWeight.Evaluate(Mathf.Abs(weight) / view.graph.maxAbsWeight);
+			edges[pair].width = widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? view.graph.maxAbsWeight : 1f));
 			edges[pair].uv = new Vector2((weight - colourMinWeight) / (colourMaxWeight - colourMinWeight), 0);
 		}
 	}

@@ -156,17 +156,17 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0.4
-      outSlope: 0.4
+      inSlope: 0.2
+      outSlope: 0.2
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 5
+      time: 10
       value: 2
-      inSlope: 0.4
-      outSlope: 0.4
+      inSlope: 0.2
+      outSlope: 0.2
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -174,6 +174,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  normaliseWeight: 0
   colourMinWeight: -2
   colourMaxWeight: 2
   offCenter: 0.1
@@ -186,12 +187,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6681684}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 884068266}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &6681687
 MeshRenderer:
@@ -902,7 +903,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.000051498413, y: -0.000034332275}
+  m_AnchoredPosition: {x: 0.000051498413, y: 0.00063180516}
   m_SizeDelta: {x: 498, y: 691.86}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &564968367
@@ -967,7 +968,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -702.3402, y: -184.75}
+  m_AnchoredPosition: {x: -702.34033, y: -184.75}
   m_SizeDelta: {x: -1404.67, y: -369.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &637802479
@@ -1288,7 +1289,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6681686}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &884068267
@@ -1429,25 +1431,25 @@ MonoBehaviour:
     complexity: -16
     complexityTolerance:
       center: -16
-      peak: 0
+      peak: 0.2
       width: 1
       steepness: 2
     enthusiasm:
       thresholdPos: 0
       thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
+      strengthPos: 0.2
+      strengthNeg: 0.2
     reach: 0
     suggestibility:
       thresholdPos: 0
       thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
+      strengthPos: 0.2
+      strengthNeg: 0.2
     adherence:
       thresholdPos: 0
       thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
+      strengthPos: 0.2
+      strengthNeg: 0.2
     extroversion: 0.5
     avoidance: 1
   nodeStatsMax:
@@ -1474,7 +1476,7 @@ MonoBehaviour:
       strengthPos: 8
       strengthNeg: 8
     extroversion: 8
-    avoidance: 8
+    avoidance: 2
   ideaComplexity: []
   ideaTolerance: []
   ideaExemplar: []
@@ -1989,7 +1991,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 744623401}
   m_HandleRect: {fileID: 744623400}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2927,4 +2929,3 @@ SceneRoots:
   - {fileID: 1064434390}
   - {fileID: 873768632}
   - {fileID: 1939759922}
-  - {fileID: 6681686}

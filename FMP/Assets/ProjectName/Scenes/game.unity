@@ -181,7 +181,7 @@ MonoBehaviour:
   colourMinWeight: -1
   colourMaxWeight: 1
   constantScreenWidth: 1
-  fadeTime: 0.1
+  fadeTime: 0.15
   offCenter: 0.01
   arrowHeadSize: 2.5
   cam: {fileID: 330585548}
@@ -566,8 +566,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2090233356}
   m_HandleRect: {fileID: 2090233355}
   m_Direction: 0
-  m_Value: -0.0000009844388
-  m_Size: 0.7510042
+  m_Value: -0.0000015997125
+  m_Size: 0.7510041
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -975,7 +975,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -764.49994, y: -282.45996}
+  m_AnchoredPosition: {x: -764.5, y: -282.46}
   m_SizeDelta: {x: -1529, y: -564.92}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &637802479
@@ -1998,7 +1998,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 744623400}
   m_Direction: 2
   m_Value: 0.99999905
-  m_Size: 0.71991444
+  m_Size: 0.72038186
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

@@ -26,8 +26,7 @@ public class MGR_input : MonoBehaviour, IInput
 
     // Update is called once per frame
     void Update()
+    { 
 
-    }
-
-    
+    }  
 }

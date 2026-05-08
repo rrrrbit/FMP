@@ -174,8 +174,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  width: 0.02
-  maxWorldWidth: 50
+  width: 0.015
+  maxWorldScale: 50
+  fadeLength: 0.2
   normaliseWeight: 0
   colourMinWeight: -1
   colourMaxWeight: 1
@@ -183,6 +184,7 @@ MonoBehaviour:
   offCenter: 0.1
   arrowHeadSize: 2.5
   cam: {fileID: 330585548}
+  edges: []
 --- !u!4 &6681686
 Transform:
   m_ObjectHideFlags: 0
@@ -907,7 +909,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.00011253357, y: 0.0008411551}
+  m_AnchoredPosition: {x: 0.00011253357, y: 0.00004539564}
   m_SizeDelta: {x: 498, y: 691.86}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &564968367
@@ -972,7 +974,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -702.3403, y: -184.75}
+  m_AnchoredPosition: {x: -702.34033, y: -184.75003}
   m_SizeDelta: {x: -1404.67, y: -369.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &637802479
@@ -1995,7 +1997,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 744623400}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9997757
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

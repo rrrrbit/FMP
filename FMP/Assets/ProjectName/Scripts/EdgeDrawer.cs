@@ -1,4 +1,5 @@
 using RBitUtils;
+using System;
 using Unity.Burst;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -19,8 +20,8 @@ public class EdgeDrawer : MonoBehaviour
 
 	[SerializeField] AnimationCurve widthByWeight;
 	[SerializeField] float width;
-	[SerializeField] float maxWorldWidth;
-    [SerializeField] float endsFadeLength = 0.2f;
+	[SerializeField] float maxWorldScale;
+    [SerializeField] float fadeLength = 0.2f;
     [SerializeField] bool normaliseWeight = true;
     [SerializeField] float colourMinWeight = -2f;
 	[SerializeField] float colourMaxWeight = 2f;
@@ -33,15 +34,17 @@ public class EdgeDrawer : MonoBehaviour
 	public float arrowHeadSize = 3f;
 
 	[SerializeField] GameCamera cam;
-	class Edge
+    [Serializable]
+    class Edge
     {
         public Vector3 from, to;
         public float width;
 		public Vector2 uvFrom;
 		public Vector2 uvTo;
         public Vector2 uvMiddle;
+        public float fadeLength;
     }
-    Edge[] edges;
+    [SerializeField] Edge[] edges;
 
     void Start()
     {
@@ -83,24 +86,25 @@ public class EdgeDrawer : MonoBehaviour
 
 			float weight = mtx[edgePairs[pair].x, edgePairs[pair].y];
 			Vector2 dir = (to.p - from.p).normalized;
+            Vector2 perp = new(-dir.y, dir.x);
 
-			edges[pair].from = from.p + dir * from.r * 0.9f; 
-			edges[pair].to = to.p - dir * to.r;
+            edges[pair].from = from.p + dir * from.r * 0.9f + perp * offCenter; 
+			edges[pair].to = to.p - dir * to.r + perp * offCenter;
 
-			float widthMult = (constantScreenWidth ? ((cam.currentZoom-maxWorldWidth) /(1-Mathf.Exp(cam.currentZoom - maxWorldWidth))) + maxWorldWidth : 1);
+			float scaleMult = (constantScreenWidth ? ((cam.currentZoom-maxWorldScale) /(1-Mathf.Exp(cam.currentZoom - maxWorldScale))) + maxWorldScale : 1);
 
 
-            edges[pair].width = width * widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? view.graph.maxAbsWeight : 1f)) * widthMult;
+            edges[pair].width = width * widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? view.graph.maxAbsWeight : 1f)) * scaleMult;
 
 			float u = (weight - colourMinWeight) / (colourMaxWeight - colourMinWeight);
 			float vFrom = view.vn[edgePairs[pair].x].obj.onScreen ? 1 : 0;
             float vTo = view.vn[edgePairs[pair].y].obj.onScreen ? 1 : 0;
             float vMiddle = view.vn[edgePairs[pair].x].obj.onScreen && view.vn[edgePairs[pair].y].obj.onScreen ? 1 : 0;
 
-
+            edges[pair]. fadeLength = fadeLength * scaleMult;
 
             edges[pair].uvFrom = new Vector2(u, vFrom);
-			edges[pair].uvTo = new Vector2(u,vFrom);
+			edges[pair].uvTo = new Vector2(u,vTo);
             edges[pair].uvMiddle = new Vector2(u, vMiddle);
         }
 	}
@@ -147,17 +151,17 @@ public class EdgeDrawer : MonoBehaviour
 
 			*/
             verts[vert++] = edge.from;
-            verts[vert++] = edge.from + Offset(endsFadeLength, 0);
-            verts[vert++] = edge.to + Offset(-edge.width * 2 - endsFadeLength, 0);
-            verts[vert++] = edge.to + Offset(-edge.width * 2, 0);
+            verts[vert++] = edge.from + Offset(edge.fadeLength, 0);
+            verts[vert++] = edge.to + Offset(-edge.width * arrowHeadSize - edge.fadeLength, 0);
+            verts[vert++] = edge.to + Offset(-edge.width * arrowHeadSize, 0);
             verts[vert++] = edge.to;
 
-            verts[vert++] = edge.to + Offset(-edge.width * 2, edge.width * 2);
+            verts[vert++] = edge.to + Offset(-edge.width * arrowHeadSize, edge.width * arrowHeadSize);
 
-            verts[vert++] = edge.to + Offset(-edge.width * 2, edge.width);
+            verts[vert++] = edge.to + Offset(-edge.width * arrowHeadSize, edge.width);
 
-            verts[vert++] = edge.to + Offset(-edge.width * 2 - endsFadeLength, edge.width);
-            verts[vert++] = edge.from + Offset(endsFadeLength, edge.width);
+            verts[vert++] = edge.to + Offset(-edge.width * arrowHeadSize - edge.fadeLength, edge.width);
+            verts[vert++] = edge.from + Offset(edge.fadeLength, edge.width);
             verts[vert++] = edge.from + Offset(0, edge.width);
         }
 

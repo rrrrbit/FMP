@@ -48,6 +48,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     float[,] inNext;
     float[,] iiNext;
 
+	[Serializable]
     public struct NodeStats
     {
         public float complexity;
@@ -97,7 +98,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     public List<float> debugFlatMtx;
     #endregion
 
-    #region utilities
+#region utilities
     [Serializable]
     public struct MagicCurveParams
     {

@@ -7,6 +7,7 @@ using UnityEngine.Rendering.Universal;
 public class EdgeDrawer : MonoBehaviour
 {
     MGR_graphView view;
+	MGR_gameMaths gameMaths;
 
 	float[,] mtx;
     
@@ -49,7 +50,8 @@ public class EdgeDrawer : MonoBehaviour
     void Start()
     {
         view = Managers.Get<MGR_graphView>();
-		mtx = view.graph.mtx;
+		gameMaths = Managers.Get<MGR_gameMaths>();
+		mtx = view.graph;
         mf = GetComponent<MeshFilter>();
         edgePairs  = new Vector2Int[mtx.Length];
 		edges = new Edge[edgePairs.Length];
@@ -98,12 +100,12 @@ public class EdgeDrawer : MonoBehaviour
 			Vector2 dir = (to.p - from.p).normalized;
             Vector2 perp = new(-dir.y, dir.x);
 
-            edges[pair].from = from.p + dir * from.r * 0.9f + perp * offCenter * scaleMult; 
+            edges[pair].from = from.p + dir * from.r + perp * offCenter * scaleMult; 
 			edges[pair].to = to.p - dir * to.r + perp * offCenter * scaleMult;
 
 
 
-            edges[pair].width = width * widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? view.graph.maxAbsWeight : 1f)) * scaleMult;
+            edges[pair].width = width * widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? gameMaths.statsNN.maxAbs : 1f)) * scaleMult;
 
 			float u = (weight - colourMinWeight) / (colourMaxWeight - colourMinWeight);
 			float vFrom = view.vn[edgePairs[pair].x].obj.onScreen ? 1 : 0;

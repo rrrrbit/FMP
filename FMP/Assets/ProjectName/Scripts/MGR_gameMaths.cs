@@ -15,7 +15,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngine.Rendering;
 
-public class MGR_gameMaths : MonoBehaviour, IGameMaths
+public class MGR_gameMaths : MonoBehaviour
 {
 #region vars
     [Header("Misc")]
@@ -23,13 +23,6 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
     public int startingNumberPeople;
 	public int startingNumberIdeas;
-	[Header("graph stats")]
-	public float max;
-	public float min;
-	public float maxAbs;
-	public float sumAbs;
-	public float maxOutdegree;
-	public float sumOutdegree;
 	public event System.Action OnReadyForVisualisation;
 	[Header("Runtime & Refs")]
     [Header("- Lists")]
@@ -38,12 +31,15 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     public int nodesCount;
     public int ideasCount;
     [Header("- Matrices")]
-	public AdjacencyMtx NN;
-    public AdjacencyMtx NI;
-    public AdjacencyMtx IN;
-    public AdjacencyMtx II;
-    [Header("-- Internal")]
-    float[,] nnDelta;
+	public float[,] NN;
+    public float[,] NI;
+    public float[,] IN;
+    public float[,] II;
+	public MtxStats statsNN;
+	public MtxStats statsNI;
+	public MtxStats statsIN;
+	public MtxStats statsII;
+	float[,] nnDelta;
     float[,] niDelta;
     float[,] inNext;
     float[,] iiNext;
@@ -247,8 +243,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
     private void Update()
     {
-        NN.RecalculateStats();
-        UpdateGraphStatistics();
+        UpdateMtxStats();
         Step(Time.deltaTime * timescale);
     }
     #endregion
@@ -395,7 +390,7 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         
 
         // initialise nn with random weights
-        NN = new AdjacencyMtx(nodes, nodes);
+        NN = new float[nodesCount, nodesCount];
         nnDelta = new float[nodesCount, nodesCount];
         for (int i = 0; i < nodesCount; i++)
         {
@@ -403,43 +398,43 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
             {
                 if (i == j) continue; // skip self-connections
                 float x = UnityEngine.Random.value * 2 - 1;
-                NN.mtx[i, j] = 0;//Mathf.Pow(x, 11) /10f;
+                NN[i, j] = 0;//Mathf.Pow(x, 11) /10f;
             }
         }
-        NN.mtx[0, 1] = 1;
+        NN[0, 1] = 1;
 
         // initialise ni with random weights
-        NI = new AdjacencyMtx(ideas, nodes);
+        NI = new float[nodesCount, ideasCount];
         niDelta = new float[nodesCount, ideasCount];
         for (int i = 0; i < nodesCount; i++)
         {
             for (int j = 0; j < ideasCount; j++)
             {
                 float x = UnityEngine.Random.value * 2 - 1;
-                NI.mtx[i, j] = x;
+                NI[i, j] = x;
             }
         }
 
         // initialise in to 0s
-        IN = new AdjacencyMtx(nodes, ideas);
+        IN = new float[ideasCount, nodesCount];
         inNext = new float[ideasCount, nodesCount];
         for (int i = 0; i < ideasCount; i++)
         {
             for (int j = 0; j < nodesCount; j++)
             {
-                IN.mtx[i, j] = 0;
+                IN[i, j] = 0;
             }
         }
 
         // initialise ii with random weights
-        II = new AdjacencyMtx(ideas, ideas);
+        II = new float[ideasCount, ideasCount];
         for (int i = 0; i < ideasCount; i++)
         {
             for (int j = 0; j < ideasCount; j++)
             {
                 if (i == j) continue; // skip self-connections
                 float x = UnityEngine.Random.value * 2 - 1;
-                II.mtx[i, j] = x;
+                II[i, j] = x;
             }
         }
     }
@@ -484,21 +479,21 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
         }
 
 		// update all
-        IN.mtx = inNext;
+        IN = inNext;
 
-        for (int i = 0; i < NI.mtx.Rows(); i++)
+        for (int i = 0; i < NI.Rows(); i++)
         {
-            for (int j = 0; j < NI.mtx.Cols(); j++)
+            for (int j = 0; j < NI.Cols(); j++)
             {
-                NI.mtx[i, j] += niDelta[i, j] * dt;
+                NI[i, j] += niDelta[i, j] * dt;
             }
         }
 
-        for (int i = 0; i < NN.mtx.Rows(); i++)
+        for (int i = 0; i < NN.Rows(); i++)
         {
-            for (int j = 0; j < NN.mtx.Cols(); j++)
+            for (int j = 0; j < NN.Cols(); j++)
             {
-                NN.mtx[i, j] += nnDelta[i, j] * dt;
+                NN[i, j] += nnDelta[i, j] * dt;
             }
         }
 
@@ -555,11 +550,11 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 	float CalcDeltaStat(int n, Func<NodeStats, float> stat)
 	{
 		float social = ManualSum(n, nodesCount, x =>
-			(stat(nodeStats[x]) - stat(nodeStats[n])) * (stat(nodeStats[x]) - stat(nodeStats[n])) * NN.mtx[n, x]
+			(stat(nodeStats[x]) - stat(nodeStats[n])) * (stat(nodeStats[x]) - stat(nodeStats[n])) * NN[n, x]
 			);
 
 		float ideological = ManualSum(-1, ideasCount, x =>
-			(stat(ideaExemplar[x]) - stat(nodeStats[n])) * (stat(ideaExemplar[x]) - stat(nodeStats[n])) * NI.mtx[n, x]
+			(stat(ideaExemplar[x]) - stat(nodeStats[n])) * (stat(ideaExemplar[x]) - stat(nodeStats[n])) * NI[n, x]
 			);
 
 		return MagicCurve(social, nodeStats[n].suggestibility) + MagicCurve(ideological, nodeStats[n].adherence);
@@ -598,17 +593,17 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
     float CalcIN(int i, int n)
     {
         // similarity here
-        var agreement = ManualSum(i, ideasCount, x => NI.mtx[n, x] * II.mtx[i, x]);
+        var agreement = ManualSum(i, ideasCount, x => NI[n, x] * II[i, x]);
         return agreement; // + similarity
     }
 
     float CalcDeltaNI(int n, int i)
     {
         float social = ManualSum(n, nodesCount, x =>
-            MagicCurve(NI.mtx[x, i], nodeStats[x].enthusiasm) * NN.mtx[n, x]
+            MagicCurve(NI[x, i], nodeStats[x].enthusiasm) * NN[n, x]
             );
         float ideological = ManualSum(i, ideasCount, x =>
-            II.mtx[x, i] * NI.mtx[n, x]
+            II[x, i] * NI[n, x]
             );
         float complexity = BumpCurve(ideaComplexity[i] - nodeStats[n].complexity, nodeStats[n].complexityTolerance);
 
@@ -617,44 +612,40 @@ public class MGR_gameMaths : MonoBehaviour, IGameMaths
 
     float CalcDeltaNN(int n, int m)
     {
-        float social = ManualSum(n, nodesCount, x => NN.mtx[x, m] * NN.mtx[n, x]) + nodeStats[m].reach;
+        float social = ManualSum(n, nodesCount, x => NN[x, m] * NN[n, x]) + nodeStats[m].reach;
         //float social = ManualSumInd(n, nodes.Count, x =>
         //    MagicCurve(NN.mtx[x, m] * NN.mtx[n, x], nodeSuggestibility[n])
         //    ) + nodeReach[m];
-        float ideological = ManualSum(-1, ideasCount, x => IN.mtx[x,m] * NI.mtx[n, x]);
-
-        //float nn2 = NN.mtx[n, m] * NN.mtx[n, m];
+        float ideological = ManualSum(-1, ideasCount, x => IN[x,m] * NI[n, x]);
+        //float nn2 = NN[n, m] * NN[n, m];
         float dScaled;
-        if (NN.mtx[n, m] >= 0)
+        if (NN[n, m] >= 0)
         {
-            dScaled = NN.mtx[n, m] / nodeStats[n].extroversion;
+            dScaled = NN[n, m] / nodeStats[n].extroversion;
         }
         else
         {
-            dScaled = NN.mtx[n,m] * nodeStats[n].avoidance;
+            dScaled = NN[n,m] * nodeStats[n].avoidance;
         }
 
 
-        float decay = - dScaled * dScaled * Mathf.Sign(NN.mtx[n, m]);
-
+        float decay = - dScaled * dScaled * Mathf.Sign(NN[n, m]);
         return MagicCurve(social, nodeStats[n].suggestibility) * MagicCurve(ideological, nodeStats[n].adherence) + decay;
     }
 
-	void UpdateGraphStatistics()
+	void UpdateMtxStats()
 	{
-		max = NN.maxWeight;
-		min = NN.minWeight;
-		maxAbs = NN.maxAbsWeight;
-		sumAbs = NN.sumAbsWeight;
-		maxOutdegree = NN.maxIndegree;
-        debugFlatMtx = NN.FlatMtx().ToList();
+		statsNN = NN.GetStats();
+		statsNI = NI.GetStats();
+		statsIN = IN.GetStats();
+		statsII = II.GetStats();
 	}
 
     #endregion
 
 }
 
-[System.Serializable]
+[Serializable]
 public class Node
 {
 	public VisualNode visual;
@@ -672,102 +663,139 @@ public class IdeaNode : Node
     //public static implicit operator VisualNode(Node node) => node.visual;
 }
 
-public class AdjacencyMtx
+public static class MtxUtils
 {
-	public List<Node> nodes;
-	public float[,] mtx;
-    public float maxWeight;
-    public float minWeight;
-    public float maxAbsWeight;
-    public float sumAbsWeight;
-    public float maxIndegree;
+	public static int Rows(this float[,] mtx) => mtx.GetLength(0);
+	public static int Cols(this float[,] mtx) => mtx.GetLength(1);
+	public static Vector2Int Dimensions(this float[,] mtx) => new Vector2Int(mtx.Rows(), mtx.Cols());
 
-    /// <summary>
-    /// Construct a matrix [y,x] with From as rows and To as columns.
-    /// </summary>
-    /// <param name="nodesTo"></param>
-    /// <param name="nodesFrom"></param>
-    public AdjacencyMtx(IEnumerable<Node> nodesTo, IEnumerable<Node> nodesFrom)
+	public static float Max(this float[,] mtx, Func<float, float> selector = null)
 	{
-		nodes = new List<Node>();
-		nodes.AddRange(nodesTo);
-		nodes.AddRange(nodesFrom);
-        nodes = nodes.ToHashSet().ToList();
-		mtx = new float[nodesFrom.Count(), nodesTo.Count()];
+		float max = float.MinValue;
+		foreach (float f in mtx)
+		{
+			float value = selector != null ? selector(f) : f;
+			if (value > max) max = value;
+		}
+		return max;
 	}
 
-    public void RecalculateStats()
-    {
-        maxWeight = Mathf.Max(FlatMtx());
-        minWeight = Mathf.Min(FlatMtx());
-        maxAbsWeight = Mathf.Max(FlatMtx().Select(x => Mathf.Abs(x)).ToArray());
-        sumAbsWeight = FlatMtx().Sum(x => Mathf.Abs(x));
-        maxIndegree = nodes.Max(x => GetIndegree(x)); // !!!!!!!! change indegree visualisation to use geometric mean as it better ignores few, strong connections and emphasises many connections.
-    }
+	public static float Min(this float[,] mtx, Func<float, float> selector = null)
+	{
+		float min = float.MaxValue;
+		foreach (float f in mtx)
+		{
+			float value = selector != null ? selector(f) : f;
+			if (value < min) min = value;
+		}
+		return min;
+	}
 
-    /// <summary>
-    /// Get a row as an array.
-    /// </summary>
-    /// <param name="from"></param>
-    /// <returns></returns>
-    public float[] GetEdgesFrom(int from)
-    {
-        float[] edges = new float[mtx.Cols()];
-        for (int to = 0; to < edges.Length; to++)
-        {
-            edges[to] = mtx[from, to];
-        }
-        return edges;
-    }
-	public float[] GetEdgesFrom(Node fromNode) => GetEdgesFrom(nodes.FindIndex(x => x == fromNode));
+	public static float Sum(this float[,] mtx, Func<float, float> selector = null)
+	{
+		float sum = 0;
+		foreach (float f in mtx)
+		{
+			sum += selector != null ? selector(f) : f;
+		}
+		return sum;
+	}
 
-    /// <summary>
-    /// Get a column as an array.
-    /// </summary>
-    /// <param name="to"></param>
-    /// <returns></returns>
-    public float[] GetEdgesTo(int to)
-    {
-        float[] edges = new float[mtx.Rows()];
-        for (int from = 0; from < edges.Length; from++)
-        {
-            edges[from] = mtx[from, to];
-        }
-        return edges;
-    }
-    public float[] GetEdgesTo(Node fromNode) => GetEdgesTo(nodes.FindIndex(x => x == fromNode));
+	public static float[] Flat(this float[,] mtx)
+	{
+		float[] flat = new float[mtx.Length];
+		Vector2Int size = mtx.Dimensions();
+		for (int i = 0; i < size.x; i++)
+		{
+			for (int j = 0; j < size.y; j++)
+			{
+				flat[i * size.y + j] = mtx[i, j];
+			}
+		}
+		return flat;
+	}
 
-    public float GetIndegree(int to)
-    {
-        float sum = 0;
-        for (int from = 0; from < mtx.Cols(); from++)
-        {
+	/// <summary>
+	/// Get a row of a matrix as an array.
+	/// </summary>
+	/// <param name="mtx"></param>
+	/// <param name="row"></param>
+	/// <returns></returns>
+	public static T[] GetRow<T>(this T[,] mtx, int row)
+	{
+		T[] edges = new T[mtx.Cols()];
+		for (int to = 0; to < edges.Length; to++)
+		{
+			edges[to] = mtx[row, to];
+		}
+		return edges;
+	}
+
+	/// <summary>
+	/// Get a row of an adjacency matrix.
+	/// </summary>
+	/// <param name="mtx"></param>
+	/// <param name="row"></param>
+	/// <returns></returns>
+	public static float[] AllFrom(this float[,] mtx, int row) => mtx.GetRow(row);
+
+	public static T[] GetCol<T>(this T[,] mtx, int col)
+	{
+		T[] edges = new T[mtx.Rows()];
+		for (int from = 0; from < edges.Length; from++)
+		{
+			edges[from] = mtx[from, col];
+		}
+		return edges;
+	}
+
+	/// <summary>
+	/// Get a column of an adjacency matrix.
+	/// </summary>
+	/// <param name="mtx"></param>
+	/// <param name="col"></param>
+	/// <returns></returns>
+	public static float[] AllTo(this float[,] mtx, int col) => mtx.GetCol(col);
+
+	public static float Indegree(this float[,] mtx, int to)
+	{
+		float sum = 0;
+		for (int from = 0; from < mtx.Rows(); from++)
+		{
 			sum += Mathf.Abs(mtx[from, to]);
 		}
-        return sum;
-    }
-    public float GetIndegree(Node fromNode) => GetIndegree(nodes.FindIndex(x => x == fromNode));
-    
-    public float GetOutdegree(int from)
-    {
-        float sum = 0;
-        for (int to = 0; to < mtx.Cols(); to++)
-        {
-            sum += Mathf.Abs(mtx[from, to]);
-        }
-        return sum;
-    }
-    public float[] FlatMtx()
-    {
-        float[] flat = new float[mtx.Length];
-        Vector2Int size = mtx.Dimensions();
-        for (int i = 0; i < size.x; i++)
-        {
-            for (int j = 0; j < size.y; j++)
-            {
-                flat[i * size.y + j] = mtx[i, j];
-            }
-        }
-        return flat;
-    }
+		return sum;
+	}
+
+	public static float MaxIndegree(this float[,] mtx)
+	{
+		float max = float.MinValue;
+		for (int to = 0; to < mtx.Cols(); to++)
+		{
+			float indegree = mtx.Indegree(to);
+			if (indegree > max) max = indegree;
+		}
+		return max;
+	}
+
+	public static MtxStats GetStats(this float[,] mtx)
+	{
+		MtxStats stats = new MtxStats();
+		stats.max = mtx.Max();
+		stats.min = mtx.Min();
+		stats.maxAbs = mtx.Max(x => Mathf.Abs(x));
+		stats.sumAbs = mtx.Sum(x => Mathf.Abs(x));
+		stats.maxIndegree = mtx.MaxIndegree();
+		return stats;
+	}
+}
+
+[Serializable]
+public struct MtxStats
+{
+	public float max;
+	public float min;
+	public float maxAbs;
+	public float sumAbs;
+	public float maxIndegree;
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem.Controls;
 
-public class MGR_input : MonoBehaviour, IInput
+public class MGR_input : MonoBehaviour
 {
     public Input input;
     public Input.GameActions gameActions;

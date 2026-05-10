@@ -69,15 +69,15 @@ public class UI_nodeViewer : MonoBehaviour
         
         for (int i = 0; i < game.ideasCount; i++)
         {
-            if (Mathf.Abs(game.NI.mtx[nodeIndex, i]) > Mathf.Abs(maxAbsNI))
+            if (Mathf.Abs(game.NI[nodeIndex, i]) > Mathf.Abs(maxAbsNI))
             {
-                maxAbsNI = game.NI.mtx[nodeIndex, i];
+                maxAbsNI = game.NI[nodeIndex, i];
             }
         }
 
         for (int i = 0; i < game.ideasCount; i++)
         {
-            ideaBars[i].GetComponent<UI_twoWayBar>().value = game.NI.mtx[nodeIndex, i] / maxAbsNI;
+            ideaBars[i].GetComponent<UI_twoWayBar>().value = game.NI[nodeIndex, i] / maxAbsNI;
         }
     }
 }

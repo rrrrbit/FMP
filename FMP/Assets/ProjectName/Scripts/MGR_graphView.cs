@@ -6,7 +6,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem.Utilities;
 
-public class MGR_graphView : MonoBehaviour, IGraphView
+public class MGR_graphView : MonoBehaviour
 {
 	[Header("Misc")]
 	public float lineGap = 0;
@@ -48,7 +48,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	public VisualNode visualNodePrefab;
 	public int nodeCount;
 	MGR_gameMaths gameMaths;
-	public AdjacencyMtx graph;
+	public float[,] graph;
 
 	public struct VisualNodeProperties
 	{
@@ -78,7 +78,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 	void Init()
 	{
 		graph = gameMaths.NN;
-		nodeCount = graph.nodes.Count;
+		nodeCount = gameMaths.nodes.Count;
 		vn = new VisualNodeProperties[nodeCount];
 
         for (int i = 0; i < nodeCount; i++)
@@ -90,7 +90,7 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 			vn[i].p = Random.insideUnitCircle * 1;
 			vn[i].v = Vector2.zero;
             vn[i].a = Vector2.zero;
-			vn[i].r = sizeByIndegree.Evaluate(graph.GetIndegree(i));
+			vn[i].r = sizeByIndegree.Evaluate(graph.Indegree(i));
 
         }
 
@@ -102,22 +102,22 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 		debug_calculatedPairs = 0;
 		for (int i = 0; i < nodeCount; i++) // nodewise forces and some calcs
         {
-            vn[i].r = sizeByIndegree.Evaluate(graph.GetIndegree(i));
+            vn[i].r = sizeByIndegree.Evaluate(graph.Indegree(i));
             vn[i].a = NodewiseForce(i);
         }
 
-        for (int i = 0; i < graph.mtx.Rows(); i++) // pairwise forces
+        for (int i = 0; i < graph.Rows(); i++) // pairwise forces
         {	
-            for (int j = 0; j < graph.mtx.Cols(); j++)
+            for (int j = 0; j < graph.Cols(); j++)
             {
                 if (i == j) continue;
-                float ij = graph.mtx[i, j];
-                float ji = graph.mtx[j, i];
+                float ij = graph[i, j];
+                float ji = graph[j, i];
 
                 float w;
                 if (symmetriseWeights) w = (Mathf.Abs(ij) + Mathf.Abs(ji)) / 2;
                 else w = Mathf.Abs(ij);
-                if (normaliseWeights) w /= graph.maxAbsWeight;
+                if (normaliseWeights) w /= gameMaths.statsNN.maxAbs;
 
 				if (w < pairwiseForceThreshold) continue;
 
@@ -177,10 +177,18 @@ public class MGR_graphView : MonoBehaviour, IGraphView
 		float radii = vn[i].r + vn[j].r;
 		float d = Mathf.Max(dv.magnitude - padding - radii * (useScale ? 1 : 0), 0.01f);
 
-		return (
+		Vector2 force = (
 			RawAttraction(d) * attractionStrength * attractionByWeight.Evaluate(weight) -
 			RawRepulsion(d) * repulsionStrength
 			) * dv.normalized;
+
+		if(!float.IsFinite(force.sqrMagnitude)) 
+		{
+			print("Caught infinite pairwise force between "+i+" and "+j);
+			force = force.WithMag(1000);
+		}
+
+		return force;
 	}
 
 	float RawAttraction(float d)
@@ -219,14 +227,25 @@ public class MGR_graphView : MonoBehaviour, IGraphView
         for (int j = 0; j < nodeCount; j++)
         {
 			if(i == j) continue;
-			globalCentroid += vn[j].p / (graph.nodes.Count - 1);
-			weightedCentroid += vn[j].p * graph.GetIndegree(j) / graph.sumAbsWeight;
+			globalCentroid += vn[j].p / (gameMaths.nodes.Count - 1);
+			weightedCentroid += vn[j].p * graph.Indegree(j) / gameMaths.statsNN.sumAbs;
         }
 		Vector2 centeringForce = centeringStrength * globalCentroid.sqrMagnitude * -globalCentroid.normalized;
 		Vector2 weightedCentroidD = (weightedCentroid - vn[i].p);
 		Vector2 clusterForce = clusterStrength * weightedCentroidD;
 
 		Vector2 drag = dragStrength * vn[i].v.sqrMagnitude * - vn[i].v.normalized;
-		return centeringForce + drag + clusterForce;
+
+		Vector2 totalForce = centeringForce + drag + clusterForce;
+
+
+
+		if(!float.IsFinite(totalForce.sqrMagnitude)) 
+		{
+			print("Caught infinite nodewise force for node "+i);
+			totalForce = totalForce.WithMag(1000);
+		}
+
+		return totalForce;
 	}
 }

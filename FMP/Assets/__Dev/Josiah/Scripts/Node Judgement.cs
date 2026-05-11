@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 public class NodeJudgement : MonoBehaviour
 {
-
+    [Header("Node judgementation")]
     public int Node_calculations = 4;
     public bool Node_opinion;
     public bool Node_attitude;
     public bool Idea_judgement;
     public bool Idea_agreement;
-
+    public bool isNode;
     private void Start()
     {
         Node_opinions();
@@ -84,7 +84,15 @@ public class NodeJudgement : MonoBehaviour
 
     }
 
-    
+    public void Node_detector()
+    {
+        if (isNode == true)
+        {
+            print("This Node is accepted in the right group");
+
+        }
+
+    }
 
 
 

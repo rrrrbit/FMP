@@ -566,8 +566,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2090233356}
   m_HandleRect: {fileID: 2090233355}
   m_Direction: 0
-  m_Value: -0.00000073832757
-  m_Size: 0.75100374
+  m_Value: -0.0000013536026
+  m_Size: 0.75100404
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -975,7 +975,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -764.4999, y: -282.45996}
+  m_AnchoredPosition: {x: -764.4998, y: -282.45996}
   m_SizeDelta: {x: -1529, y: -564.92}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &637802479
@@ -1346,11 +1346,12 @@ MonoBehaviour:
   padding: 0
   useScale: 1
   normaliseWeights: 1
-  symmetriseWeights: 1
-  centeringStrength: 0.2
+  symmetriseWeights: 0
+  maxVel: 1000
+  centeringStrength: 0.001
   dragStrength: 5
   clusterStrength: 0
-  attractionStrength: 50
+  attractionStrength: 20
   attractionByWeight:
     serializedVersion: 2
     m_Curve:
@@ -1376,14 +1377,44 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   attractionType: 2
-  repulsionStrength: 20
+  repulsionStrength: 100
   repulsionType: 1
   visualNodePrefab: {fileID: 8003208030640895489, guid: e4227e8697f29a146bcde6987d96a048, type: 3}
   visualIdeaPrefab: {fileID: 7114069883873563681, guid: fca1452ae1a5a1647896b1cbd4b26648, type: 3}
   nodeCount: 25
-  gameMaths: {fileID: 0}
-  visualNodes: []
-  visualIdeas: []
+  gameMaths: {fileID: 884068268}
+  visualNodes:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  visualIdeas:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &884068268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1992,7 +2023,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 744623400}
   m_Direction: 2
   m_Value: 0.99999905
-  m_Size: 0.7199143
+  m_Size: 0.71954775
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

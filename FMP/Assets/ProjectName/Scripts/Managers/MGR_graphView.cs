@@ -25,6 +25,7 @@ public class MGR_graphView : MonoBehaviour
 	public bool useScale = true;
 	public bool normaliseWeights = true;
 	public bool symmetriseWeights = true;
+	public float maxVel = 1000f;
 	[Space]
 	public float centeringStrength;
 	public float dragStrength;
@@ -89,7 +90,7 @@ public class MGR_graphView : MonoBehaviour
 			VisualNodePerson newNode = Instantiate(visualNodePrefab);
 			newNode.id = i;
 			newNode.gameObject.name = "Node " + newNode.id.ToString();
-			newNode.transform.position = Random.insideUnitCircle * 1;
+			newNode.transform.position = Random.insideUnitCircle * 10;
 			newNode.graphView = this;
 			newNode.gameMaths = gameMaths;
 
@@ -103,7 +104,7 @@ public class MGR_graphView : MonoBehaviour
 			VisualNodeIdea newNode = Instantiate(visualIdeaPrefab);
 			newNode.id = i;
 			newNode.gameObject.name = "Idea " + newNode.id.ToString();
-			newNode.transform.position = Random.insideUnitCircle * 1;
+			newNode.transform.position = Random.insideUnitCircle * 10;
 			newNode.graphView = this;
 			newNode.gameMaths = gameMaths;
 

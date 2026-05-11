@@ -174,8 +174,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  width: 0.015
-  maxWorldScale: 20
+  width: 0.04
+  maxWorldScale: 10
   fadeLength: 0.2
   normaliseWeight: 0
   colourMinWeight: -1
@@ -674,7 +674,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 1
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -769,10 +769,10 @@ MonoBehaviour:
   zoomMin: 1
   zoomMax: 10
   zoomInterval: 1.2
-  currentZoom: 1
+  currentZoom: 5
   midCam: {fileID: 2138412822}
   frontCam: {fileID: 25208400}
-  targetZoom: 1
+  targetZoom: 8
   zoomEasingSettings:
     useToken: 1
     value:
@@ -1319,17 +1319,17 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: 0.1
-      outSlope: 0.1
+      inSlope: 0.02
+      outSlope: 0.02
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 10
+      time: 50
       value: 2
-      inSlope: 0.1
-      outSlope: 0.1
+      inSlope: 0.02
+      outSlope: 0.02
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -1337,46 +1337,20 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  edgeColourGradient:
-    serializedVersion: 2
-    key0: {r: 1, g: 0, b: 0, a: 0.8784314}
-    key1: {r: 1, g: 1, b: 1, a: 0}
-    key2: {r: 0, g: 1, b: 0, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 1}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 32768
-    ctime2: 65535
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 26214
-    atime2: 39321
-    atime3: 65535
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 2
-    m_ColorSpace: -1
-    m_NumColorKeys: 3
-    m_NumAlphaKeys: 4
-  minColourEdge: -2
-  maxColourEdge: 2
+  showNodes: 1
+  showIdeas: 0
+  applyNN: 1
+  applyNI: 0
+  applyIN: 0
+  applyII: 0
   padding: 0
   useScale: 1
   normaliseWeights: 1
   symmetriseWeights: 1
-  centeringStrength: 0
+  centeringStrength: 0.2
   dragStrength: 5
   clusterStrength: 0
-  attractionStrength: 10
+  attractionStrength: 50
   attractionByWeight:
     serializedVersion: 2
     m_Curve:
@@ -1402,12 +1376,14 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   attractionType: 2
-  repulsionStrength: 100
-  repulsionType: 0
-  debug_calculatedPairs: 0
-  totalPairs: 625
+  repulsionStrength: 20
+  repulsionType: 1
   visualNodePrefab: {fileID: 8003208030640895489, guid: e4227e8697f29a146bcde6987d96a048, type: 3}
+  visualIdeaPrefab: {fileID: 7114069883873563681, guid: fca1452ae1a5a1647896b1cbd4b26648, type: 3}
   nodeCount: 25
+  gameMaths: {fileID: 0}
+  visualNodes: []
+  visualIdeas: []
 --- !u!114 &884068268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1480,26 +1456,26 @@ MonoBehaviour:
     complexity: 16
     complexityTolerance:
       center: 16
-      peak: 1.5
+      peak: 1
       width: 4
       steepness: 2
     enthusiasm:
       thresholdPos: 32
       thresholdNeg: 32
-      strengthPos: 8
-      strengthNeg: 8
+      strengthPos: 3
+      strengthNeg: 3
     reach: 32
     suggestibility:
       thresholdPos: 32
       thresholdNeg: 32
-      strengthPos: 8
-      strengthNeg: 8
+      strengthPos: 3
+      strengthNeg: 3
     adherence:
       thresholdPos: 32
       thresholdNeg: 32
-      strengthPos: 8
-      strengthNeg: 8
-    extroversion: 8
+      strengthPos: 3
+      strengthNeg: 3
+    extroversion: 2
     avoidance: 4
   ideaComplexity: []
   ideaTolerance: []

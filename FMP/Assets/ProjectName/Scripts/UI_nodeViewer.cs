@@ -14,7 +14,6 @@ public class UI_nodeViewer : MonoBehaviour
 
     MGR_gameMaths game;
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         game = Managers.Get<MGR_gameMaths>();

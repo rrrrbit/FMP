@@ -12,9 +12,14 @@ public class MGR_graphView : MonoBehaviour
 	public float lineGap = 0;
 	public float pairwiseForceThreshold = 0.01f;
 	public AnimationCurve sizeByIndegree;
-	public Gradient edgeColourGradient;
-	public float minColourEdge = -10;
-	public float maxColourEdge = 10;
+	[Header("Graphs")]
+	public bool showNodes;
+	public bool showIdeas;
+	public bool applyNN;
+	public bool applyNI;
+	public bool applyIN;
+	public bool applyII;
+
 	[Header("Forces")]
 	public float padding = 10f;
 	public bool useScale = true;
@@ -43,11 +48,10 @@ public class MGR_graphView : MonoBehaviour
 	}
 	public RepulsionTypes repulsionType;
 	[Header("Runtime & Refs")]
-	[SerializeField] int debug_calculatedPairs;
-	[SerializeField] int totalPairs;
-	public VisualNode visualNodePrefab;
+	public VisualNodePerson visualNodePrefab;
+	public VisualNodeIdea visualIdeaPrefab;
 	public int nodeCount;
-	MGR_gameMaths gameMaths;
+	public MGR_gameMaths gameMaths;
 	public float[,] graph;
 
 	public struct VisualNodeProperties
@@ -57,6 +61,9 @@ public class MGR_graphView : MonoBehaviour
 		public float r;
 	}
 	public VisualNodeProperties[] vn;
+
+	public List<VisualNodePerson> visualNodes;
+	public List<VisualNodeIdea> visualIdeas;
 
 	private void Awake()
 	{
@@ -71,181 +78,41 @@ public class MGR_graphView : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-
         UpdateView(Time.fixedDeltaTime);
     }
 
 	void Init()
 	{
-		graph = gameMaths.NN;
-		nodeCount = gameMaths.nodes.Count;
-		vn = new VisualNodeProperties[nodeCount];
+		visualNodes = new List<VisualNodePerson>();
+		for (int i = 0; i < gameMaths.nodesCount; i++)
+		{
+			VisualNodePerson newNode = Instantiate(visualNodePrefab);
+			newNode.id = i;
+			newNode.gameObject.name = "Node " + newNode.id.ToString();
+			newNode.transform.position = Random.insideUnitCircle * 1;
+			newNode.graphView = this;
+			newNode.gameMaths = gameMaths;
 
-        for (int i = 0; i < nodeCount; i++)
-        {
-			vn[i].obj = Instantiate(visualNodePrefab);
-			vn[i].obj.id = i;
-			vn[i].obj.gameObject.name = "Node "+vn[i].obj.id.ToString();
+			visualNodes.Add(newNode);
+		}
 
-			vn[i].p = Random.insideUnitCircle * 1;
-			vn[i].v = Vector2.zero;
-            vn[i].a = Vector2.zero;
-			vn[i].r = sizeByIndegree.Evaluate(graph.Indegree(i));
 
-        }
+		visualIdeas = new List<VisualNodeIdea>();
+		for (int i = 0; i < gameMaths.ideasCount; i++)
+		{
+			VisualNodeIdea newNode = Instantiate(visualIdeaPrefab);
+			newNode.id = i;
+			newNode.gameObject.name = "Idea " + newNode.id.ToString();
+			newNode.transform.position = Random.insideUnitCircle * 1;
+			newNode.graphView = this;
+			newNode.gameMaths = gameMaths;
 
-		totalPairs = nodeCount * nodeCount;
+			visualIdeas.Add(newNode);
+		}
 	}
 
 	void UpdateView(float dt)
 	{
-		debug_calculatedPairs = 0;
-		for (int i = 0; i < nodeCount; i++) // nodewise forces and some calcs
-        {
-            vn[i].r = sizeByIndegree.Evaluate(graph.Indegree(i));
-            vn[i].a = NodewiseForce(i);
-        }
 
-        for (int i = 0; i < graph.Rows(); i++) // pairwise forces
-        {	
-            for (int j = 0; j < graph.Cols(); j++)
-            {
-                if (i == j) continue;
-                float ij = graph[i, j];
-                float ji = graph[j, i];
-
-                float w;
-                if (symmetriseWeights) w = (Mathf.Abs(ij) + Mathf.Abs(ji)) / 2;
-                else w = Mathf.Abs(ij);
-                if (normaliseWeights) w /= gameMaths.statsNN.maxAbs;
-
-				if (w < pairwiseForceThreshold) continue;
-
-                Vector2 d = vn[j].p - vn[i].p;
-                Vector2 dn = d.normalized;
-
-                vn[i].a += PairwiseForce(i, j, d, w, padding);
-				debug_calculatedPairs += 1;
-
-                //debug edge visualisation
-                Vector2 offs = new(dn.y, -dn.x);
-
-				Vector2 startPoint = vn[i].p + offs * lineGap + dn * vn[i].r;
-				Vector2 endPoint = vn[j].p + offs * lineGap - dn * vn[j].r;
-				Debug.DrawLine(startPoint, endPoint, edgeColourGradient.Evaluate((ij - minColourEdge) / (maxColourEdge - minColourEdge)));
-				Debug.DrawLine(endPoint, endPoint + (offs-dn), edgeColourGradient.Evaluate((ij - minColourEdge) / (maxColourEdge - minColourEdge)));
-			}
-
-		}
-        for (int i = 0; i < nodeCount; i++) // integrate and update transform
-        {
-			Vector2 p = vn[i].p;
-			Vector2 v = vn[i].v;
-			Vector2 a = vn[i].a;
-
-            if (!float.IsFinite(a.sqrMagnitude))
-            {
-                print("Caught infinite force");
-                a = a.WithMag(1000);
-            }
-
-            v += a.ClampLength(1000) * dt;
-            if (!float.IsFinite(v.sqrMagnitude))
-            {
-                print("Caught infinite velocity");
-                v = v.WithMag(1000);
-            }
-
-			p += v.ClampLength(1000) * dt;
-            if (!float.IsFinite(p.sqrMagnitude))
-            {
-                print("Caught infinite position");
-                p = Vector3.zero;
-            }
-
-			vn[i].obj.transform.position = p;
-			vn[i].obj.transform.localScale = vn[i].r * 2 * Vector3.one;
-
-			vn[i].p = p;
-			vn[i].v = v;
-			vn[i].a = a;
-        }
-	}
-
-	Vector2 PairwiseForce(int i, int j, Vector3 dv, float weight, float padding)
-	{
-		float radii = vn[i].r + vn[j].r;
-		float d = Mathf.Max(dv.magnitude - padding - radii * (useScale ? 1 : 0), 0.01f);
-
-		Vector2 force = (
-			RawAttraction(d) * attractionStrength * attractionByWeight.Evaluate(weight) -
-			RawRepulsion(d) * repulsionStrength
-			) * dv.normalized;
-
-		if(!float.IsFinite(force.sqrMagnitude)) 
-		{
-			print("Caught infinite pairwise force between "+i+" and "+j);
-			force = force.WithMag(1000);
-		}
-
-		return force;
-	}
-
-	float RawAttraction(float d)
-	{
-		switch (attractionType)
-		{
-			case AttractionTypes.Linear:
-				return d;
-			case AttractionTypes.Log:
-				return Mathf.Log(d + 1);
-			case AttractionTypes.Quadratic:
-				return d * d;
-			default:
-				return 0;
-		}
-	}
-
-	float RawRepulsion(float d)
-	{
-		switch (repulsionType)
-		{
-			case RepulsionTypes.Reciprocal:
-				return 1 / d;
-			case RepulsionTypes.InverseSqr:
-				return 1 / (d * d);
-			default:
-				return 0;
-		}
-	}
-
-	Vector2 NodewiseForce(int i)
-	{
-		Vector2 globalCentroid = Vector3.zero;
-		Vector2 weightedCentroid = Vector3.zero;
-
-        for (int j = 0; j < nodeCount; j++)
-        {
-			if(i == j) continue;
-			globalCentroid += vn[j].p / (gameMaths.nodes.Count - 1);
-			weightedCentroid += vn[j].p * graph.Indegree(j) / gameMaths.statsNN.sumAbs;
-        }
-		Vector2 centeringForce = centeringStrength * globalCentroid.sqrMagnitude * -globalCentroid.normalized;
-		Vector2 weightedCentroidD = (weightedCentroid - vn[i].p);
-		Vector2 clusterForce = clusterStrength * weightedCentroidD;
-
-		Vector2 drag = dragStrength * vn[i].v.sqrMagnitude * - vn[i].v.normalized;
-
-		Vector2 totalForce = centeringForce + drag + clusterForce;
-
-
-
-		if(!float.IsFinite(totalForce.sqrMagnitude)) 
-		{
-			print("Caught infinite nodewise force for node "+i);
-			totalForce = totalForce.WithMag(1000);
-		}
-
-		return totalForce;
 	}
 }

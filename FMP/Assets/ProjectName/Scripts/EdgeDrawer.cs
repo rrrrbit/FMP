@@ -51,7 +51,7 @@ public class EdgeDrawer : MonoBehaviour
     {
         view = Managers.Get<MGR_graphView>();
 		gameMaths = Managers.Get<MGR_gameMaths>();
-		mtx = view.graph;
+		mtx = gameMaths.NN;
         mf = GetComponent<MeshFilter>();
         edgePairs  = new Vector2Int[mtx.Length];
 		edges = new Edge[edgePairs.Length];
@@ -91,26 +91,28 @@ public class EdgeDrawer : MonoBehaviour
     {
 		for (int pair = 0; pair < edgePairs.Length; pair++)
 		{
-			MGR_graphView.VisualNodeProperties from = view.vn[edgePairs[pair].x];
-			MGR_graphView.VisualNodeProperties to = view.vn[edgePairs[pair].y];
+			VisualNode from = view.visualNodes[edgePairs[pair].x];
+			VisualNode to = view.visualNodes[edgePairs[pair].y];
+
+			//MGR_graphView.VisualNodeProperties from = view.vn[edgePairs[pair].x];
+			//MGR_graphView.VisualNodeProperties to = view.vn[edgePairs[pair].y];
 
 			float scaleMult = (constantScreenWidth ? ((cam.currentZoom-maxWorldScale) /(1-Mathf.Exp(cam.currentZoom - maxWorldScale))) + maxWorldScale : 1);
 			
             float weight = mtx[edgePairs[pair].x, edgePairs[pair].y];
-			Vector2 dir = (to.p - from.p).normalized;
-            Vector2 perp = new(-dir.y, dir.x);
+			Vector3 dir = (to.transform.position - from.transform.position).normalized;
+            Vector3 perp = new(-dir.y, dir.x);
 
-            edges[pair].from = from.p + dir * from.r + perp * offCenter * scaleMult; 
-			edges[pair].to = to.p - dir * to.r + perp * offCenter * scaleMult;
-
+            edges[pair].from = from.transform.position + dir * from.r + perp * offCenter * scaleMult; 
+			edges[pair].to = to.transform.position - dir * to.r + perp * offCenter * scaleMult;
 
 
             edges[pair].width = width * widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? gameMaths.statsNN.maxAbs : 1f)) * scaleMult;
 
 			float u = (weight - colourMinWeight) / (colourMaxWeight - colourMinWeight);
-			float vFrom = view.vn[edgePairs[pair].x].obj.onScreen ? 1 : 0;
-            float vTo = view.vn[edgePairs[pair].y].obj.onScreen ? 1 : 0;
-            float vMiddle = view.vn[edgePairs[pair].x].obj.onScreen && view.vn[edgePairs[pair].y].obj.onScreen ? 1 : 0;
+			float vFrom = from.onScreen ? 1 : 0;
+            float vTo = to.onScreen ? 1 : 0;
+            float vMiddle = from.onScreen && to.onScreen ? 1 : 0;
 
             edges[pair]. fadeLength = fadeLength * scaleMult;
 

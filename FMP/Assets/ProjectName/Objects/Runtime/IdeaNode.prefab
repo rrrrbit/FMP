@@ -78,8 +78,8 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1986059213
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &8059651175184013901
@@ -111,8 +111,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -186,10 +186,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4773160439233436703}
   - component: {fileID: 5967507920949871521}
-  - component: {fileID: 8003208030640895489}
-  - component: {fileID: 7382463068070604053}
+  - component: {fileID: 7114069883873563681}
+  - component: {fileID: 5440183813710715898}
   m_Layer: 0
-  m_Name: Node
+  m_Name: IdeaNode
   m_TagString: Untagged
   m_Icon: {fileID: 7866945982896999795, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -234,7 +234,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -876546973899608171, guid: d2a070bdca6af9349b05bfd50761a61f, type: 3}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -255,7 +255,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: addb9eb7a70a11e4fa1ae09128dcb8d8, type: 3}
+  m_Sprite: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -266,7 +266,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &8003208030640895489
+--- !u!114 &7114069883873563681
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -275,7 +275,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2956038023147323852}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d15ca90b83a6f5b45a25055181fe5c00, type: 3}
+  m_Script: {fileID: 11500000, guid: 439b50e7bd5992d4eaf4b200defe0b8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   id: 0
@@ -283,66 +283,10 @@ MonoBehaviour:
   r: 0
   graphView: {fileID: 0}
   gameMaths: {fileID: 0}
-  rb: {fileID: 7382463068070604053}
+  rb: {fileID: 5440183813710715898}
   sr: {fileID: 5967507920949871521}
   text: {fileID: 8059651175184013901}
-  niEdges: []
-  inEdges: []
-  nnEdgesTo: []
-  stats:
-    complexity: 0
-    complexityTolerance:
-      center: 0
-      peak: 0
-      width: 0
-      steepness: 0
-    enthusiasm:
-      thresholdPos: 0
-      thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
-    reach: 0
-    suggestibility:
-      thresholdPos: 0
-      thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
-    adherence:
-      thresholdPos: 0
-      thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
-    extroversion: 0
-    avoidance: 0
-  dstats:
-    complexity: 0
-    complexityTolerance:
-      center: 0
-      peak: 0
-      width: 0
-      steepness: 0
-    enthusiasm:
-      thresholdPos: 0
-      thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
-    reach: 0
-    suggestibility:
-      thresholdPos: 0
-      thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
-    adherence:
-      thresholdPos: 0
-      thresholdNeg: 0
-      strengthPos: 0
-      strengthNeg: 0
-    extroversion: 0
-    avoidance: 0
-  mouseOver: 0
-  dragging: 0
-  toMouse: {x: 0, y: 0}
---- !u!50 &7382463068070604053
+--- !u!50 &5440183813710715898
 Rigidbody2D:
   serializedVersion: 5
   m_ObjectHideFlags: 0

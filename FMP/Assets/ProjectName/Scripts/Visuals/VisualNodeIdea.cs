@@ -20,11 +20,13 @@ public class VisualNodeIdea : VisualNode
         {
             sr.enabled = true;
             text.renderer.enabled = true;
+            rb.simulated = true;
         }
         else
         {
             sr.enabled = false;
             text.renderer.enabled = false;
+            rb.simulated = false;
             return;
         }
 

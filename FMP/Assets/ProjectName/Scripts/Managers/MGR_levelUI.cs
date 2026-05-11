@@ -3,6 +3,7 @@ using UnityEngine;
 public class MGR_levelUI : MonoBehaviour
 {
     VisualNode selectedNode;
+    public GameCamera cam;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

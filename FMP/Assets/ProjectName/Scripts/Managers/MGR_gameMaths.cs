@@ -442,27 +442,27 @@ public class MGR_gameMaths : MonoBehaviour
     void Step(float dt)
     {
         // in
-        for (int i = 0; i < ideas.Count; i++)
+        for (int i = 0; i < ideasCount; i++)
         {
-            for (int n = 0; n < nodes.Count; n++)
+            for (int n = 0; n < nodesCount; n++)
             {
                 inNext[i, n] = CalcIN(i, n);
             }
         }
 
         // ni
-        for (int n = 0; n < nodes.Count; n++)
+        for (int n = 0; n < nodesCount; n++)
         {
-            for (int i = 0; i < ideas.Count; i++)
+            for (int i = 0; i < ideasCount; i++)
             {
                 niDelta[n, i] = CalcDeltaNI(n, i);
             }
         }
 
         // nn
-        for (int a = 0; a < nodes.Count; a++)
+        for (int a = 0; a < nodesCount; a++)
         {
-            for (int b = 0; b < nodes.Count; b++)
+            for (int b = 0; b < nodesCount; b++)
             {
                 if (a == b) continue;
                 nnDelta[a, b] = CalcDeltaNN(a, b);
@@ -475,8 +475,14 @@ public class MGR_gameMaths : MonoBehaviour
 			CalcDeltaStats(n);
         }
 
-		// update all
-        IN = inNext;
+        // update all
+        for (int i = 0; i < IN.Rows(); i++)
+        {
+            for (int j = 0; j < IN.Cols(); j++)
+            {
+               IN[i, j] = inNext[i, j];
+            }
+        }
 
         for (int i = 0; i < NI.Rows(); i++)
         {

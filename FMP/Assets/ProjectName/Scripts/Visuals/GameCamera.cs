@@ -41,6 +41,7 @@ public class GameCamera : MonoBehaviour
     public TokenResolvableValue<SpringSettings> zoomEasingSettings;
     void Awake()
     {
+        prevZoom = currentZoom;
         input = Managers.Get<MGR_input>();
         backCam = GetComponent<Camera>();
         input.OnInputReady += AddCallbacks;

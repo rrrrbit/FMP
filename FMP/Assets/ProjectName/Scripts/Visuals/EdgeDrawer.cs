@@ -14,7 +14,10 @@ public class EdgeDrawer : MonoBehaviour
     public List<VisualNode> nodesFrom;
     public List<VisualNode> nodesTo;
 	public float[,] mtx;
-    
+	public GameCamera cam;
+    public bool show;
+
+
     MeshFilter mf;
     MeshRenderer mr;
 
@@ -34,7 +37,6 @@ public class EdgeDrawer : MonoBehaviour
     [SerializeField] float fadeTime = 0.25f;
     [SerializeField] float offCenter = 0.1f;
     [SerializeField] float arrowHeadSize = 3f;
-	[SerializeField] GameCamera cam;
 
 	Vector2Int[] edgePairs;
     [Serializable]
@@ -49,9 +51,10 @@ public class EdgeDrawer : MonoBehaviour
     }
     [SerializeField] Edge[] edges;
 
-    void Init()
+    public void Init()
     {
         mf = GetComponent<MeshFilter>();
+        mr = GetComponent<MeshRenderer>();
 
         edgePairs  = new Vector2Int[mtx.Length];
 		edges = new Edge[edgePairs.Length];
@@ -83,9 +86,17 @@ public class EdgeDrawer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		UpdateEdges( Time.deltaTime);
-		UpdateMesh();
-		UpdateColours();
+		if (show)
+        {
+            mr.enabled = true;
+            UpdateEdges(Time.deltaTime);
+            UpdateMesh();
+            UpdateColours();
+        }
+        else
+        {
+            mr.enabled = false;
+        }
 	}
 
     void UpdateEdges(float dt)

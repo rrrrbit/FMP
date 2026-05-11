@@ -136,6 +136,11 @@ public class Nodestats : MonoBehaviour
             // This line of code commands the identification of a Node that is an Anomaly, but in this case the Anomaly would be spotted
 
         }
+        if (isChamar_theMascot)
+        {
+            print("Chamar is the games B mascot");
+        }
+
         else if (isNodeAnomalyDetected)
         {
             print("Node is unknown");
@@ -143,7 +148,7 @@ public class Nodestats : MonoBehaviour
         else
         {
             print("Node is validated");
-            print("Chamar is the Games B Mascot");
+            print("Chamar is not the Games B Mascot");
             // This line of code
         }
         // These bits of code will ingrain this into the node which could improve their energy levels

@@ -35,10 +35,7 @@ public class MGR_gameMaths : MonoBehaviour
     public float[,] NI;
     public float[,] IN;
     public float[,] II;
-	public MtxStats statsNN;
-	public MtxStats statsNI;
-	public MtxStats statsIN;
-	public MtxStats statsII;
+    public Dictionary<float[,], MtxStats> mtxStats;
 	float[,] nnDelta;
     float[,] niDelta;
     float[,] inNext;
@@ -248,7 +245,7 @@ public class MGR_gameMaths : MonoBehaviour
     }
     #endregion
 
-#region init procs
+#region init
     void InitFloatArr(ref float[] x, int length, float min, float max)
     {
         x = new float[length];
@@ -387,7 +384,7 @@ public class MGR_gameMaths : MonoBehaviour
 
     void InitMtx()
     {
-        
+        mtxStats = new Dictionary<float[,], MtxStats>();
 
         // initialise nn with random weights
         NN = new float[nodesCount, nodesCount];
@@ -635,10 +632,10 @@ public class MGR_gameMaths : MonoBehaviour
 
 	void UpdateMtxStats()
 	{
-		statsNN = NN.GetStats();
-		statsNI = NI.GetStats();
-		statsIN = IN.GetStats();
-		statsII = II.GetStats();
+        mtxStats[NN] = NN.GetStats();
+        mtxStats[NI] = NI.GetStats();
+        mtxStats[IN] = IN.GetStats();
+        mtxStats[II] = II.GetStats();
 	}
 
     #endregion

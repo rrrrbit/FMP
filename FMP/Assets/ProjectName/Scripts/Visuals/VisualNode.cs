@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using static MGR_graphView;
 
@@ -23,6 +24,38 @@ public class VisualNode : MonoBehaviour
         onScreen = false;
     }
 
+    protected Vector2 NodesForces(bool applyAttraction, List<VisualNode> otherList, float[,] fromMtx, float[,] toMtx)
+    {
+        Vector2 totalForce = Vector2.zero;
+        for (int otherId = 0; otherId < otherList.Count; otherId++)
+        {
+            if (fromMtx.Equals(toMtx) && otherId == id) continue;
+            VisualNode other = otherList[otherId];
+
+            Vector2 d = other.transform.position - transform.position;
+
+            totalForce += Repulsion(other, d, graphView.padding);
+
+            if (applyAttraction)
+            {
+                float fromThis = fromMtx[id, otherId];
+                float toThis = toMtx[otherId, id];
+
+                float w;
+                if (graphView.symmetriseWeights) w = (Mathf.Abs(fromThis) + Mathf.Abs(toThis)) / 2;
+                else w = Mathf.Abs(fromThis);
+
+                float max = graphView.symmetriseWeights ? Mathf.Max(gameMaths.mtxStats[fromMtx].maxAbs, gameMaths.mtxStats[toMtx].maxAbs) : gameMaths.mtxStats[fromMtx].maxAbs;
+                if (graphView.normaliseWeights) w /= max;
+
+                if (w < graphView.pairwiseForceThreshold) continue;
+
+
+                totalForce += Attraction(other, d, w, graphView.padding);
+            }
+        }
+        return totalForce;
+    }
     protected Vector2 Attraction(VisualNode other, Vector3 dv, float weight, float padding)
     {
         float radii = r + other.r;

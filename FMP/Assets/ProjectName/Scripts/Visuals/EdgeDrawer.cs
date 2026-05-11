@@ -1,5 +1,7 @@
+using NUnit.Framework;
 using RBitUtils;
 using System;
+using System.Collections.Generic;
 using Unity.Burst;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -9,7 +11,9 @@ public class EdgeDrawer : MonoBehaviour
     MGR_graphView view;
 	MGR_gameMaths gameMaths;
 
-	float[,] mtx;
+    public List<VisualNode> nodesFrom;
+    public List<VisualNode> nodesTo;
+	public float[,] mtx;
     
     MeshFilter mf;
     MeshRenderer mr;
@@ -28,13 +32,11 @@ public class EdgeDrawer : MonoBehaviour
 	[SerializeField] float colourMaxWeight = 2f;
     [SerializeField] bool constantScreenWidth = true;
     [SerializeField] float fadeTime = 0.25f;
+    [SerializeField] float offCenter = 0.1f;
+    [SerializeField] float arrowHeadSize = 3f;
+	[SerializeField] GameCamera cam;
 
 	Vector2Int[] edgePairs;
-
-	public float offCenter = 0.1f;
-	public float arrowHeadSize = 3f;
-
-	[SerializeField] GameCamera cam;
     [Serializable]
     class Edge
     {
@@ -47,14 +49,13 @@ public class EdgeDrawer : MonoBehaviour
     }
     [SerializeField] Edge[] edges;
 
-    void Start()
+    void Init()
     {
-        view = Managers.Get<MGR_graphView>();
-		gameMaths = Managers.Get<MGR_gameMaths>();
-		mtx = gameMaths.NN;
         mf = GetComponent<MeshFilter>();
+
         edgePairs  = new Vector2Int[mtx.Length];
 		edges = new Edge[edgePairs.Length];
+
 		for (int i = 0; i < edges.Length; i++)
 		{
 			edges[i] = new Edge();
@@ -91,13 +92,13 @@ public class EdgeDrawer : MonoBehaviour
     {
 		for (int pair = 0; pair < edgePairs.Length; pair++)
 		{
-			VisualNode from = view.visualNodes[edgePairs[pair].x];
-			VisualNode to = view.visualNodes[edgePairs[pair].y];
+			VisualNode from = nodesFrom[edgePairs[pair].x];
+			VisualNode to = nodesTo[edgePairs[pair].y];
 
 			//MGR_graphView.VisualNodeProperties from = view.vn[edgePairs[pair].x];
 			//MGR_graphView.VisualNodeProperties to = view.vn[edgePairs[pair].y];
 
-			float scaleMult = (constantScreenWidth ? ((cam.currentZoom-maxWorldScale) /(1-Mathf.Exp(cam.currentZoom - maxWorldScale))) + maxWorldScale : 1);
+			float scaleMult = constantScreenWidth ? ((cam.currentZoom-maxWorldScale) /(1-Mathf.Exp(cam.currentZoom - maxWorldScale))) + maxWorldScale : 1;
 			
             float weight = mtx[edgePairs[pair].x, edgePairs[pair].y];
 			Vector3 dir = (to.transform.position - from.transform.position).normalized;
@@ -107,7 +108,7 @@ public class EdgeDrawer : MonoBehaviour
 			edges[pair].to = to.transform.position - dir * to.r + perp * offCenter * scaleMult;
 
 
-            edges[pair].width = width * widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? gameMaths.statsNN.maxAbs : 1f)) * scaleMult;
+            edges[pair].width = width * widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? gameMaths.mtxStats[mtx].maxAbs : 1f)) * scaleMult;
 
 			float u = (weight - colourMinWeight) / (colourMaxWeight - colourMinWeight);
 			float vFrom = from.onScreen ? 1 : 0;

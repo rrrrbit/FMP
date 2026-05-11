@@ -566,7 +566,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2090233356}
   m_HandleRect: {fileID: 2090233355}
   m_Direction: 0
-  m_Value: -0.0000013536026
+  m_Value: -0.0000012305478
   m_Size: 0.75100404
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -975,7 +975,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -764.4998, y: -282.45996}
+  m_AnchoredPosition: {x: -764.49976, y: -282.45993}
   m_SizeDelta: {x: -1529, y: -564.92}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &637802479
@@ -1351,7 +1351,7 @@ MonoBehaviour:
   centeringStrength: 0.001
   dragStrength: 5
   clusterStrength: 0
-  attractionStrength: 20
+  attractionStrength: 100
   attractionByWeight:
     serializedVersion: 2
     m_Curve:
@@ -1432,30 +1432,6 @@ MonoBehaviour:
   startingNumberIdeas: 5
   nodesCount: 0
   ideasCount: 0
-  statsNN:
-    max: 0
-    min: 0
-    maxAbs: 0
-    sumAbs: 0
-    maxIndegree: 0
-  statsNI:
-    max: 0
-    min: 0
-    maxAbs: 0
-    sumAbs: 0
-    maxIndegree: 0
-  statsIN:
-    max: 0
-    min: 0
-    maxAbs: 0
-    sumAbs: 0
-    maxIndegree: 0
-  statsII:
-    max: 0
-    min: 0
-    maxAbs: 0
-    sumAbs: 0
-    maxIndegree: 0
   nodeStats: []
   nodeStatsDelta: []
   nodeStatsMin:
@@ -2023,7 +1999,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 744623400}
   m_Direction: 2
   m_Value: 0.99999905
-  m_Size: 0.71954775
+  m_Size: 0.72011745
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

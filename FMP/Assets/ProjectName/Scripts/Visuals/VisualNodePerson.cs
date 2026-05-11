@@ -48,91 +48,29 @@ public class VisualNodePerson : VisualNode
 
 	private void FixedUpdate()
 	{
-		if (graphView.showNodes)
-		{
-			sr.enabled = true;
-		}
-		else
-		{
-			sr.enabled = false;
-			return;
-		}
+        if (graphView.showIdeas)
+        {
+            sr.enabled = true;
+            text.renderer.enabled = true;
+        }
+        else
+        {
+            sr.enabled = false;
+            text.renderer.enabled = false;
+            return;
+        }
 
-		Vector2 totalForce = Vector2.zero;
+        Vector2 totalForce = Vector2.zero;
 
 		r = graphView.sizeByIndegree.Evaluate(gameMaths.NN.Indegree(id)) * (graphView.useScale ? 1 : 0);
 
 		totalForce += CenteringForce(graphView.centeringStrength);
 		totalForce += DragForce(graphView.dragStrength);
 
-		if (graphView.showNodes) totalForce += NodesForces();
-		if (graphView.showIdeas) totalForce += IdeasForces();
+		if (graphView.showNodes) totalForce += NodesForces(graphView.applyNN, graphView.visualNodes, gameMaths.NN, gameMaths.NN);
+		if (graphView.showIdeas) totalForce += NodesForces(graphView.applyNI, graphView.visualIdeas, gameMaths.NI, gameMaths.IN);
 
 		totalForce = totalForce.ClampLength(graphView.maxVel);
 		rb.AddForce(totalForce);
 	}
-
-	Vector2 NodesForces()
-	{
-		Vector2 totalForce = Vector2.zero;
-		for (int otherId = 0; otherId < gameMaths.nodesCount; otherId++)
-        {
-            if (otherId == id) continue;
-            VisualNodePerson other = graphView.visualNodes[otherId];
-
-            Vector2 d = other.transform.position - transform.position;
-
-            totalForce += Repulsion(other, d, graphView.padding);
-
-            if (graphView.applyNN)
-            {
-                float fromThis = gameMaths.NN[id, otherId];
-                float toThis = gameMaths.NN[otherId, id];
-
-                float w;
-                if (graphView.symmetriseWeights) w = (Mathf.Abs(fromThis) + Mathf.Abs(toThis)) / 2;
-                else w = Mathf.Abs(fromThis);
-                if (graphView.normaliseWeights) w /= gameMaths.statsNN.maxAbs;
-
-                if (w < graphView.pairwiseForceThreshold) continue;
-
-
-                totalForce += Attraction(other, d, w, graphView.padding);
-            }
-        }
-		return totalForce;
-    }
-	Vector2 IdeasForces()
-	{
-        Vector2 totalForce = Vector2.zero;
-        for (int otherId = 0; otherId < gameMaths.ideasCount; otherId++)
-        {
-            if (otherId == id) continue;
-            VisualNode other = graphView.visualIdeas[otherId];
-
-            Vector2 d = other.transform.position - transform.position;
-
-            totalForce += Repulsion(other, d, graphView.padding);
-
-            if (graphView.applyNI)
-            {
-                float fromThis = gameMaths.NI[id, otherId];
-                float toThis = gameMaths.IN[otherId, id];
-
-                float w;
-                if (graphView.symmetriseWeights) w = (Mathf.Abs(fromThis) + Mathf.Abs(toThis)) / 2;
-                else w = Mathf.Abs(fromThis);
-
-
-
-                if (graphView.normaliseWeights) w /= Mathf.Max(gameMaths.statsNI.maxAbs, gameMaths.statsIN.maxAbs);
-
-                if (w < graphView.pairwiseForceThreshold) continue;
-
-
-                totalForce += Attraction(other, d, w, graphView.padding);
-            }
-        }
-		return totalForce;
-    }
 }

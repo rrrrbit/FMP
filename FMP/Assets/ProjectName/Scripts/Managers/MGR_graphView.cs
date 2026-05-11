@@ -63,8 +63,8 @@ public class MGR_graphView : MonoBehaviour
 	}
 	public VisualNodeProperties[] vn;
 
-	public List<VisualNodePerson> visualNodes;
-	public List<VisualNodeIdea> visualIdeas;
+	public List<VisualNode> visualNodes;
+	public List<VisualNode> visualIdeas;
 
 	private void Awake()
 	{
@@ -84,7 +84,7 @@ public class MGR_graphView : MonoBehaviour
 
 	void Init()
 	{
-		visualNodes = new List<VisualNodePerson>();
+		visualNodes = new List<VisualNode>();
 		for (int i = 0; i < gameMaths.nodesCount; i++)
 		{
 			VisualNodePerson newNode = Instantiate(visualNodePrefab);
@@ -98,7 +98,7 @@ public class MGR_graphView : MonoBehaviour
 		}
 
 
-		visualIdeas = new List<VisualNodeIdea>();
+		visualIdeas = new List<VisualNode>();
 		for (int i = 0; i < gameMaths.ideasCount; i++)
 		{
 			VisualNodeIdea newNode = Instantiate(visualIdeaPrefab);

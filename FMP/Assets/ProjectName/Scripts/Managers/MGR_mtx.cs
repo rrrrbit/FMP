@@ -1,45 +1,25 @@
-using NUnit;
 using RBitUtils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using TMPro;
-using Unity.Mathematics;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-using UnityEngine.InputSystem.Utilities;
-using UnityEngine.Rendering;
 
-public class MGR_gameMaths : MonoBehaviour
+public class MGR_mtx : MonoBehaviour
 {
 #region vars
-    [Header("Misc")]
+    [Header("Init")]
     public float timescale = 1;
 
     public int startingNumberPeople;
 	public int startingNumberIdeas;
-	public event System.Action OnReadyForVisualisation;
-	[Header("Runtime & Refs")]
-    [Header("- Lists")]
+    [Header("Lists")]
 	public List<PersonNode> nodes;
     public List<IdeaNode> ideas;
-    public int nodesCount;
-    public int ideasCount;
-    [Header("- Matrices")]
+    [Header("Matrices")]
 	public float[,] NN;
     public float[,] NI;
     public float[,] IN;
     public float[,] II;
-    public Dictionary<float[,], MtxStats> mtxStats;
-	float[,] nnDelta;
-    float[,] niDelta;
-    float[,] inNext;
-    float[,] iiNext;
 
 	[Serializable]
     public struct NodeStats
@@ -76,19 +56,24 @@ public class MGR_gameMaths : MonoBehaviour
             avoidance = a.avoidance * b,
         };
     }
-    [Header("- Node Stats")]
-    public NodeStats[] nodeStats;
-	public NodeStats[] nodeStatsDelta;
-
+    [Header("Node Stats")]
     public NodeStats nodeStatsMin;
     public NodeStats nodeStatsMax;
-    [Header("-- Idea Stats")]
+
+	[Header("Runtime & Refs")]
+    public int ideasCount;
+    public int nodesCount;
+	public event System.Action OnReadyForVisualisation;
+    public Dictionary<float[,], MtxStats> mtxStats;
+	float[,] nnDelta;
+    float[,] niDelta;
+    float[,] inNext;
+    float[,] iiNext;
+    public NodeStats[] nodeStats;
+	public NodeStats[] nodeStatsDelta;
     public float[] ideaComplexity;
     public MagicCurveParams[] ideaTolerance;
     public NodeStats[] ideaExemplar;
-    [Header("debug")]
-	public TextMeshProUGUI debugText;
-    public List<float> debugFlatMtx;
     #endregion
 
 #region utilities

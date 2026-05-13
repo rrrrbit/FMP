@@ -14,17 +14,11 @@ public class UI_pointer : MonoBehaviour
     /// </summary>
     public Vector3 relativePos;
     public Vector3 pos;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
     void Update()
     {
         prevRelativePos = relativePos;
-        transform.position = midCam.ScreenToWorldPoint(Managers.Get<MGR_input>().generalActions.MousePos.ReadValue<Vector2>().xy(-midCam.transform.position.z));
+        transform.position = midCam.ScreenToWorldPoint(MGR_game.input.generalActions.MousePos.ReadValue<Vector2>().xy(-midCam.transform.position.z));
         pos = transform.position;
         relativePos = pos - midCam.transform.position;
 

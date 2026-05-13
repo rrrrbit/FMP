@@ -9,22 +9,16 @@ public class VisualNodePerson : VisualNode
     [SerializeField] float[] niEdges;
     [SerializeField] float[] inEdges;
     [SerializeField] float[] nnEdgesTo;
-    [SerializeField] MGR_gameMaths.NodeStats stats;
-    [SerializeField] MGR_gameMaths.NodeStats dstats;
+    [SerializeField] MGR_mtx.NodeStats dstats;
     [SerializeField] bool mouseOver;
     [SerializeField] bool dragging;
     [SerializeField] Vector2 toMouse;
-
-    private void Start()
-    {
-        gameMaths = Managers.Get<MGR_gameMaths>();
-    }
 
     void Update()
     {
         int strongestId = 0;
         float strongestWeight = 0;
-        niEdges = gameMaths.NI.AllFrom(id);
+        niEdges = MGR_game.mtx.NI.AllFrom(id);
 
 		for (int i = 0; i < niEdges.Length; i++)
 		{
@@ -37,18 +31,17 @@ public class VisualNodePerson : VisualNode
 
         text.text = strongestId.ToString();
 
-		inEdges = gameMaths.IN.AllTo(id);
-        nnEdgesTo = gameMaths.NN.AllTo(id);
+		inEdges = MGR_game.mtx.IN.AllTo(id);
+        nnEdgesTo = MGR_game.mtx.NN.AllTo(id);
 
-        stats = gameMaths.nodeStats[id];
-        dstats = gameMaths.nodeStatsDelta[id];
+        dstats = MGR_game.mtx.nodeStatsDelta[id];
 
 		transform.localScale = 2 * r * Vector3.one;
     }
 
 	private void FixedUpdate()
 	{
-        if (graphView.showNodes)
+        if (MGR_game.visuals.showNodes)
         {
             sr.enabled = true;
             text.renderer.enabled = true;
@@ -64,15 +57,15 @@ public class VisualNodePerson : VisualNode
 
         Vector2 totalForce = Vector2.zero;
 
-		r = graphView.sizeByIndegree.Evaluate(gameMaths.NN.Indegree(id)) * (graphView.useScale ? 1 : 0);
+		r = MGR_game.visuals.sizeByIndegree.Evaluate(MGR_game.mtx.NN.Indegree(id)) * (MGR_game.visuals.useScale ? 1 : 0);
 
-		totalForce += CenteringForce(graphView.centeringStrength);
-		totalForce += DragForce(graphView.dragStrength);
+		totalForce += CenteringForce(MGR_game.visuals.centeringStrength);
+		totalForce += DragForce(MGR_game.visuals.dragStrength);
 
-		if (graphView.showNodes) totalForce += NodesForces(graphView.applyNN, graphView.visualNodes, gameMaths.NN, gameMaths.NN);
-		if (graphView.showIdeas) totalForce += NodesForces(graphView.applyNI, graphView.visualIdeas, gameMaths.NI, gameMaths.IN);
+		if (MGR_game.visuals.showNodes) totalForce += NodesForces(MGR_game.visuals.applyNN, MGR_game.visuals.visualNodes, MGR_game.mtx.NN, MGR_game.mtx.NN);
+		if (MGR_game.visuals.showIdeas) totalForce += NodesForces(MGR_game.visuals.applyNI, MGR_game.visuals.visualIdeas, MGR_game.mtx.NI, MGR_game.mtx.IN);
 
-		totalForce = totalForce.ClampLength(graphView.maxVel);
+		totalForce = totalForce.ClampLength(MGR_game.visuals.maxVel);
 		rb.AddForce(totalForce);
 	}
 }

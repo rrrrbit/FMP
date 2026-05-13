@@ -1,20 +1,14 @@
-using NUnit.Framework;
 using RBitUtils;
 using System;
 using System.Collections.Generic;
-using Unity.Burst;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 public class EdgeDrawer : MonoBehaviour
 {
-    MGR_graphView view;
-	MGR_gameMaths gameMaths;
 
     public List<VisualNode> nodesFrom;
     public List<VisualNode> nodesTo;
 	public float[,] mtx;
-	public GameCamera cam;
     public bool show;
 
 
@@ -81,8 +75,9 @@ public class EdgeDrawer : MonoBehaviour
         }
 
 		UpdateEdges(Time.deltaTime);
-		UpdateMesh();
-	}
+        UpdateMesh();
+
+    }
     // Update is called once per frame
     void Update()
     {
@@ -91,7 +86,6 @@ public class EdgeDrawer : MonoBehaviour
             mr.enabled = true;
             UpdateEdges(Time.deltaTime);
             UpdateMesh();
-            UpdateColours();
         }
         else
         {
@@ -105,9 +99,7 @@ public class EdgeDrawer : MonoBehaviour
 		{
 			VisualNode from = nodesFrom[edgePairs[pair].x];
 			VisualNode to = nodesTo[edgePairs[pair].y];
-
-			//MGR_graphView.VisualNodeProperties from = view.vn[edgePairs[pair].x];
-			//MGR_graphView.VisualNodeProperties to = view.vn[edgePairs[pair].y];
+            GameCamera cam = MGR_game.levelUI.cam;
 
 			float scaleMult = constantScreenWidth ? ((cam.currentZoom-maxWorldScale) /(1-Mathf.Exp(cam.currentZoom - maxWorldScale))) + maxWorldScale : 1;
 			
@@ -119,7 +111,7 @@ public class EdgeDrawer : MonoBehaviour
 			edges[pair].to = to.transform.position - dir * to.r + perp * offCenter * scaleMult;
 
 
-            edges[pair].width = width * widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? gameMaths.mtxStats[mtx].maxAbs : 1f)) * scaleMult;
+            edges[pair].width = width * widthByWeight.Evaluate(Mathf.Abs(weight) / (normaliseWeight ? MGR_game.mtx.mtxStats[mtx].maxAbs : 1f)) * scaleMult;
 
 			float u = (weight - colourMinWeight) / (colourMaxWeight - colourMinWeight);
 			float vFrom = from.onScreen ? 1 : 0;
@@ -132,43 +124,27 @@ public class EdgeDrawer : MonoBehaviour
             float vMiddleNext = Mathf.MoveTowards(edges[pair].uvMiddle.y, vMiddle, dt / fadeTime);
             float vToNext= Mathf.MoveTowards(edges[pair].uvTo.y, vTo, dt / fadeTime);
 
-
-
             edges[pair].uvFrom = new Vector2(u, vFromNext);
             edges[pair].uvMiddle = new Vector2(u, vMiddleNext);
 			edges[pair].uvTo = new Vector2(u, vToNext);
         }
 	}
+    void UpdateMesh()
+    {
+        WriteVerts();
+        WriteTris();
+        WriteUV();
 
-	void UpdateColours()
-	{
-		int vert = 0;
-		foreach(Edge edge in edges)
-		{
-            uvs[vert++] = edge.uvFrom;
-
-            uvs[vert++] = edge.uvMiddle;
-            uvs[vert++] = edge.uvMiddle;
-
-            uvs[vert++] = edge.uvTo;
-            uvs[vert++] = edge.uvTo;
-            uvs[vert++] = edge.uvTo;
-            uvs[vert++] = edge.uvTo;
-
-            uvs[vert++] = edge.uvMiddle;
-            uvs[vert++] = edge.uvMiddle;
-
-            uvs[vert++] = edge.uvFrom;
-        }
-
-		mf.mesh.uv = uvs;
-	}
-
-	void UpdateMesh()
-	{
+        mf.mesh.RecalculateBounds();
+        mf.mesh.uv = uvs;
+        mf.mesh.vertices = verts;
+        mf.mesh.triangles = tris;
+    }
+    void WriteVerts()
+    {
         int vert = 0;
-		foreach(Edge edge in edges)
-		{
+        foreach (Edge edge in edges)
+        {
             Vector3 dir = (edge.to - edge.from).normalized;
             Vector3 perp = new(-dir.y, dir.x);
             Vector3 Offset(float x, float y) => dir * x + perp * y;
@@ -195,11 +171,13 @@ public class EdgeDrawer : MonoBehaviour
             verts[vert++] = edge.from + Offset(edge.fadeLength, edge.width);
             verts[vert++] = edge.from + Offset(0, edge.width);
         }
-
-		vert = 0;
-		int tri = 0;
-		foreach(Edge edge in edges)
-		{
+    }
+    void WriteTris()
+    {
+        int vert = 0;
+        int tri = 0;
+        foreach (Edge edge in edges)
+        {
 
             /* tris: 
 
@@ -246,10 +224,28 @@ public class EdgeDrawer : MonoBehaviour
 
             vert += vertCount;
         }
+    }
+	void WriteUV()
+	{
+		int vert = 0;
+		foreach(Edge edge in edges)
+		{
+            uvs[vert++] = edge.uvFrom;
 
-		mf.mesh.RecalculateBounds();
-		mf.mesh.vertices = verts;
-		mf.mesh.triangles = tris;
+            uvs[vert++] = edge.uvMiddle;
+            uvs[vert++] = edge.uvMiddle;
+
+            uvs[vert++] = edge.uvTo;
+            uvs[vert++] = edge.uvTo;
+            uvs[vert++] = edge.uvTo;
+            uvs[vert++] = edge.uvTo;
+
+            uvs[vert++] = edge.uvMiddle;
+            uvs[vert++] = edge.uvMiddle;
+
+            uvs[vert++] = edge.uvFrom;
+        }
+
+		
 	}
-
 }

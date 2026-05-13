@@ -16,7 +16,7 @@ public class VisualNodeIdea : VisualNode
 
     private void FixedUpdate()
     {
-        if (graphView.showIdeas)
+        if (MGR_game.visuals.showIdeas)
         {
             sr.enabled = true;
             text.renderer.enabled = true;
@@ -32,15 +32,15 @@ public class VisualNodeIdea : VisualNode
 
         Vector2 totalForce = Vector2.zero;
 
-        r = graphView.sizeByIndegree.Evaluate(gameMaths.NN.Indegree(id)) * (graphView.useScale ? 1 : 0);
+        r = MGR_game.visuals.sizeByIndegree.Evaluate(MGR_game.mtx.NN.Indegree(id)) * (MGR_game.visuals.useScale ? 1 : 0);
 
-        totalForce += CenteringForce(graphView.centeringStrength);
-        totalForce += DragForce(graphView.dragStrength);
+        totalForce += CenteringForce(MGR_game.visuals.centeringStrength);
+        totalForce += DragForce(MGR_game.visuals.dragStrength);
 
-        if (graphView.showNodes) totalForce += NodesForces(graphView.applyIN, graphView.visualNodes, gameMaths.IN, gameMaths.NI);
-        if (graphView.showIdeas) totalForce += NodesForces(graphView.applyII, graphView.visualIdeas, gameMaths.II, gameMaths.II);
+        if (MGR_game.visuals.showNodes) totalForce += NodesForces(MGR_game.visuals.applyIN, MGR_game.visuals.visualNodes, MGR_game.mtx.IN, MGR_game.mtx.NI);
+        if (MGR_game.visuals.showIdeas) totalForce += NodesForces(MGR_game.visuals.applyII, MGR_game.visuals.visualIdeas, MGR_game.mtx.II, MGR_game.mtx.II);
 
-        totalForce = totalForce.ClampLength(graphView.maxVel);
+        totalForce = totalForce.ClampLength(MGR_game.visuals.maxVel);
         rb.AddForce(totalForce);
     }
 }

@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
-using static MGR_graphView;
+using static MGR_visuals;
 
 public class VisualNode : MonoBehaviour
 {
 	public int id;
 	public bool onScreen = true;
 	public float r;
-	public MGR_graphView graphView;
-	public MGR_gameMaths gameMaths;
 	public Rigidbody2D rb;
 	public SpriteRenderer sr;
 
@@ -34,7 +32,7 @@ public class VisualNode : MonoBehaviour
 
             Vector2 d = other.transform.position - transform.position;
 
-            totalForce += Repulsion(other, d, graphView.padding);
+            totalForce += Repulsion(other, d, MGR_game.visuals.padding);
 
             if (applyAttraction)
             {
@@ -42,16 +40,16 @@ public class VisualNode : MonoBehaviour
                 float toThis = toMtx[otherId, id];
 
                 float w;
-                if (graphView.symmetriseWeights) w = (Mathf.Abs(fromThis) + Mathf.Abs(toThis)) / 2;
+                if (MGR_game.visuals.symmetriseWeights) w = (Mathf.Abs(fromThis) + Mathf.Abs(toThis)) / 2;
                 else w = Mathf.Abs(fromThis);
 
-                float max = graphView.symmetriseWeights ? Mathf.Max(gameMaths.mtxStats[fromMtx].maxAbs, gameMaths.mtxStats[toMtx].maxAbs) : gameMaths.mtxStats[fromMtx].maxAbs;
-                if (graphView.normaliseWeights) w /= max;
+                float max = MGR_game.visuals.symmetriseWeights ? Mathf.Max(MGR_game.mtx.mtxStats[fromMtx].maxAbs, MGR_game.mtx.mtxStats[toMtx].maxAbs) : MGR_game.mtx.mtxStats[fromMtx].maxAbs;
+                if (MGR_game.visuals.normaliseWeights) w /= max;
 
-                if (w < graphView.pairwiseForceThreshold) continue;
+                if (w < MGR_game.visuals.pairForceWeightThreshold) continue;
 
 
-                totalForce += Attraction(other, d, w, graphView.padding);
+                totalForce += Attraction(other, d, w, MGR_game.visuals.padding);
             }
         }
         return totalForce;
@@ -59,18 +57,18 @@ public class VisualNode : MonoBehaviour
     protected Vector2 Attraction(VisualNode other, Vector3 dv, float weight, float padding)
     {
         float radii = r + other.r;
-        float d = Mathf.Max(dv.magnitude - padding - radii * (graphView.useScale ? 1 : 0), 0.01f);
+        float d = Mathf.Max(dv.magnitude - padding - radii * (MGR_game.visuals.useScale ? 1 : 0), 0.01f);
 
-        Vector2 force = RawAttraction(d, graphView.attractionType) * graphView.attractionStrength * graphView.attractionByWeight.Evaluate(weight) * dv.normalized;
+        Vector2 force = RawAttraction(d, MGR_game.visuals.attractionType) * MGR_game.visuals.attractionStrength * MGR_game.visuals.attractionByWeight.Evaluate(weight) * dv.normalized;
         return force;
     }
 
     protected Vector2 Repulsion(VisualNode other, Vector3 dv, float padding)
     {
         float radii = r + other.r;
-        float d = Mathf.Max(dv.magnitude - padding - radii * (graphView.useScale ? 1 : 0), 0.01f);
+        float d = Mathf.Max(dv.magnitude - padding - radii * (MGR_game.visuals.useScale ? 1 : 0), 0.01f);
 
-        Vector2 force = -RawRepulsion(d, graphView.repulsionType) * graphView.repulsionStrength * dv.normalized;
+        Vector2 force = -RawRepulsion(d, MGR_game.visuals.repulsionType) * MGR_game.visuals.repulsionStrength * dv.normalized;
         return force;
     }
 

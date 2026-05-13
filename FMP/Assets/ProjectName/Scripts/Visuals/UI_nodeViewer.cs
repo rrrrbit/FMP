@@ -11,19 +11,20 @@ public class UI_nodeViewer : MonoBehaviour
     public RectTransform ideaBarsContainer;
     public GameObject[] ideaBars;
     public GameObject ideaBarPrefab;
-
-    MGR_gameMaths game;
     
     void Start()
     {
-        game = Managers.Get<MGR_gameMaths>();
-        game.OnReadyForVisualisation += InitIdeaBars;
+        MGR_game.mtx.OnReadyForVisualisation += InitIdeaBars;
+    }
+    void Update()
+    {
+        UpdateViewer();
     }
 
     void InitIdeaBars()
     {
-        ideaBars = new GameObject[game.ideasCount];
-        for (int i = 0; i < game.ideasCount; i++)
+        ideaBars = new GameObject[MGR_game.mtx.ideasCount];
+        for (int i = 0; i < MGR_game.mtx.ideasCount; i++)
         {
             if (ideaBars[i] == null)
             {
@@ -33,21 +34,15 @@ public class UI_nodeViewer : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        UpdateViewer();
-    }
-
-    float Round(float x)
-    {
-        int nearest = 100;
-        return Mathf.Round(x * nearest) / nearest;
-    }
-
     void UpdateViewer()
     {
-        MGR_gameMaths.NodeStats stats = game.nodeStats[nodeIndex];
+        float Round(float x)
+        {
+            int nearest = 100;
+            return Mathf.Round(x * nearest) / nearest;
+        }
+
+        MGR_mtx.NodeStats stats = MGR_game.mtx.nodeStats[nodeIndex];
         texts.text = (
               "Complexity: " + Round(stats.complexity) +
             "\nComplexity Tolerance: " + Round(stats.complexityTolerance.width) + 
@@ -65,18 +60,19 @@ public class UI_nodeViewer : MonoBehaviour
     void UpdateIdeaBars()
     {
         float maxAbsNI = 0;
-        
-        for (int i = 0; i < game.ideasCount; i++)
+        float[,] NI = MGR_game.mtx.NI;
+
+        for (int i = 0; i < MGR_game.mtx.ideasCount; i++)
         {
-            if (Mathf.Abs(game.NI[nodeIndex, i]) > Mathf.Abs(maxAbsNI))
+            if (Mathf.Abs(NI[nodeIndex, i]) > Mathf.Abs(maxAbsNI))
             {
-                maxAbsNI = game.NI[nodeIndex, i];
+                maxAbsNI = NI[nodeIndex, i];
             }
         }
 
-        for (int i = 0; i < game.ideasCount; i++)
+        for (int i = 0; i < MGR_game.mtx.ideasCount; i++)
         {
-            ideaBars[i].GetComponent<UI_twoWayBar>().value = game.NI[nodeIndex, i] / maxAbsNI;
+            ideaBars[i].GetComponent<UI_twoWayBar>().value = NI[nodeIndex, i] / maxAbsNI;
         }
     }
 }

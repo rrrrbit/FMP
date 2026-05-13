@@ -2,27 +2,22 @@ using RBitUtils;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem.Utilities;
 
-public class MGR_graphView : MonoBehaviour
+public class MGR_visuals : MonoBehaviour
 {
 	[Header("Misc")]
-	public float lineGap = 0;
-	public float pairwiseForceThreshold = 0.01f;
 	public AnimationCurve sizeByIndegree;
-	[Header("Graphs")]
+	public float pairForceWeightThreshold;
+
+	[Header("Show")]
 	public bool showNodes;
 	public bool showIdeas;
 	public bool applyNN;
 	public bool applyNI;
 	public bool applyIN;
 	public bool applyII;
-
-	[Header("Edge")]
-	public EdgeDrawer edgeDrawerPrefab;
-	public Dictionary<float[,], EdgeDrawer> edgeDrawers;
 
     [Header("Forces")]
 	public float padding = 10f;
@@ -53,12 +48,10 @@ public class MGR_graphView : MonoBehaviour
 	}
 	public RepulsionTypes repulsionType;
 	[Header("Runtime & Refs")]
-	public GameCamera cam;
+	public EdgeDrawer edgeDrawerPrefab;
 	public VisualNodePerson visualNodePrefab;
 	public VisualNodeIdea visualIdeaPrefab;
-	public int nodeCount;
-	public MGR_gameMaths gameMaths;
-	public float[,] graph;
+	public Dictionary<float[,], EdgeDrawer> edgeDrawers;
 
 	public struct VisualNodeProperties
 	{
@@ -73,57 +66,47 @@ public class MGR_graphView : MonoBehaviour
 
 	private void Awake()
 	{
-		gameMaths = Managers.Get<MGR_gameMaths>();
-		gameMaths.OnReadyForVisualisation += Init;
+        MGR_game.mtx.OnReadyForVisualisation += Init;
 	}
 
 	private void Update()
 	{
-		edgeDrawers[gameMaths.NN].show = applyNN && showNodes;
-		edgeDrawers[gameMaths.NI].show = applyNI && showNodes && showIdeas;
-        edgeDrawers[gameMaths.IN].show = applyIN && showIdeas && showNodes;
-        edgeDrawers[gameMaths.II].show = applyII && showIdeas;
-    }
-
-    private void FixedUpdate()
-	{
-        UpdateView(Time.fixedDeltaTime);
+		edgeDrawers[MGR_game.mtx.NN].show = applyNN && showNodes;
+		edgeDrawers[MGR_game.mtx.NI].show = applyNI && showNodes && showIdeas;
+        edgeDrawers[MGR_game.mtx.IN].show = applyIN && showIdeas && showNodes;
+        edgeDrawers[MGR_game.mtx.II].show = applyII && showIdeas;
     }
 
 	void Init()
 	{
 		visualNodes = new List<VisualNode>();
-		for (int i = 0; i < gameMaths.nodesCount; i++)
+		for (int i = 0; i < MGR_game.mtx.nodesCount; i++)
 		{
 			VisualNodePerson newNode = Instantiate(visualNodePrefab);
 			newNode.id = i;
 			newNode.gameObject.name = "Node " + newNode.id.ToString();
 			newNode.transform.position = Random.insideUnitCircle * 10;
-			newNode.graphView = this;
-			newNode.gameMaths = gameMaths;
 
 			visualNodes.Add(newNode);
 		}
 
 
 		visualIdeas = new List<VisualNode>();
-		for (int i = 0; i < gameMaths.ideasCount; i++)
+		for (int i = 0; i < MGR_game.mtx.ideasCount; i++)
 		{
 			VisualNodeIdea newNode = Instantiate(visualIdeaPrefab);
 			newNode.id = i;
 			newNode.gameObject.name = "Idea " + newNode.id.ToString();
 			newNode.transform.position = Random.insideUnitCircle * 10;
-			newNode.graphView = this;
-			newNode.gameMaths = gameMaths;
 
 			visualIdeas.Add(newNode);
 		}
 
 		edgeDrawers = new Dictionary<float[,], EdgeDrawer>();
-		AddEdgeDrawer(gameMaths.NN, visualNodes, visualNodes, "EdgeDrawer_NN");
-        AddEdgeDrawer(gameMaths.NI, visualNodes, visualIdeas, "EdgeDrawer_NI");
-		AddEdgeDrawer(gameMaths.IN, visualIdeas, visualNodes, "EdgeDrawer_IN");
-		AddEdgeDrawer(gameMaths.II, visualIdeas, visualIdeas, "EdgeDrawer_II");
+		AddEdgeDrawer(MGR_game.mtx.NN, visualNodes, visualNodes, "EdgeDrawer_NN");
+        AddEdgeDrawer(MGR_game.mtx.NI, visualNodes, visualIdeas, "EdgeDrawer_NI");
+		AddEdgeDrawer(MGR_game.mtx.IN, visualIdeas, visualNodes, "EdgeDrawer_IN");
+		AddEdgeDrawer(MGR_game.mtx.II, visualIdeas, visualIdeas, "EdgeDrawer_II");
     }
 
 	void AddEdgeDrawer(float[,] mtx, List<VisualNode> nodesFrom, List<VisualNode> nodesTo, string name = "EdgeDrawer")
@@ -134,15 +117,9 @@ public class MGR_graphView : MonoBehaviour
 		edgeDrawer.nodesFrom = nodesFrom;
 		edgeDrawer.nodesTo = nodesTo;
 		edgeDrawer.mtx = mtx;
-		edgeDrawer.cam = cam;
 		edgeDrawers[mtx] = edgeDrawer;
 		edgeDrawers[mtx].Init();
     }
-
-    void UpdateView(float dt)
-	{
-
-	}
 
 	public void SocialView(bool toggle)
 	{

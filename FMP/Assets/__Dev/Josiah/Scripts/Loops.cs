@@ -3,10 +3,29 @@ using System.Collections;
 
 public class Loops : MonoBehaviour
 {
+    public class loops
+    {
+
+
+    }
+
     int nodeCorrelation;
     int numEnemies = 5;
-    
 
+    public enum loop_statements
+    {
+          For,
+          IF,
+          While,
+          Do,
+          Foreach,
+          Else
+        // Just Experimenting
+
+
+
+    }
+    
 
     private void Start()
     { 
@@ -25,7 +44,7 @@ public class Loops : MonoBehaviour
             
         }
 
-        
+       
 
     }
     private void Update()
@@ -33,6 +52,7 @@ public class Loops : MonoBehaviour
        
     }
 
+   
     
 
 }

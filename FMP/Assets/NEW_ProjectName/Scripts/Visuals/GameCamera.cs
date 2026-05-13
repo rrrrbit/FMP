@@ -1,3 +1,4 @@
+  
 using RBitUtils;
 using RBitUtils.ResponseTypes;
 using Unity.Hierarchy;
@@ -5,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
-
+// From the old main branch
 [CustomEditor(typeof(GameCamera), true)]
 public class EDITOR_GameCamera : Editor
 {

@@ -63,7 +63,7 @@ public class MGR_mtx : MonoBehaviour
 	[Header("Runtime & Refs")]
     public int ideasCount;
     public int nodesCount;
-	public event System.Action OnReadyForVisualisation;
+	public event Action OnReadyForVisualisation;
     public Dictionary<float[,], MtxStats> mtxStats;
 	float[,] nnDelta;
     float[,] niDelta;

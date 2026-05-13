@@ -64,7 +64,7 @@ public class MGR_visuals : MonoBehaviour
 	public List<Visual_Node> visualNodes;
 	public List<Visual_Node> visualIdeas;
 
-	private void Awake()
+	private void Start()
 	{
         MGR_game.mtx.OnReadyForVisualisation += Init;
 	}

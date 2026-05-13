@@ -14,6 +14,11 @@ public class Visual_NodeIdea : Visual_Node
 		transform.localScale = 2 * r * Vector3.one;
 	}
 
+    public override void Select()
+    {
+        MGR_game.levelUI.FocusNodeViewer(this);
+    }
+
     private void FixedUpdate()
     {
         if (MGR_game.visuals.showIdeas)

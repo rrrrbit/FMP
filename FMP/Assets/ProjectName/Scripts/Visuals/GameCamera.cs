@@ -35,7 +35,7 @@ public class GameCamera : MonoBehaviour
 
     public Spring zoomEasing;
     public TokenResolvableValue<SpringSettings> zoomEasingSettings;
-    void Awake()
+    void Start()
     {
         prevZoom = currentZoom;
         MGR_game.input.OnInputReady += AddCallbacks;

@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using static MGR_visuals;
 
-public class Visual_Node : MonoBehaviour
+public class Visual_Node : MonoBehaviour, IPointerClickHandler
 {
 	public int id;
 	public bool onScreen = true;
@@ -21,6 +22,13 @@ public class Visual_Node : MonoBehaviour
     {
         onScreen = false;
     }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Select();
+    }
+
+    public virtual void Select() { }
 
     protected Vector2 NodesForces(bool applyAttraction, List<Visual_Node> otherList, float[,] fromMtx, float[,] toMtx)
     {

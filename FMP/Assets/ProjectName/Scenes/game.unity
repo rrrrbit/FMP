@@ -506,8 +506,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2090233356}
   m_HandleRect: {fileID: 2090233355}
   m_Direction: 0
-  m_Value: 1.000005
-  m_Size: 0.74887526
+  m_Value: 1.0000014
+  m_Size: 0.7509719
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -563,7 +563,6 @@ GameObject:
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
   - component: {fileID: 330585548}
-  - component: {fileID: 330585549}
   m_Layer: 0
   m_Name: bgCamera
   m_TagString: MainCamera
@@ -707,7 +706,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panSpeed: {x: 2, y: 2}
   zoomMin: 1
-  zoomMax: 10
+  zoomMax: 100
   zoomInterval: 1.2
   cameras: []
   currentZoom: 5
@@ -719,22 +718,6 @@ MonoBehaviour:
       damping: 1
       response: 1
     token: {fileID: 11400000, guid: 29aff3315e44a8344b7429a4952c353c, type: 2}
---- !u!114 &330585549
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 330585543}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56666c5a40171f54783dd416a44f42bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EventMask:
-    serializedVersion: 2
-    m_Bits: 193
-  m_MaxRayIntersections: 0
 --- !u!1 &348268513
 GameObject:
   m_ObjectHideFlags: 0
@@ -1079,7 +1062,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -124.0006, y: 193.78075}
+  m_AnchoredPosition: {x: -124.0002, y: 193.78033}
   m_SizeDelta: {x: 498, y: 691.86}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &564968367
@@ -1390,7 +1373,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 873768628}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 
@@ -1592,6 +1575,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 330585548}
+  nodeViewer: {fileID: 637802481}
 --- !u!114 &884068272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2311,8 +2295,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 744623401}
   m_HandleRect: {fileID: 744623400}
   m_Direction: 2
-  m_Value: -0.0000037796574
-  m_Size: 0.71787363
+  m_Value: -0.0000018898287
+  m_Size: 0.7198838
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2428,7 +2412,7 @@ MonoBehaviour:
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -2442,14 +2426,14 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 504586363}
-  toggleTransition: 1
+  toggleTransition: 0
   graphic: {fileID: 1119670990}
   m_Group: {fileID: 348268515}
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MGR_graphView, Assembly-CSharp
+      - m_Target: {fileID: 884068273}
+        m_TargetAssemblyTypeName: MGR_visuals, Assembly-CSharp
         m_MethodName: IdeaView
         m_Mode: 0
         m_Arguments:
@@ -2460,7 +2444,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!1 &1807449357
 GameObject:
   m_ObjectHideFlags: 0
@@ -3021,6 +3005,7 @@ GameObject:
   - component: {fileID: 2138412819}
   - component: {fileID: 2138412822}
   - component: {fileID: 2138412820}
+  - component: {fileID: 2138412823}
   m_Layer: 0
   m_Name: gameCamera
   m_TagString: MainCamera
@@ -3138,6 +3123,22 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &2138412823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2138412818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56666c5a40171f54783dd416a44f42bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EventMask:
+    serializedVersion: 2
+    m_Bits: 128
+  m_MaxRayIntersections: 0
 --- !u!1 &2143303917
 GameObject:
   m_ObjectHideFlags: 0
@@ -3211,7 +3212,7 @@ MonoBehaviour:
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -3225,14 +3226,14 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 429581154}
-  toggleTransition: 1
+  toggleTransition: 0
   graphic: {fileID: 182126179}
   m_Group: {fileID: 348268515}
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MGR_graphView, Assembly-CSharp
+      - m_Target: {fileID: 884068273}
+        m_TargetAssemblyTypeName: MGR_visuals, Assembly-CSharp
         m_MethodName: SocialView
         m_Mode: 0
         m_Arguments:
@@ -3243,7 +3244,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_IsOn: 0
+  m_IsOn: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

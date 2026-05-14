@@ -26,7 +26,7 @@ public class NodeJudgement : MonoBehaviour
     public void Node_opinions()
     {
         if (Node_opinion == true)
-            print("I love you and you influence my opnions a lot");
+            print("I love you and you influence my opinions a lot");
 
         else if (Node_opinion == false)
         {
@@ -91,7 +91,10 @@ public class NodeJudgement : MonoBehaviour
             print("This Node is accepted in the right group");
 
         }
-
+        else if (isNode == false)
+        {
+            print("This Node doesn't meet our expectations");
+        }
     }
 
 

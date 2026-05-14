@@ -49,7 +49,7 @@ public class Visual_NodeIdea : Visual_Node
         if (dragging)
         {
             Vector2 dMouse = (MGR_game.input.worldPointer.pos - transform.position);
-            totalForce += dMouse.sqrMagnitude * dMouse.normalized;
+            totalForce += dMouse.sqrMagnitude * dMouse.normalized * MGR_game.visuals.mouseStrength;
         }
 
         totalForce = totalForce.ClampLength(MGR_game.visuals.maxVel);

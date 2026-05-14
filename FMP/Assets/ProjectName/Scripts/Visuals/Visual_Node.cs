@@ -1,16 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using static MGR_visuals;
 
-public class Visual_Node : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
+public class Visual_Node : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
 	public int id;
 	public bool onScreen = true;
 	public float r;
 	public Rigidbody2D rb;
 	public SpriteRenderer sr;
-    protected bool dragging;
+    public bool dragging;
+    public bool hovered;
 
     // will handle clicks
 
@@ -24,19 +26,38 @@ public class Visual_Node : MonoBehaviour, IPointerClickHandler, IPointerDownHand
         onScreen = false;
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    private void Start()
     {
-        Select();
+        MGR_game.input.OnInputReady += InputCallbacks;
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    void InputCallbacks()
     {
-        dragging = true;
-        print("asdkfjg");
+        print("eoug");
+        MGR_game.input.input.General.LMB.started += OnPointerDown;
+        MGR_game.input.input.General.LMB.canceled += OnPointerUp;
     }
-    public void OnPointerUp(PointerEventData eventData)
+
+    public void OnPointerDown(InputAction.CallbackContext ctx)
+    {
+        print("sjkfdgh");
+        if (hovered)
+        {
+            dragging = true;
+        }
+    }
+    public void OnPointerUp(InputAction.CallbackContext ctx)
     {
         dragging = false;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        hovered = true;
+    }
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        hovered = false;
     }
 
 

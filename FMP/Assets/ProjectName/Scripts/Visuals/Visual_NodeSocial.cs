@@ -9,10 +9,7 @@ public class Visual_NodeSocial : Visual_Node
     [SerializeField] float[] niEdges;
     [SerializeField] float[] inEdges;
     [SerializeField] float[] nnEdgesTo;
-    [SerializeField] MGR_mtx.NodeStats dstats;
-    [SerializeField] bool mouseOver;
-    [SerializeField] bool dragging;
-    [SerializeField] Vector2 toMouse;
+    [SerializeField] MGR_mtx.NodeStats dstats; 
 
     void Update()
     {
@@ -70,7 +67,13 @@ public class Visual_NodeSocial : Visual_Node
 		if (MGR_game.visuals.showNodes) totalForce += NodesForces(MGR_game.visuals.applyNN, MGR_game.visuals.visualNodes, MGR_game.mtx.NN, MGR_game.mtx.NN);
 		if (MGR_game.visuals.showIdeas) totalForce += NodesForces(MGR_game.visuals.applyNI, MGR_game.visuals.visualIdeas, MGR_game.mtx.NI, MGR_game.mtx.IN);
 
-		totalForce = totalForce.ClampLength(MGR_game.visuals.maxVel);
+        if (dragging)
+        {
+            Vector2 dMouse = (MGR_game.input.pointer.pos - transform.position);
+            totalForce += dMouse.sqrMagnitude * dMouse.normalized;
+        }
+
+        totalForce = totalForce.ClampLength(MGR_game.visuals.maxVel);
 		rb.AddForce(totalForce);
 	}
 }

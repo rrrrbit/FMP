@@ -3,13 +3,14 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using static MGR_visuals;
 
-public class Visual_Node : MonoBehaviour, IPointerClickHandler
+public class Visual_Node : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
 	public int id;
 	public bool onScreen = true;
 	public float r;
 	public Rigidbody2D rb;
 	public SpriteRenderer sr;
+    protected bool dragging;
 
     // will handle clicks
 
@@ -27,6 +28,17 @@ public class Visual_Node : MonoBehaviour, IPointerClickHandler
     {
         Select();
     }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        dragging = true;
+        print("asdkfjg");
+    }
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        dragging = false;
+    }
+
 
     public virtual void Select() { }
 
@@ -110,4 +122,5 @@ public class Visual_Node : MonoBehaviour, IPointerClickHandler
     {
         return strength * rb.linearVelocity.sqrMagnitude * -rb.linearVelocity.normalized;
     }
+
 }

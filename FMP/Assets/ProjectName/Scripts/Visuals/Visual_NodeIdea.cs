@@ -2,6 +2,7 @@ using RBitUtils;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Visual_NodeIdea : Visual_Node
 {
@@ -45,7 +46,14 @@ public class Visual_NodeIdea : Visual_Node
         if (MGR_game.visuals.showNodes) totalForce += NodesForces(MGR_game.visuals.applyIN, MGR_game.visuals.visualNodes, MGR_game.mtx.IN, MGR_game.mtx.NI);
         if (MGR_game.visuals.showIdeas) totalForce += NodesForces(MGR_game.visuals.applyII, MGR_game.visuals.visualIdeas, MGR_game.mtx.II, MGR_game.mtx.II);
 
+        if (dragging)
+        {
+            Vector2 dMouse = (MGR_game.input.pointer.pos - transform.position);
+            totalForce += dMouse.sqrMagnitude * dMouse.normalized;
+        }
+
         totalForce = totalForce.ClampLength(MGR_game.visuals.maxVel);
         rb.AddForce(totalForce);
+
     }
 }

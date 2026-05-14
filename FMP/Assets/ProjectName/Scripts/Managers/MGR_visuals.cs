@@ -25,6 +25,7 @@ public class MGR_visuals : MonoBehaviour
 	public bool normaliseWeights = true;
 	public bool symmetriseWeights = true;
 	public float maxVel = 1000f;
+	public float mouseStrength;
 	[Space]
 	public float centeringStrength;
 	public float dragStrength;

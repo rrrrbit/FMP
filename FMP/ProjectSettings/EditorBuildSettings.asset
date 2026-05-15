@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/__Dev/Josiah/Scenes/Main menu.unity
-    guid: 29df326c4f0eb3040a5059834afb2db3
+    path: Assets/NEW_ProjectName/Scenes/Main menu 1.unity
+    guid: 21821baa46962d341a9b9711c463c60e
   - enabled: 1
     path: Assets/NEW_ProjectName/Scenes/game.unity
     guid: db42bcdb45988b64484c00f46efe0091

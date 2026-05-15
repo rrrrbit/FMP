@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.UI;
 
 public class UI_nodeViewer : MonoBehaviour
 {
@@ -87,6 +88,7 @@ public class UI_nodeViewer : MonoBehaviour
         for (int i = 0; i < MGR_game.mtx.ideasCount; i++)
         {
             ideaBars[i].GetComponent<UI_twoWayBar>().value = NI[nodeIndex, i] / maxAbsNI;
+            ideaBars[i].GetComponentInChildren<Image>().color = MGR_game.visuals.ideaColours[i];
         }
     }
 }

@@ -6,13 +6,11 @@ using UnityEngine.UIElements;
 
 public class Visual_NodeIdea : Visual_Node
 {
-    [SerializeField] TextMeshPro text;
-
     void Update()
     {
-        text.text = id.ToString();
 
 		transform.localScale = 2 * r * Vector3.one;
+        sr.color = MGR_game.visuals.ideaColours[id];
 	}
 
     public override void Select()
@@ -25,13 +23,11 @@ public class Visual_NodeIdea : Visual_Node
         if (MGR_game.visuals.showIdeas)
         {
             sr.enabled = true;
-            text.renderer.enabled = true;
             rb.simulated = true;
         }
         else
         {
             sr.enabled = false;
-            text.renderer.enabled = false;
             rb.simulated = false;
             return;
         }

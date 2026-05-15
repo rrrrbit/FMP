@@ -10,6 +10,9 @@ public class MGR_visuals : MonoBehaviour
 	[Header("Misc")]
 	public AnimationCurve sizeByIndegree;
 	public float pairForceWeightThreshold;
+	public List<Color> ideaColours;
+
+	public Gradient debug_ideaColoursGradient;
 
 	[Header("Show")]
 	public bool showNodes;
@@ -95,6 +98,7 @@ public class MGR_visuals : MonoBehaviour
 
 
 		visualIdeas = new List<Visual_Node>();
+
 		for (int i = 0; i < MGR_game.mtx.ideasCount; i++)
 		{
 			Visual_NodeIdea newNode = Instantiate(visualIdeaPrefab);
@@ -103,6 +107,9 @@ public class MGR_visuals : MonoBehaviour
 			newNode.transform.position = Random.insideUnitCircle * 10;
 
 			visualIdeas.Add(newNode);
+
+			Color nodeColour = debug_ideaColoursGradient.Evaluate(Random.value);
+			ideaColours.Add(nodeColour);
 		}
 
 		edgeDrawers = new Dictionary<float[,], Visual_EdgeDrawer>();

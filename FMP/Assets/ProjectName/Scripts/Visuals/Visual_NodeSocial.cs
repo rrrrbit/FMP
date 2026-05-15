@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 public class Visual_NodeSocial : Visual_Node
 {
-	[SerializeField] TextMeshPro text;
     [SerializeField] float[] niEdges;
     [SerializeField] float[] inEdges;
     [SerializeField] float[] nnEdgesTo;
@@ -26,14 +25,12 @@ public class Visual_NodeSocial : Visual_Node
             }
 		}
 
-        text.text = strongestId.ToString();
-
 		inEdges = MGR_game.mtx.IN.AllTo(id);
         nnEdgesTo = MGR_game.mtx.NN.AllTo(id);
 
         dstats = MGR_game.mtx.nodeStatsDelta[id];
-
-		transform.localScale = 2 * r * Vector3.one;
+        sr.color = MGR_game.visuals.ideaColours[strongestId];
+        transform.localScale = 2 * r * Vector3.one;
     }
 
     public override void Select()
@@ -46,13 +43,11 @@ public class Visual_NodeSocial : Visual_Node
         if (MGR_game.visuals.showNodes)
         {
             sr.enabled = true;
-            text.renderer.enabled = true;
             rb.simulated = true;
         }
         else
         {
             sr.enabled = false;
-            text.renderer.enabled = false;
             rb.simulated = false;
             return;
         }

@@ -90,7 +90,7 @@ public class MGR_mtx : MonoBehaviour
         {
             thresholdNeg = a.thresholdNeg + b.thresholdNeg,
             thresholdPos = a.thresholdPos + b.thresholdPos,
-            strengthNeg = a.strengthPos + b.strengthNeg,
+            strengthNeg = a.strengthNeg + b.strengthNeg,
             strengthPos = a.strengthPos + b.strengthPos,
         };
 
@@ -98,7 +98,7 @@ public class MGR_mtx : MonoBehaviour
         {
             thresholdPos = a.thresholdPos * b,
             thresholdNeg = a.thresholdNeg * b,
-            strengthNeg = a.strengthPos * b,
+            strengthNeg = a.strengthNeg * b,
             strengthPos = a.strengthPos * b,
         };
     }

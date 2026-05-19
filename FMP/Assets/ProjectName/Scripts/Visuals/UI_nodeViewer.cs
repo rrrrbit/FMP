@@ -57,16 +57,38 @@ public class UI_nodeViewer : MonoBehaviour
             return Mathf.Round(x * nearest) / nearest;
         }
 
+        string PosNegString(float pos, float neg, bool perSec = false, string divider = " / ")
+        {
+            if(perSec) return "<color=#FF0000>" + Round(pos) + "/s</color>" + divider + "<color=#00FF00>" + Round(neg) + "/s</color>";
+            else return "<color=#FF0000>" + Round(pos) + "</color>"+divider+"<color=#00FF00>" + Round(neg) + "</color>";
+        }
+
         MGR_mtx.NodeStats stats = MGR_game.mtx.nodeStats[nodeIndex];
+        MGR_mtx.NodeStats dstats = MGR_game.mtx.nodeStatsDelta[nodeIndex];
         texts.text = (
-              "Complexity: " + Round(stats.complexity) +
-            "\nComplexity Tolerance: " + Round(stats.complexityTolerance.width) + 
-            "\nEnthusiasm: <color=#FF0000>" + Round(stats.enthusiasm.strengthPos) + "</color> / <color=#00FF00>" + Round(stats.enthusiasm.strengthNeg) + "</color>" +
-            "\nReach: " + Round(stats.reach) +
-            "\nSuggestibility: <color=#FF0000>" + Round(stats.suggestibility.strengthPos) + "</color> / <color=#00FF00>" + Round(stats.suggestibility.strengthNeg) + "</color>" +
-            "\nAdherence: <color=#FF0000>" + Round(stats.adherence.strengthPos) + "</color> / <color=#00FF00>" + Round(stats.adherence.strengthNeg) + "</color>" +
-            "\nExtroversion: " + Round(stats.extroversion) + 
-            "\nAvoidance: " + Round(stats.avoidance)
+                        "Complexity: " + Round(stats.complexity) + 
+                                  " (" + Round(dstats.complexity) + "/s)" +
+
+            "\nComplexity Tolerance: " + Round(stats.complexityTolerance.width) +
+                                  " (" + Round(dstats.complexityTolerance.width) + "/s)" + 
+
+                      "\nEnthusiasm: " + PosNegString(stats.enthusiasm.strengthPos, stats.enthusiasm.strengthNeg) +
+                                  " (" + PosNegString(dstats.enthusiasm.strengthPos, dstats.enthusiasm.strengthNeg, true) + ")" +
+
+                           "\nReach: " + Round(stats.reach) + 
+                                  " (" + Round(dstats.reach) + "/s)" +
+
+                  "\nSuggestibility: " + PosNegString(stats.suggestibility.strengthPos, stats.suggestibility.strengthNeg) +
+                                  " (" + PosNegString(dstats.suggestibility.strengthPos, dstats.suggestibility.strengthNeg, true) + ")" +
+
+                       "\nAdherence: " + PosNegString(stats.adherence.strengthPos, stats.adherence.strengthNeg) +
+                                  " (" + PosNegString(dstats.adherence.strengthPos, dstats.adherence.strengthNeg, true) + ")" +
+
+                    "\nExtroversion: " + Round(stats.extroversion) + 
+                                  " (" + Round(dstats.extroversion) + "/s)" + 
+
+                       "\nAvoidance: " + Round(stats.avoidance) + 
+                                  " (" + Round(dstats.avoidance) + "/s)"
             );
 
         UpdateIdeaBars();

@@ -966,7 +966,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2090233355}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1760,11 +1760,11 @@ RectTransform:
   - {fileID: 60840021}
   - {fileID: 219847146}
   - {fileID: 886038278}
-  m_Father: {fileID: 842680429}
+  m_Father: {fileID: 873768632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 135, y: 102}
+  m_AnchoredPosition: {x: 151, y: 118}
   m_SizeDelta: {x: 944.75, y: 726.88}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &637802480
@@ -2130,7 +2130,6 @@ RectTransform:
   m_Children:
   - {fileID: 876277335}
   - {fileID: 348268514}
-  - {fileID: 637802478}
   m_Father: {fileID: 873768632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2234,6 +2233,7 @@ RectTransform:
   m_Children:
   - {fileID: 842680429}
   - {fileID: 799457090}
+  - {fileID: 637802478}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4418,7 +4418,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 1070.65}
+  m_SizeDelta: {x: 0, y: 849.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1845849691
 MonoBehaviour:
@@ -4442,7 +4442,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'test : 9999999999
 
-    <b>kindly</b> ignore the placeholder text
+    <b>kindly</b> ignore the placeholder textasdfasdfasdfsf
 
 
     afdsa
@@ -4498,9 +4498,9 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 3
+  m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0

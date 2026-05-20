@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+
+
 public class MGR_mtx : MonoBehaviour
 {
 #region vars
@@ -29,7 +31,7 @@ public class MGR_mtx : MonoBehaviour
     public int ideasCount;
     public int nodesCount;
 	public event Action OnReadyForVisualisation;
-    public Dictionary<float[,], MtxStats> mtxStats;
+    public Dictionary<float[,], MtxUtils.MtxStats> mtxStats;
 	float[,] nnDelta;
     float[,] niDelta;
     float[,] inNext;
@@ -42,6 +44,7 @@ public class MGR_mtx : MonoBehaviour
     #endregion
 
     #region subclasses
+    
     [Serializable]
     public struct NodeStats
     {
@@ -78,6 +81,10 @@ public class MGR_mtx : MonoBehaviour
         };
     }
     [Serializable]
+
+    /// <summary>
+    /// Parametric f(x) with an optional threshold and asymmetric shape. <a href="https://www.desmos.com/calculator/ygh3492ofo">See demo.</a>
+    /// </summary>
     public struct MagicCurveParams
     {
         public float thresholdPos;
@@ -85,6 +92,21 @@ public class MGR_mtx : MonoBehaviour
 
         public float strengthPos;
         public float strengthNeg;
+
+        public static MagicCurveParams operator +(MagicCurveParams a, MagicCurveParams b) => new()
+        {
+            thresholdNeg = a.thresholdNeg + b.thresholdNeg,
+            thresholdPos = a.thresholdPos + b.thresholdPos,
+            strengthNeg = a.strengthNeg + b.strengthNeg,
+            strengthPos = a.strengthPos + b.strengthPos,
+        };
+        public static MagicCurveParams operator *(MagicCurveParams a, float b) => new()
+        {
+            thresholdPos = a.thresholdPos * b,
+            thresholdNeg = a.thresholdNeg * b,
+            strengthNeg = a.strengthNeg * b,
+            strengthPos = a.strengthPos * b,
+        };
 
         public float Eval(float xRaw)
         {
@@ -115,21 +137,6 @@ public class MGR_mtx : MonoBehaviour
             }
             return total;
         }
-        public static MagicCurveParams operator +(MagicCurveParams a, MagicCurveParams b) => new()
-        {
-            thresholdNeg = a.thresholdNeg + b.thresholdNeg,
-            thresholdPos = a.thresholdPos + b.thresholdPos,
-            strengthNeg = a.strengthNeg + b.strengthNeg,
-            strengthPos = a.strengthPos + b.strengthPos,
-        };
-
-        public static MagicCurveParams operator *(MagicCurveParams a, float b) => new()
-        {
-            thresholdPos = a.thresholdPos * b,
-            thresholdNeg = a.thresholdNeg * b,
-            strengthNeg = a.strengthNeg * b,
-            strengthPos = a.strengthPos * b,
-        };
     }
     [Serializable]
     public struct BumpCurveParams
@@ -152,58 +159,21 @@ public class MGR_mtx : MonoBehaviour
             width = a.width * b,
             steepness = a.steepness * b,
         };
+
+        public float Eval(float x)
+        {
+            float total = peak * Mathf.Exp(-Mathf.Pow(Mathf.Abs((x - center) / width), steepness));
+            if (!float.IsFinite(total))
+            {
+                Debug.LogWarning("caught NaN in bumpCurve");
+                return 0;
+            }
+            return total;
+        }
     }
     #endregion
 
-    #region utilities
-
-    /// <summary>
-    /// Parametric f(x) with an optional threshold and asymmetric shape. <a href="https://www.desmos.com/calculator/ygh3492ofo">See demo.</a>
-    /// </summary>
-    /// <param name="xRaw"></param>
-    /// <param name="activation">value of x where threshold is roughly fully open (0.99 hard coded).</param>
-    /// <param name="steepness">Maximum gradient of threshold</param>
-    /// <returns></returns>
-    //float MagicCurve(float xRaw, MagicCurveParams param)
-    //{
-    //    float strength;
-    //    float threshold;
-    //    if (xRaw >= 0)
-    //    {
-    //        strength = param.strengthPos;
-    //        threshold = param.thresholdPos;
-    //    }
-    //    else
-    //    {
-    //        strength = param.strengthNeg;
-    //        threshold = param.thresholdNeg;
-    //    }
-        
-    //    float x = Mathf.Abs(xRaw);
-    //    float x2 = x * x;
-
-    //    float curve = strength > 0 ? strength - strength * Mathf.Exp(-x / strength) : 0;
-    //    float activation =  x < threshold ? -x2 / (2*threshold*x - 2*x2 - threshold*threshold) : 1;
-
-    //    float total = activation * curve * Mathf.Sign(xRaw);
-    //    if (!float.IsFinite(total))
-    //    {
-    //        Debug.LogWarning("caught NaN in magicCurve");
-    //        return 0;
-    //    }
-    //    return total;
-    //}
-
-    float BumpCurve(float x, BumpCurveParams param)
-    {
-        float total = param.peak * Mathf.Exp(-Mathf.Pow(Mathf.Abs((x - param.center) / param.width), param.steepness));
-        if (!float.IsFinite(total))
-        {
-            Debug.LogWarning("caught NaN in bumpCurve");
-            return 0;
-        }
-        return total;
-    }
+#region utilities
 
     float ManualSum(int excludeInd, int range, Func<int, float> func)
     {
@@ -402,7 +372,7 @@ public class MGR_mtx : MonoBehaviour
 
     void InitMtx()
     {
-        mtxStats = new Dictionary<float[,], MtxStats>();
+        mtxStats = new Dictionary<float[,], MtxUtils.MtxStats>();
 
         // initialise nn with random weights
         NN = new float[nodesCount, nodesCount];
@@ -525,7 +495,7 @@ public class MGR_mtx : MonoBehaviour
 		}
 	}
 
-#region - stat
+    #region stat
     NodeStats ClampStats(NodeStats stats, NodeStats min, NodeStats max)
     {
         float ClampFloatStat(Func<NodeStats, float> stat) => Mathf.Clamp(stat(stats), stat(min), stat(max));
@@ -626,7 +596,7 @@ public class MGR_mtx : MonoBehaviour
         float ideological = ManualSum(i, ideasCount, x =>
             II[x, i] * NI[n, x]
             );
-        float complexity = BumpCurve(ideaComplexity[i] - nodeStats[n].complexity, nodeStats[n].complexityTolerance);
+        float complexity = nodeStats[n].complexityTolerance.Eval(ideaComplexity[i] - nodeStats[n].complexity);
 
         return nodeStats[n].suggestibility.Eval(social) + nodeStats[n].adherence.Eval(ideological) * complexity;
     }
@@ -799,7 +769,17 @@ public static class MtxUtils
 		return max;
 	}
 
-	public static MtxStats GetStats(this float[,] mtx)
+    [Serializable]
+    public struct MtxStats
+    {
+        public float max;
+        public float min;
+        public float maxAbs;
+        public float sumAbs;
+        public float maxIndegree;
+    } 
+
+    public static MtxStats GetStats(this float[,] mtx)
 	{
 		MtxStats stats = new MtxStats();
 		stats.max = mtx.Max();
@@ -809,14 +789,4 @@ public static class MtxUtils
 		stats.maxIndegree = mtx.MaxIndegree();
 		return stats;
 	}
-}
-
-[Serializable]
-public struct MtxStats
-{
-	public float max;
-	public float min;
-	public float maxAbs;
-	public float sumAbs;
-	public float maxIndegree;
 }

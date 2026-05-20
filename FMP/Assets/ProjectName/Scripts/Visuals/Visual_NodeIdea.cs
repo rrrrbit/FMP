@@ -15,7 +15,7 @@ public class Visual_NodeIdea : Visual_Node
 
     public override void Select()
     {
-        MGR_game.levelUI.TryFocusNodeViewer(this);
+        MGR_game.levelUI.TryFocusNodeViewer(this, true);
     }
 
     private void FixedUpdate()

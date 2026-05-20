@@ -21,7 +21,7 @@ public class MGR_levelUI : MonoBehaviour
         
     }
 
-    public void TryFocusNodeViewer(Visual_Node node)
+    public void TryFocusNodeViewer(Visual_Node node, bool idea = false)
     {
         if (nodeViewer.nodeIndex == node.id)
         {
@@ -29,6 +29,7 @@ public class MGR_levelUI : MonoBehaviour
             return;
         }
         nodeViewer.nodeIndex = node.id;
+        nodeViewer.viewIdea = idea;
         selection.target = node.transform;
         selection.GetComponent<SpriteRenderer>().enabled = true;
     }
@@ -37,10 +38,5 @@ public class MGR_levelUI : MonoBehaviour
     {
         nodeViewer.nodeIndex = -1;
         selection.GetComponent<SpriteRenderer>().enabled = false;
-    }
-
-    public void FocusIdeaViewer(Visual_Node node)
-    {
-
     }
 }

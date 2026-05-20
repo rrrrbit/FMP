@@ -3,24 +3,49 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UI;
+using RBitUtils;
 
 public class UI_nodeViewer : MonoBehaviour
 {
-
+    public bool viewIdea = false;
+    bool prevViewIdea;
     public int nodeIndex;
-    public TMP_Text texts;
+    [SerializeField] float fadeLength = 0.05f;
+
+    public GameObject nodeViewer;
+    public TMP_Text nodeStatsTexts;
     public RectTransform ideaBarsContainer;
     public GameObject[] ideaBars;
     public GameObject ideaBarPrefab;
+    [Space]
+    public GameObject ideaViewer;
+    public TMP_Text ideaStatsTexts;
 
-    [SerializeField] float fadeLength = 0.05f;
-    
+    float Round(float x)
+    {
+        int nearest = 100;
+        return Mathf.Round(x * nearest) / nearest;
+    }
+
+    string PosNegString(float pos, float neg, bool perSec = false, string divider = " / ")
+    {
+        if (perSec) return "<color=#FF0000>" + Round(pos) + "/s</color>" + divider + "<color=#00FF00>" + Round(neg) + "/s</color>";
+        else return "<color=#FF0000>" + Round(pos) + "</color>" + divider + "<color=#00FF00>" + Round(neg) + "</color>";
+    }
+
     void Start()
     {
         MGR_game.mtx.OnReadyForVisualisation += InitIdeaBars;
     }
     void Update()
     {
+        viewIdea.CheckChange(ref prevViewIdea, () => {
+        
+            nodeViewer.SetActive(!viewIdea);
+            ideaViewer.SetActive(viewIdea);
+        
+        });
+        
         float a = GetComponent<CanvasGroup>().alpha;
         if (nodeIndex == -1)
         {
@@ -29,9 +54,17 @@ public class UI_nodeViewer : MonoBehaviour
         }
         else
         {
-            UpdateViewer();
             a = Mathf.MoveTowards(a, 1, Time.deltaTime / fadeLength);
             GetComponent<CanvasGroup>().blocksRaycasts = true;
+
+            if (viewIdea)
+            {
+                UpdateIdeaView();
+            }
+            else
+            {
+                UpdateNodeView();
+            }
         }
         GetComponent<CanvasGroup>().alpha = a;
     }
@@ -49,23 +82,11 @@ public class UI_nodeViewer : MonoBehaviour
         }
     }
 
-    void UpdateViewer()
+    void UpdateNodeView()
     {
-        float Round(float x)
-        {
-            int nearest = 100;
-            return Mathf.Round(x * nearest) / nearest;
-        }
-
-        string PosNegString(float pos, float neg, bool perSec = false, string divider = " / ")
-        {
-            if(perSec) return "<color=#FF0000>" + Round(pos) + "/s</color>" + divider + "<color=#00FF00>" + Round(neg) + "/s</color>";
-            else return "<color=#FF0000>" + Round(pos) + "</color>"+divider+"<color=#00FF00>" + Round(neg) + "</color>";
-        }
-
         MGR_mtx.NodeStats stats = MGR_game.mtx.nodeStats[nodeIndex];
         MGR_mtx.NodeStats dstats = MGR_game.mtx.nodeStatsDelta[nodeIndex];
-        texts.text = (
+        nodeStatsTexts.text = (
                         "Complexity: " + Round(stats.complexity) + 
                                   " (" + Round(dstats.complexity) + "/s)" +
 
@@ -94,6 +115,29 @@ public class UI_nodeViewer : MonoBehaviour
         UpdateIdeaBars();
     }
 
+    void UpdateIdeaView()
+    {
+        MGR_mtx.NodeStats xmplrStats = MGR_game.mtx.ideaExemplar[nodeIndex];
+        ideaStatsTexts.text = (
+                        "\n<b>EXEMPLAR STATS</b>\n" +
+                        "Complexity: " + Round(xmplrStats.complexity) +
+
+            "\nComplexity Tolerance: " + Round(xmplrStats.complexityTolerance.width) +
+
+                      "\nEnthusiasm: " + PosNegString(xmplrStats.enthusiasm.strengthPos, xmplrStats.enthusiasm.strengthNeg) +
+
+                           "\nReach: " + Round(xmplrStats.reach) +
+
+                  "\nSuggestibility: " + PosNegString(xmplrStats.suggestibility.strengthPos, xmplrStats.suggestibility.strengthNeg) +
+
+                       "\nAdherence: " + PosNegString(xmplrStats.adherence.strengthPos, xmplrStats.adherence.strengthNeg) +
+
+                    "\nExtroversion: " + Round(xmplrStats.extroversion) +
+
+                       "\nAvoidance: " + Round(xmplrStats.avoidance)
+            );
+    }
+
     void UpdateIdeaBars()
     {
         float maxAbsNI = 0;
@@ -103,7 +147,7 @@ public class UI_nodeViewer : MonoBehaviour
         {
             if (Mathf.Abs(NI[nodeIndex, i]) > Mathf.Abs(maxAbsNI))
             {
-                maxAbsNI = NI[nodeIndex, i];
+                maxAbsNI = Mathf.Abs(NI[nodeIndex, i]);
             }
         }
 

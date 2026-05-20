@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7114069883873563681}
   - component: {fileID: 5440183813710715898}
   - component: {fileID: -8725896965996951560}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: NodeIdea
   m_TagString: Untagged
   m_Icon: {fileID: 7866945982896999795, guid: 0000000000000000d000000000000000, type: 0}
@@ -109,7 +109,6 @@ MonoBehaviour:
   sr: {fileID: 5967507920949871521}
   dragging: 0
   hovered: 0
-  text: {fileID: 0}
 --- !u!50 &5440183813710715898
 Rigidbody2D:
   serializedVersion: 5

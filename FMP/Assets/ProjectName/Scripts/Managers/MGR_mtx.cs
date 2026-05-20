@@ -21,7 +21,28 @@ public class MGR_mtx : MonoBehaviour
     public float[,] IN;
     public float[,] II;
 
-	[Serializable]
+    [Header("Node Stats")]
+    public NodeStats nodeStatsMin;
+    public NodeStats nodeStatsMax;
+
+	[Header("Runtime & Refs")]
+    public int ideasCount;
+    public int nodesCount;
+	public event Action OnReadyForVisualisation;
+    public Dictionary<float[,], MtxStats> mtxStats;
+	float[,] nnDelta;
+    float[,] niDelta;
+    float[,] inNext;
+    float[,] iiNext;
+    public NodeStats[] nodeStats;
+	public NodeStats[] nodeStatsDelta;
+    public float[] ideaComplexity;
+    public MagicCurveParams[] ideaTolerance;
+    public NodeStats[] ideaExemplar;
+    #endregion
+
+    #region subclasses
+    [Serializable]
     public struct NodeStats
     {
         public float complexity;
@@ -56,27 +77,6 @@ public class MGR_mtx : MonoBehaviour
             avoidance = a.avoidance * b,
         };
     }
-    [Header("Node Stats")]
-    public NodeStats nodeStatsMin;
-    public NodeStats nodeStatsMax;
-
-	[Header("Runtime & Refs")]
-    public int ideasCount;
-    public int nodesCount;
-	public event Action OnReadyForVisualisation;
-    public Dictionary<float[,], MtxStats> mtxStats;
-	float[,] nnDelta;
-    float[,] niDelta;
-    float[,] inNext;
-    float[,] iiNext;
-    public NodeStats[] nodeStats;
-	public NodeStats[] nodeStatsDelta;
-    public float[] ideaComplexity;
-    public MagicCurveParams[] ideaTolerance;
-    public NodeStats[] ideaExemplar;
-    #endregion
-
-#region utilities
     [Serializable]
     public struct MagicCurveParams
     {
@@ -86,6 +86,35 @@ public class MGR_mtx : MonoBehaviour
         public float strengthPos;
         public float strengthNeg;
 
+        public float Eval(float xRaw)
+        {
+            float strength;
+            float threshold;
+            if (xRaw >= 0)
+            {
+                strength = strengthPos;
+                threshold = thresholdPos;
+            }
+            else
+            {
+                strength = strengthNeg;
+                threshold = thresholdNeg;
+            }
+
+            float x = Mathf.Abs(xRaw);
+            float x2 = x * x;
+
+            float curve = strength > 0 ? strength - strength * Mathf.Exp(-x / strength) : 0;
+            float activation = x < threshold ? -x2 / (2 * threshold * x - 2 * x2 - threshold * threshold) : 1;
+
+            float total = activation * curve * Mathf.Sign(xRaw);
+            if (!float.IsFinite(total))
+            {
+                Debug.LogWarning("caught NaN in magicCurve");
+                return 0;
+            }
+            return total;
+        }
         public static MagicCurveParams operator +(MagicCurveParams a, MagicCurveParams b) => new()
         {
             thresholdNeg = a.thresholdNeg + b.thresholdNeg,
@@ -124,6 +153,10 @@ public class MGR_mtx : MonoBehaviour
             steepness = a.steepness * b,
         };
     }
+    #endregion
+
+    #region utilities
+
     /// <summary>
     /// Parametric f(x) with an optional threshold and asymmetric shape. <a href="https://www.desmos.com/calculator/ygh3492ofo">See demo.</a>
     /// </summary>
@@ -131,35 +164,35 @@ public class MGR_mtx : MonoBehaviour
     /// <param name="activation">value of x where threshold is roughly fully open (0.99 hard coded).</param>
     /// <param name="steepness">Maximum gradient of threshold</param>
     /// <returns></returns>
-    float MagicCurve(float xRaw, MagicCurveParams param)
-    {
-        float strength;
-        float threshold;
-        if (xRaw >= 0)
-        {
-            strength = param.strengthPos;
-            threshold = param.thresholdPos;
-        }
-        else
-        {
-            strength = param.strengthNeg;
-            threshold = param.thresholdNeg;
-        }
+    //float MagicCurve(float xRaw, MagicCurveParams param)
+    //{
+    //    float strength;
+    //    float threshold;
+    //    if (xRaw >= 0)
+    //    {
+    //        strength = param.strengthPos;
+    //        threshold = param.thresholdPos;
+    //    }
+    //    else
+    //    {
+    //        strength = param.strengthNeg;
+    //        threshold = param.thresholdNeg;
+    //    }
         
-        float x = Mathf.Abs(xRaw);
-        float x2 = x * x;
+    //    float x = Mathf.Abs(xRaw);
+    //    float x2 = x * x;
 
-        float curve = strength > 0 ? strength - strength * Mathf.Exp(-x / strength) : 0;
-        float activation =  x < threshold ? -x2 / (2*threshold*x - 2*x2 - threshold*threshold) : 1;
+    //    float curve = strength > 0 ? strength - strength * Mathf.Exp(-x / strength) : 0;
+    //    float activation =  x < threshold ? -x2 / (2*threshold*x - 2*x2 - threshold*threshold) : 1;
 
-        float total = activation * curve * Mathf.Sign(xRaw);
-        if (!float.IsFinite(total))
-        {
-            Debug.LogWarning("caught NaN in magicCurve");
-            return 0;
-        }
-        return total;
-    }
+    //    float total = activation * curve * Mathf.Sign(xRaw);
+    //    if (!float.IsFinite(total))
+    //    {
+    //        Debug.LogWarning("caught NaN in magicCurve");
+    //        return 0;
+    //    }
+    //    return total;
+    //}
 
     float BumpCurve(float x, BumpCurveParams param)
     {
@@ -545,7 +578,7 @@ public class MGR_mtx : MonoBehaviour
 			(stat(ideaExemplar[x]) - stat(nodeStats[n])) * (stat(ideaExemplar[x]) - stat(nodeStats[n])) * NI[n, x]
 			);
 
-		return MagicCurve(social, nodeStats[n].suggestibility) + MagicCurve(ideological, nodeStats[n].adherence);
+		return nodeStats[n].suggestibility.Eval(social) + nodeStats[n].adherence.Eval(ideological);
 	}
 
 	void CalcDeltaStats(int n)
@@ -588,14 +621,14 @@ public class MGR_mtx : MonoBehaviour
     float CalcDeltaNI(int n, int i)
     {
         float social = ManualSum(n, nodesCount, x =>
-            MagicCurve(NI[x, i], nodeStats[x].enthusiasm) * NN[n, x]
+            nodeStats[x].enthusiasm.Eval(NI[x, i]) * NN[n, x]
             );
         float ideological = ManualSum(i, ideasCount, x =>
             II[x, i] * NI[n, x]
             );
         float complexity = BumpCurve(ideaComplexity[i] - nodeStats[n].complexity, nodeStats[n].complexityTolerance);
 
-        return MagicCurve(social, nodeStats[n].suggestibility) + MagicCurve(ideological, nodeStats[n].adherence) * complexity;
+        return nodeStats[n].suggestibility.Eval(social) + nodeStats[n].adherence.Eval(ideological) * complexity;
     }
 
     float CalcDeltaNN(int n, int m)
@@ -618,7 +651,7 @@ public class MGR_mtx : MonoBehaviour
 
 
         float decay = - dScaled * dScaled * Mathf.Sign(NN[n, m]);
-        return MagicCurve(social, nodeStats[n].suggestibility) * MagicCurve(ideological, nodeStats[n].adherence) + decay;
+        return nodeStats[n].suggestibility.Eval(social) * nodeStats[n].adherence.Eval(ideological) + decay;
     }
 
 	void UpdateMtxStats()

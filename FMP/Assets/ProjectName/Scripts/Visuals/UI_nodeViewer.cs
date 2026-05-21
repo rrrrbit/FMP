@@ -119,6 +119,7 @@ public class UI_nodeViewer : MonoBehaviour
     {
         MGR_mtx.NodeStats xmplrStats = MGR_game.mtx.ideaExemplar[nodeIndex];
         ideaStatsTexts.text = (
+            "\n"+
                         "\n<b>EXEMPLAR STATS</b>\n" +
                         "Complexity: " + Round(xmplrStats.complexity) +
 

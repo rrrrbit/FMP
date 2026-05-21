@@ -39,7 +39,7 @@ public class MGR_mtx : MonoBehaviour
     public NodeStats[] nodeStats;
 	public NodeStats[] nodeStatsDelta;
     public float[] ideaComplexity;
-    public MagicCurveParams[] ideaTolerance;
+    public BumpCurve[] ideaTolerance;
     public NodeStats[] ideaExemplar;
     #endregion
 
@@ -49,11 +49,11 @@ public class MGR_mtx : MonoBehaviour
     public struct NodeStats
     {
         public float complexity;
-        public BumpCurveParams complexityTolerance;
-        public MagicCurveParams enthusiasm;
+        public BumpCurve complexityTolerance;
+        public MagicCurve enthusiasm;
         public float reach;
-        public MagicCurveParams suggestibility; // rename conformity...?
-        public MagicCurveParams adherence;
+        public MagicCurve suggestibility; // rename conformity...?
+        public MagicCurve adherence;
         public float extroversion;
         public float avoidance;
 
@@ -85,7 +85,7 @@ public class MGR_mtx : MonoBehaviour
     /// <summary>
     /// Parametric f(x) with an optional threshold and asymmetric shape. <a href="https://www.desmos.com/calculator/ygh3492ofo">See demo.</a>
     /// </summary>
-    public struct MagicCurveParams
+    public struct MagicCurve
     {
         public float thresholdPos;
         public float thresholdNeg;
@@ -93,14 +93,14 @@ public class MGR_mtx : MonoBehaviour
         public float strengthPos;
         public float strengthNeg;
 
-        public static MagicCurveParams operator +(MagicCurveParams a, MagicCurveParams b) => new()
+        public static MagicCurve operator +(MagicCurve a, MagicCurve b) => new()
         {
             thresholdNeg = a.thresholdNeg + b.thresholdNeg,
             thresholdPos = a.thresholdPos + b.thresholdPos,
             strengthNeg = a.strengthNeg + b.strengthNeg,
             strengthPos = a.strengthPos + b.strengthPos,
         };
-        public static MagicCurveParams operator *(MagicCurveParams a, float b) => new()
+        public static MagicCurve operator *(MagicCurve a, float b) => new()
         {
             thresholdPos = a.thresholdPos * b,
             thresholdNeg = a.thresholdNeg * b,
@@ -139,30 +139,25 @@ public class MGR_mtx : MonoBehaviour
         }
     }
     [Serializable]
-    public struct BumpCurveParams
+    public struct BumpCurve
     {
         public float center;
-        public float peak;
         public float width;
-        public float steepness;
-        public static BumpCurveParams operator +(BumpCurveParams a, BumpCurveParams b) => new()
+        public static BumpCurve operator +(BumpCurve a, BumpCurve b) => new()
         {
             center = a.center + b.center,
-            peak = a.peak + b.peak,
             width = a.width + b.width,
-            steepness = a.steepness + b.steepness,
         };
-        public static BumpCurveParams operator *(BumpCurveParams a, float b) => new()
+        public static BumpCurve operator *(BumpCurve a, float b) => new()
         {
             center = a.center * b,
-            peak = a.peak * b,
             width = a.width * b,
-            steepness = a.steepness * b,
         };
 
         public float Eval(float x)
         {
-            float total = peak * Mathf.Exp(-Mathf.Pow(Mathf.Abs((x - center) / width), steepness));
+            float xp = (x - center) / width;
+            float total = Mathf.Exp(-xp*xp);
             if (!float.IsFinite(total))
             {
                 Debug.LogWarning("caught NaN in bumpCurve");
@@ -192,9 +187,9 @@ public class MGR_mtx : MonoBehaviour
         return accm;
     }
 
-    MagicCurveParams RandomMagicCurve(MagicCurveParams min, MagicCurveParams max)
+    MagicCurve RandomMagicCurve(MagicCurve min, MagicCurve max)
     {
-        return new MagicCurveParams()
+        return new MagicCurve()
         {
             thresholdPos = UnityEngine.Random.Range(min.thresholdPos, max.thresholdPos),
             strengthPos = UnityEngine.Random.Range(min.strengthPos, max.strengthPos),
@@ -204,14 +199,12 @@ public class MGR_mtx : MonoBehaviour
         };
     }
 
-    BumpCurveParams RandomBumpCurve(BumpCurveParams min, BumpCurveParams max)
+    BumpCurve RandomBumpCurve(BumpCurve min, BumpCurve max)
     {
-        return new BumpCurveParams()
+        return new BumpCurve()
         {
             center = UnityEngine.Random.Range(min.center, max.center),
-            peak = UnityEngine.Random.Range(min.peak, max.peak),
             width = UnityEngine.Random.Range(min.width, max.width),
-            steepness = UnityEngine.Random.Range(min.steepness, max.steepness),
         };
     }
     #endregion
@@ -243,17 +236,17 @@ public class MGR_mtx : MonoBehaviour
         }
     }
 
-    void InitMagicCurves(ref MagicCurveParams[] x, int length, MagicCurveParams min, MagicCurveParams max)
+    void InitMagicCurves(ref MagicCurve[] x, int length, MagicCurve min, MagicCurve max)
     {
-        x = new MagicCurveParams[length];
+        x = new MagicCurve[length];
         for (int i = 0; i < length; i++)
         {
             x[i] = RandomMagicCurve(min,max);
         }
     }
-    void InitBumpCurves(ref BumpCurveParams[] x, int length, BumpCurveParams min, BumpCurveParams max)
+    void InitBumpCurves(ref BumpCurve[] x, int length, BumpCurve min, BumpCurve max)
     {
-        x = new BumpCurveParams[length];
+        x = new BumpCurve[length];
         for (int i = 0; i < length; i++)
         {
             x[i] = RandomBumpCurve(min,max);
@@ -281,7 +274,7 @@ public class MGR_mtx : MonoBehaviour
     void InitStats()
     {
         #region default curves
-        MagicCurveParams minMagicCurve = new()
+        MagicCurve minMagicCurve = new()
         {
             thresholdPos = 2,
             thresholdNeg = 2,
@@ -289,7 +282,7 @@ public class MGR_mtx : MonoBehaviour
             strengthPos = 0.1f,
             strengthNeg = 0.1f,
         };
-        MagicCurveParams maxMagicCurve = new()
+        MagicCurve maxMagicCurve = new()
         {
             thresholdPos = 10,
             thresholdNeg = 10,
@@ -298,7 +291,7 @@ public class MGR_mtx : MonoBehaviour
             strengthNeg = 2,
         };
 
-        MagicCurveParams socDecMinCurve = new()
+        MagicCurve socDecMinCurve = new()
         {
             thresholdPos = 5,
             thresholdNeg = 5,
@@ -306,7 +299,7 @@ public class MGR_mtx : MonoBehaviour
             strengthPos = .5f,
             strengthNeg = .5f,
         };
-        MagicCurveParams socDecMaxCurve = new()
+        MagicCurve socDecMaxCurve = new()
         {
             thresholdPos = 20,
             thresholdNeg = 20,
@@ -315,19 +308,15 @@ public class MGR_mtx : MonoBehaviour
             strengthNeg = 2,
         };
 
-        BumpCurveParams minBumpCurve = new()
+        BumpCurve minBumpCurve = new()
         {
             center = -1,
-            peak = 1,
             width = 1,
-            steepness = 2,
         };
-        BumpCurveParams maxBumpCurve = new()
+        BumpCurve maxBumpCurve = new()
         {
             center = 1,
-            peak = 1.5f,
             width = 3,
-            steepness = 5,
         };
         #endregion
 
@@ -351,7 +340,7 @@ public class MGR_mtx : MonoBehaviour
 
         // idea stats
         InitFloatArr(ref ideaComplexity, startingNumberIdeas, .5f, 1);
-        InitMagicCurves(ref ideaTolerance, startingNumberIdeas, minMagicCurve, maxMagicCurve);
+        InitBumpCurves(ref ideaTolerance, startingNumberIdeas, minBumpCurve, maxBumpCurve);
 
         ideaExemplar = new NodeStats[ideasCount];
         for (int i = 0; i < ideasCount; i++)
@@ -499,9 +488,9 @@ public class MGR_mtx : MonoBehaviour
     NodeStats ClampStats(NodeStats stats, NodeStats min, NodeStats max)
     {
         float ClampFloatStat(Func<NodeStats, float> stat) => Mathf.Clamp(stat(stats), stat(min), stat(max));
-        MagicCurveParams ClampMagicCurveStat(Func<NodeStats, MagicCurveParams> stat)
+        MagicCurve ClampMagicCurveStat(Func<NodeStats, MagicCurve> stat)
         {
-            float ClampMagicCurveParam(Func<MagicCurveParams, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
+            float ClampMagicCurveParam(Func<MagicCurve, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
             return new()
             {
                 thresholdNeg = ClampMagicCurveParam(x => x.thresholdNeg),
@@ -511,15 +500,13 @@ public class MGR_mtx : MonoBehaviour
             };
         }
 
-        BumpCurveParams ClampBumpCurveStat(Func<NodeStats, BumpCurveParams> stat)
+        BumpCurve ClampBumpCurveStat(Func<NodeStats, BumpCurve> stat)
         {
-            float ClampBumpCurveParam(Func<BumpCurveParams, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
+            float ClampBumpCurveParam(Func<BumpCurve, float> param) => Mathf.Clamp(param(stat(stats)), param(stat(min)), param(stat(max)));
             return new()
             {
                 center = ClampBumpCurveParam(x => x.center),
-                peak = ClampBumpCurveParam(x => x.peak),
                 width = ClampBumpCurveParam(x => x.width),
-                steepness = ClampBumpCurveParam(x => x.steepness),
             };
         }
         
@@ -555,10 +542,8 @@ public class MGR_mtx : MonoBehaviour
 	{
 		nodeStatsDelta[n].complexity = CalcDeltaStat(n, x => x.complexity);
 
-		nodeStatsDelta[n].complexityTolerance.steepness = CalcDeltaStat(n, x => x.complexityTolerance.steepness);
 		nodeStatsDelta[n].complexityTolerance.width = CalcDeltaStat(n, x => x.complexityTolerance.width);
 		nodeStatsDelta[n].complexityTolerance.center = CalcDeltaStat(n, x => x.complexityTolerance.center);
-		nodeStatsDelta[n].complexityTolerance.peak =	CalcDeltaStat(n, x => x.complexityTolerance.peak);
 
         nodeStatsDelta[n].enthusiasm.thresholdNeg = CalcDeltaStat(n, x => x.enthusiasm.thresholdNeg);
         nodeStatsDelta[n].enthusiasm.thresholdPos = CalcDeltaStat(n, x => x.enthusiasm.thresholdPos);
